@@ -9,6 +9,6 @@
 
 <script setup>
 useHead({
-  titleTemplate: "%s | WiseUtils"
+  titleTemplate: "%s | Samby"
 });
 </script>
