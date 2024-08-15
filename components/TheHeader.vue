@@ -3,7 +3,8 @@
     <nav>
       <div class="w-full max-w-screen flex justify-between items-center mx-auto py-[1.429rem] pt-0">
         <NuxtLink to="/" class="flex items-center space-x-3 rtl:space-x-reverse hover:bg-transparent no-hover">
-          <img src="/img/new-logo.png" class="w-24" width="94" height="74" alt="PayTrackr Logo" />
+          <PhXLogoDuotone class="w-[100px] h-auto" />
+          <!-- <img src="/img/new-logo.png" class="w-24" width="94" height="74" alt="PayTrackr Logo" /> -->
         </NuxtLink>
         <div class="relative" v-if="user">
           <button class="text-sm p-0 rounded-full no-button" @click="switchMenu">
