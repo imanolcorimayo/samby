@@ -1,32 +1,14 @@
 <template>
-  <div class="w-full min-h-screen">
+  <div class="w-full min-h-screen flex flex-col justify-between">
     <TheHeader />
-    <div class="flex flex-col gap-[3rem] py-[2rem] max-w-[80rem] m-auto px-[1.429rem]">
-      <div class="flex flex-row justify-between w-full max-w-[40rem] mx-auto">
-        <NuxtLink
-          class="text-[1.143rem] p-[0.571rem] rounded-[0.214rem] text-center bg-white text-black hover:bg-secondary hover:text-white hover:font-semibold shadow-md"
-          :class="{ selected: route.path == '/recurrent' }" to="/recurrent">
-          Recurrent
-        </NuxtLink>
-        <NuxtLink
-          class="text-[1.143rem] p-[0.571rem] rounded-[0.214rem] text-center bg-white text-black hover:bg-secondary hover:text-white hover:font-semibold"
-          :class="{ selected: route.path == '/one-time' }" to="/one-time">One Time</NuxtLink>
-        <NuxtLink
-          class="text-[1.143rem] p-[0.571rem] rounded-[0.214rem] text-center bg-white text-black hover:bg-secondary hover:text-white hover:font-semibold"
-          :class="{ selected: route.path == '/summary' }" to="/summary">Summary</NuxtLink>
-      </div>
-      <main class="h-full">
-        <slot @totals="updateTotals" />
-      </main>
-    </div>
+    <main class="flex-1 flex px-[1.429rem] max-w-[80rem] mx-auto w-full">
+      <slot @totals="updateTotals" />
+    </main>
     <TheFooter />
   </div>
 </template>
 
 <script setup>
-import WpfPaid from '~icons/wpf/paid';
-import MaterialSymbolsPaidRounded from '~icons/material-symbols/paid-rounded';
-import HugeiconsSummationCircle from '~icons/hugeicons/summation-circle';
 
 const user = useCurrentUser();
 const route = useRoute();

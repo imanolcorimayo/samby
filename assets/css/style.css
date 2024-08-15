@@ -50,24 +50,6 @@ body, #__nuxt {
 
 #__nuxt {
     overflow: hidden;
-    margin-left: auto;
-    padding-top: 1.429rem;
-}
-
-h1 {
-    font-weight: bold;
-    font-size: 24px;
-    text-align: center;
-}
-
-.btn-primary, .form-input {
-    height: 48px;
-    box-shadow: none;
-    outline: none;
-    padding-left: 12px;
-    padding-right: 12px;
-    border-radius: 6px;
-    font-size: 1rem;
 }
 
 input:disabled {
@@ -106,27 +88,10 @@ textarea, select {
 
 .btn {
     cursor: pointer;
-    background-color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-    color: white;
     font-weight: 500;
     outline: none;
-    border-radius: 6px;
-    padding: 0.286rem;
-}
-
-h2 {
-    font-size: 20px;
-}
-
-.done {
-    text-decoration: line-through;
-}
-
-h4 {
-    text-align: center;
-    opacity: 0.5;
-    margin: 0;
+    border-radius: 0.428rem;
+    padding: 0.714rem;
 }
 
 .vc-container {
