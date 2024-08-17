@@ -6,10 +6,12 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "deploy": "nuxt generate && firebase deploy",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@formkit/nuxt": "^1.6.5",
     "@pinia/nuxt": "^0.5.3",
     "@vueuse/nuxt": "^10.11.1",
     "firebase": "^10.12.5",

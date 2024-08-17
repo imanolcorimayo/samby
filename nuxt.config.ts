@@ -26,8 +26,13 @@ export default defineNuxtConfig({
     "nuxt-vuefire",
     "@pinia/nuxt",
     // "@vite-pwa/nuxt",
-    "unplugin-icons/nuxt"
+    "unplugin-icons/nuxt",
+    '@formkit/nuxt'
   ],
+
+  formkit: {
+    autoImport: true
+  },
 
   vuefire: {
     // ensures the auth module is enabled
