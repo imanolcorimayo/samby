@@ -2,14 +2,13 @@
   <FormKit
     type="form"
     id="ventas-nuevo"
-    :form-class="`flex flex-col gap-[1rem] w-full ${submitted ? 'hidden' : ''}`"
-    submit-label="Register"
+    :form-class="`flex flex-col gap-4 w-full ${submitted ? 'hidden' : ''}`"
+    submit-label="Nueva Venta"
     @submit="submitHandler"
     :actions="false"
-    #default="{ value }"
   >
     <div class="flex flex-col gap-0">
-      <h1 class="text-2xl font-bold">Nueva venta</h1>
+      <h1 class="text-start">Nueva venta</h1>
       <p class="text-gray-600">Mensaje de aclaracion</p>
     </div>
     <FormKit
@@ -29,9 +28,9 @@
       label-class="font-medium"
       messages-class="text-red-500 text-[0.75rem]"
       input-class="w-full"
-      label="Detalles de la venta"
+      label="Detalles de la venta (opcional)"
       placeholder="Ej: ...reparto a domicilio, etc."
-      validation="required|length:4"
+      validation="length:4"
       v-model="form.description"
     />
     <FormKit
