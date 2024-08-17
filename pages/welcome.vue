@@ -9,7 +9,7 @@
       </div>
       <div class="flex flex-col justify-center gap-[0.571rem] text-center">
         <h1>Bienvenido a Samby! 😎</h1>
-        <span class="text-gray-600 text-[16px]">Inicia sesion para ver detalles de tu negocio</span>
+        <span class="text-gray-600 text-[1.143rem]">Inicia sesion para ver detalles de tu negocio</span>
       </div>
       <div class="flex flex-col items-center">
         <button class="w-full max-w-80 btn bg-primary text-white" @click="googleSignIn">

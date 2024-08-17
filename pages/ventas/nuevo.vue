@@ -64,7 +64,7 @@
       <span class="text-[2rem] font-semibold">¡Venta Cargada!</span>
     </div>
     <div class="flex flex-col gap-4">
-      <span class="text-[16px] text-gray-600 text-center">Tu venta se proceso correctamente</span>
+      <span class="text-[1.143rem] text-gray-600 text-center">Tu venta se proceso correctamente</span>
       <div class="flex flex-col gap-3">
         <button @click="submitted = false" class="btn bg-primary text-white">Agregar Nuevo</button>
         <NuxtLink to="/" class="btn bg-secondary w-full text-center ring-1 ring-gray-300">Menu</NuxtLink>
