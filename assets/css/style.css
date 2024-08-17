@@ -30,6 +30,22 @@ body {
   color: black;
 }
 
+h1 {
+  font-weight: bold;
+  font-size: 24px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h4 {
+  text-align: center;
+  opacity: 0.5;
+  margin: 0;
+}
+
 body.modal-opened {
   overflow: hidden;
 }

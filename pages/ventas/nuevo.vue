@@ -56,7 +56,8 @@
       validation="required"
       v-model="form.date"
     />
-    <FormKit type="submit" label="Agregar" outer-class="btn bg-primary text-white text-center" />
+    <div v-if="submitting" class="btn bg-primary text-white text-center">loading...</div>
+    <FormKit v-else type="submit" label="Agregar" outer-class="btn bg-primary text-white text-center" />
   </FormKit>
   <div v-if="submitted" class="w-full flex flex-col gap-[2rem] flex-1 min-h-full justify-center">
     <div class="flex flex-col items-center gap-[1rem]">
@@ -80,6 +81,7 @@ import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 
 // ----- Define Vars -------
 const submitted = ref(false);
+const submitting = ref(false);
 const form = ref({
   sellName: "",
   description: "",
@@ -89,6 +91,13 @@ const form = ref({
 
 // ----- Define Methods -------
 async function submitHandler() {
+  // If submitting, return
+  if (submitting.value) return;
+
+  // Set submitting to avoid having multiple requests
+  submitting.value = true;
+
+  // Get Firestore and Current User
   const db = useFirestore();
   const user = useCurrentUser();
 
@@ -110,6 +119,7 @@ async function submitHandler() {
   };
 
   submitted.value = true;
+  submitting.value = false;
 }
 
 useHead({
