@@ -72,6 +72,7 @@
       </div>
     </div>
   </div>
+  <Loader v-if="submitting" />
 </template>
 
 <script setup>

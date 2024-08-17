@@ -85,6 +85,7 @@
       </div>
     </div>
   </div>
+  <Loader v-if="submitting" />
 </template>
 
 <script setup>
@@ -92,7 +93,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 
 // ----- Define Vars -------
-const submitted = ref(true);
+const submitted = ref(false);
 const submitting = ref(false);
 const form = ref({
   productName: "",
@@ -137,6 +138,6 @@ async function submitHandler() {
 }
 
 useHead({
-  title: "Nueva venta"
+  title: "Nueva producto"
 });
 </script>
