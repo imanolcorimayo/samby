@@ -8,21 +8,48 @@
         </NuxtLink>
         <div class="relative">
           <button class="text-sm p-0 rounded-full no-button" @click="switchMenu">
-            <img class="w-14 h-14 rounded-full" :src="user?.photoURL" :alt="`${user?.displayName}'s photo`" width="90"
-              height="90">
+            <img
+              class="w-14 h-14 rounded-full"
+              :src="user?.photoURL"
+              :alt="`${user?.displayName}'s photo`"
+              width="90"
+              height="90"
+            />
           </button>
           <!-- Dropdown menu -->
-          <div class="z-50 my-4 text-base list-none divide-y rounded-lg shadow bg-gray-800 absolute top-12 right-0"
-            v-if="showMenu" ref="dropdownMenu">
-            <div class="px-4 py-3">
-              <span class="block text-sm text-gray-900 dark:text-white min-w-60">{{ user?.displayName }}</span>
-              <span class="block text-sm  text-gray-500 truncate dark:text-gray-400">{{ user?.email }}</span>
+          <div
+            class="z-50 my-4 text-dark list-none divide-y rounded-lg shadow bg-secondary absolute top-12 right-0"
+            v-if="showMenu"
+            ref="dropdownMenu"
+          >
+            <div class="px-4 py-3 bg-gray-200">
+              <span class="block text-sm min-w-60">{{ user?.displayName }}</span>
+              <span class="block text-sm truncate">{{ user?.email }}</span>
             </div>
-            <ul class="py-2">
+            <ul>
               <li @click="switchMenu">
-                <button @click="signOut"
-                  class="w-full block px-4 py-2 text-start text-sm text-gray-700 text-white hover:bg-base-transparent hover:text-black">Sign
-                  Out</button>
+                <NuxtLink
+                  to="/ventas"
+                  class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
+                  :class="{ selected: route.path === '/ventas' }"
+                  >Pagina principal</NuxtLink
+                >
+              </li>
+              <li @click="switchMenu">
+                <NuxtLink
+                  to="/productos"
+                  class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
+                  :class="{ selected: route.path === '/productos' }"
+                  >Productos</NuxtLink
+                >
+              </li>
+              <li @click="switchMenu">
+                <button
+                  @click="signOut"
+                  class="w-full block px-4 py-2 text-start text-sm border-t hover:bg-primary-transparent hover:text-black"
+                >
+                  Sign Out
+                </button>
               </li>
             </ul>
           </div>
@@ -34,10 +61,10 @@
 
 <script setup>
 // TODO: Replace for logo
-import PhXLogoDuotone from '~icons/ph/x-logo-duotone';
+import PhXLogoDuotone from "~icons/ph/x-logo-duotone";
 
 // ----- Define Useful Properties ---------
-const auth = useFirebaseAuth()
+const auth = useFirebaseAuth();
 const user = await getCurrentUser();
 const route = useRoute();
 
@@ -45,12 +72,12 @@ const route = useRoute();
 const indexStore = useIndexStore();
 
 // ---- Define Vars --------
-const showMenu = ref(false)
-const dropdownMenu = ref(null)
-onClickOutside(dropdownMenu, event => switchMenu())
+const showMenu = ref(false);
+const dropdownMenu = ref(null);
+onClickOutside(dropdownMenu, (event) => switchMenu());
 // ---- Define Methods --------
 function switchMenu() {
-  showMenu.value = !showMenu.value
+  showMenu.value = !showMenu.value;
 }
 
 async function signOut() {
@@ -70,9 +97,8 @@ async function signOut() {
 
 <style scoped>
 .selected {
-  background-color: #a0a4d9;
-  border: 1px solid #a0a4d9;
-  color: #1f2023;
+  background-color: var(--primary-color);
+  color: white;
   font-weight: bold;
   outline: none;
 }

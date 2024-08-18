@@ -139,8 +139,8 @@ input[type="email"],
 input[type="password"],
 input[type="number"],
 input[type="date"],
+select,
 textarea {
-  border: 2px solid rgba(255, 255, 255, 0.35);
   border-radius: 0.428rem;
   padding: 0.714rem;
   font-size: 1rem;

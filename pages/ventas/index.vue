@@ -8,7 +8,7 @@
           ><IcRoundPlus class="text-[1.143rem]" /> Nueva venta
         </NuxtLink>
       </div>
-      <div class="flex flex-col gap-[0.571rem]" v-if="areSellsFetched">
+      <div class="flex flex-col gap-[0.571rem]" v-if="sells.length">
         <div
           class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow"
           v-for="(sell, index) in sells"
@@ -26,7 +26,8 @@
           </div>
         </div>
       </div>
-      <div class="flex" v-else>Cargando ventas...</div>
+      <div class="flex" v-else-if="!areSellsFetched">Cargando ventas...</div>
+      <div class="flex" v-else>No se encontraron ventas</div>
     </div>
   </div>
 </template>
