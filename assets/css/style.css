@@ -141,6 +141,7 @@ input[type="number"],
 input[type="date"],
 select,
 textarea {
+  border: 1px solid #ccc;
   border-radius: 0.428rem;
   padding: 0.714rem;
   font-size: 1rem;

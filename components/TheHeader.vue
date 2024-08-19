@@ -32,7 +32,7 @@
                   to="/ventas"
                   class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
                   :class="{ selected: route.path === '/ventas' }"
-                  >Pagina principal</NuxtLink
+                  >Ventas</NuxtLink
                 >
               </li>
               <li @click="switchMenu">
@@ -41,6 +41,14 @@
                   class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
                   :class="{ selected: route.path === '/productos' }"
                   >Productos</NuxtLink
+                >
+              </li>
+              <li @click="switchMenu">
+                <NuxtLink
+                  to="/dashboard"
+                  class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
+                  :class="{ selected: route.path === '/dashboard' }"
+                  >Resumen</NuxtLink
                 >
               </li>
               <li @click="switchMenu">

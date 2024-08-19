@@ -5,26 +5,30 @@
       <p class="text-gray-600">Clickea el producto y agrega tu venta</p>
     </div>
     <div
-      class="flex flex-col gap-[0.571rem] bg-secondary rounded-[0.428rem] shadow"
+      class="flex flex-col bg-secondary shadow overflow-hidden"
       v-for="(product, index) in products"
+      :class="{
+        'border border-primary rounded-[0.857rem]': selectedProduct[product.id],
+        'rounded-[0.428rem]': !selectedProduct[product.id]
+      }"
       :key="index"
     >
       <div
         :class="{ 'border-b': selectedProduct[product.id] }"
-        class="flex flex-col gap-1 p-[0.714rem] cursor-pointer"
+        class="flex flex-col p-[0.714rem] cursor-pointer"
         @click="selectProduct(product.id)"
       >
         <span class="font-semibold">{{ product.productName }}</span>
         <span class="text-gray-500">Unidad: {{ product.unit }}</span>
       </div>
       <Transition>
-        <div class="flex justify-between p-[0.714rem]" v-if="selectedProduct[product.id]">
+        <div class="flex justify-between p-[0.714rem] bg-gray-200" v-if="selectedProduct[product.id]">
           <FormKit
             type="form"
             id="ventas-nuevo"
             :form-class="'flex flex-col gap-4 w-full'"
             submit-label="Nueva Venta"
-            @submit="() => submitHandler(product.id)"
+            @submit="() => submitHandler(product.id, product.productName)"
             :actions="false"
           >
             <FormKit
@@ -44,7 +48,7 @@
               label-class="font-medium"
               messages-class="text-red-500 text-[0.75rem]"
               input-class="w-full"
-              label="Precio de venta"
+              label="Precio de venta por unidad"
               placeholder="$$$"
               validation="required"
               v-model="form.sellingPrice"
@@ -55,7 +59,7 @@
               label-class="font-medium"
               messages-class="text-red-500 text-[0.75rem]"
               input-class="w-full"
-              label="Precio de compra"
+              label="Precio de compra por unidad"
               placeholder="$$$"
               validation="required"
               v-model="form.buyingPrice"

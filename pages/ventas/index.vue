@@ -15,15 +15,32 @@
           :key="index"
         >
           <div class="flex justify-between">
-            <div class="flex flex-col gap-[0]">
-              <span class="font-semibold">{{ sell.sellName }}</span>
-              <span>{{ sell.description }}</span>
+            <span class="font-semibold text-[1.143rem]">{{ sell.product.name }}</span>
+            <span class="font-medium text-[1.143rem]">{{ formatPrice(sell.sellingPrice * sell.quantity) }}</span>
+          </div>
+          <div class="flex flex-col gap-0">
+            <div class="flex justify-between">
+              <span class="font-semibold">Precio de venta: </span>
+              <span>{{ formatPrice(sell.sellingPrice) }}</span>
             </div>
-            <span class="font-medium text-[1.143rem]">{{ formatPrice(sell.price) }}</span>
+            <div class="flex justify-between">
+              <span class="font-semibold">Precio de compra: </span>
+              <span>{{ formatPrice(sell.buyingPrice) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold">Cantidad: </span>
+              <span>{{ sell.quantity }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold">Ganancia: </span>
+              <span
+                >{{ formatPrice((sell.sellingPrice - sell.buyingPrice) * sell.quantity) }} ({{
+                  (((sell.sellingPrice - sell.buyingPrice) * 100) / sell.buyingPrice).toFixed(1)
+                }}%)</span
+              >
+            </div>
           </div>
-          <div class="flex justify-between">
-            <span class="">Fecha: {{ sell.date }}</span>
-          </div>
+          <span class="">Fecha: {{ sell.date }}</span>
         </div>
       </div>
       <div class="flex" v-else-if="!areSellsFetched">Cargando ventas...</div>
@@ -37,6 +54,8 @@ import IcRoundPlus from "~icons/ic/round-plus";
 // ----- Define Pinia Vars --------
 const sellsStore = useSellsStore();
 const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
+
+console.log("sells: ", sells.value);
 
 // Function will manage if the data is already fetched
 sellsStore.fetchData();
