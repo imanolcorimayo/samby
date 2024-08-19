@@ -68,6 +68,9 @@ export const useSellsStore = defineStore("sells", {
 
       this.$state.fetched = true;
       this.$state.sells = sells;
+    },
+    async addSell(sell: any) {
+      this.$state.sells.push(sell);
     }
   }
 });

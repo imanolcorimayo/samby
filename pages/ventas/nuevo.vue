@@ -104,6 +104,7 @@ const form = ref({
 
 // ----- Define Pinia Vars --------
 const productsStore = useProductsStore();
+const sellsStore = useSellsStore();
 const { products, areProductsFetched } = storeToRefs(productsStore);
 
 // Function will manage if the data is already fetched
@@ -124,8 +125,7 @@ async function submitHandler(productId, productName) {
   const db = useFirestore();
   const user = useCurrentUser();
 
-  // Handle recurrent payments
-  const newSell = await addDoc(collection(db, "venta"), {
+  const sellObject = {
     ...form.value,
     product: {
       id: productId,
@@ -133,7 +133,10 @@ async function submitHandler(productId, productName) {
     },
     createdAt: serverTimestamp(),
     userUid: user.value.uid
-  });
+  };
+
+  // Handle recurrent payments
+  const newSell = await addDoc(collection(db, "venta"), sellObject);
 
   // the way to access to the sell id if needed: newSell.id;
 
@@ -151,6 +154,14 @@ async function submitHandler(productId, productName) {
   Object.keys(selectedProduct.value).forEach((key) => {
     selectedProduct.value[key] = false;
   });
+
+  // Add sell to the store
+  sellsStore.addSell({
+    id: newSell.id,
+    ...sellObject
+  });
+
+  useToast("success", "Venta agregada correctamente");
 }
 
 function selectProduct(id) {
