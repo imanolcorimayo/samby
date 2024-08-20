@@ -15,7 +15,11 @@
           :key="index"
         >
           <div class="flex justify-between">
-            <span class="font-semibold text-[1.143rem]">{{ sell.product?.productName }}</span>
+            <div class="flex flex-col">
+              <span class="font-semibold text-[1.143rem]">{{ sell.product?.productName }}</span>
+              <span class="text-xs text-gray-500">Venta id: {{ sell.id }}</span>
+              <span class="text-xs text-gray-500">Producto id: {{ sell.product?.id }}</span>
+            </div>
             <span class="font-medium text-[1.143rem]">{{ formatPrice(sell.sellingPrice * sell.quantity) }}</span>
           </div>
           <div class="flex flex-col gap-0">
