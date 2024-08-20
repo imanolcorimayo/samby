@@ -22,6 +22,6 @@ import TablerPlus from "~icons/tabler/plus";
 import BxLogIn from "~icons/bx/log-in";
 
 useHead({
-  title: "Actions Page"
+  title: "Pagina Principal"
 });
 </script>

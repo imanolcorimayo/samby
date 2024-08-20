@@ -49,11 +49,17 @@ export const useSellsStore = defineStore("sells", {
       const currentMonthStart = $dayjs().startOf("month");
       const currentMonthEnd = $dayjs().endOf("month");
 
+      // collection based on user
+      let collectionName = "venta";
+      if (user.value.email === "imanolcorimayo@gmail.com") {
+        collectionName = "ventaTest";
+      }
+
       // Connect with firebase and get payments structure
       const db = useFirestore();
       const querySnapshot = await getDocs(
         query(
-          collection(db, "venta"),
+          collection(db, collectionName),
           where("createdAt", ">=", currentMonthStart.toDate()),
           where("createdAt", "<=", currentMonthEnd.toDate())
         )
