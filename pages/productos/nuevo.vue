@@ -36,7 +36,7 @@
     <FormKit
       type="select"
       name="product_quantity"
-      :options="['Kg', 'Unitario', 'Docena', 'Cajon', 'Gramo', 'Litro']"
+      :options="['Kg', 'Unitario', 'Bolsa', 'Cajon', 'Gramo', 'Litro', 'Docena']"
       label-class="font-medium"
       messages-class="text-red-500 text-[0.75rem]"
       input-class="w-full"

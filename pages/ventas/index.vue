@@ -15,7 +15,7 @@
           :key="index"
         >
           <div class="flex justify-between">
-            <span class="font-semibold text-[1.143rem]">{{ sell.product.productName }}</span>
+            <span class="font-semibold text-[1.143rem]">{{ sell.product?.productName }}</span>
             <span class="font-medium text-[1.143rem]">{{ formatPrice(sell.sellingPrice * sell.quantity) }}</span>
           </div>
           <div class="flex flex-col gap-0">
@@ -28,7 +28,7 @@
               <span>{{ formatPrice(sell.buyingPrice) }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="font-semibold">Cantidad ({{ sell.product.unit }}): </span>
+              <span class="font-semibold">Cantidad ({{ sell.product?.unit }}): </span>
               <span>{{ sell.quantity }}</span>
             </div>
             <div class="flex justify-between">
@@ -65,6 +65,13 @@ sellsStore.fetchData();
 // ----- Define Computed -------
 const sellsCleaned = computed(() => {
   return sells.value.map((sell) => {
+    let objectToReturn = {
+      ...sell
+    };
+
+    // Set product name
+    objectToReturn.product.productName = objectToReturn.product.name;
+
     // Check products are fetched
     if (!products.value) return sell;
     return {
