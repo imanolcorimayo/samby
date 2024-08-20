@@ -158,7 +158,7 @@ async function submitHandler(productId, productName) {
 
   // collection based on user
   let collectionName = "venta";
-  if (user.value.email === "imanolcorimayo@gmail.com") {
+  if (user.value.email === "imanolcorimayotest@gmail.com") {
     collectionName = "ventaTest";
   }
 

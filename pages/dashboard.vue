@@ -3,14 +3,25 @@
     <Navigator />
     <div class="flex flex-col gap-4">
       <span class="text-[1.143rem] font-semibold">Resumen</span>
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-[2rem]">
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
           <div class="flex flex-col">
             <span class="font-semibold text-[1.143rem]">Costo vs Ganancia</span>
-            <span class="text-gray-500">Para visualizar tendencias de rentabilidad, comparamos costo vs ganancia</span>
+            <span class="text-gray-500"
+              >Análisis comparativo para identificar la rentabilidad entre costos y ganancias</span
+            >
           </div>
           <div>
             <canvas id="costVsProfit" width="400" height="200"></canvas>
+          </div>
+        </div>
+        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
+          <div class="flex flex-col">
+            <span class="font-semibold text-[1.143rem]">% de Ganancia</span>
+            <span class="text-gray-500">Porcentaje de ganancia basado en la comparación entre costos y ventas</span>
+          </div>
+          <div>
+            <canvas id="earningsP" width="400" height="200"></canvas>
           </div>
         </div>
       </div>
@@ -32,13 +43,13 @@ const sellsStore = useSellsStore();
 const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
 
 // ----- Define Vars --------
-const profitChart = ref(null);
+const profitChart = ref({});
 
 // Function will manage if the data is already fetched
 sellsStore.fetchData();
 
 // ----- Define Methods ------------
-function createCostVsProfit() {
+function createearningsP() {
   const totalCosts = [];
   const totalSells = [];
   const totalProfit = [];
@@ -69,6 +80,7 @@ function createCostVsProfit() {
     totalProfit.push(totalProfitInWeek.toFixed(1));
   }
 
+  // Data Eagnings percentage
   const data = {
     labels: labels,
     datasets: [
@@ -81,6 +93,26 @@ function createCostVsProfit() {
       }
     ]
   };
+
+  // Data Costs vs Earnings
+  const dataCostsVsEarnings = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Total Costos",
+        data: totalCosts,
+        fill: false,
+        tension: 0.1
+      },
+      {
+        label: "Total en Ventas",
+        data: totalSells,
+        fill: false,
+        tension: 0.1
+      }
+    ]
+  };
+
   const config = {
     type: "line",
     data: data,
@@ -91,7 +123,27 @@ function createCostVsProfit() {
           ticks: {
             // Include a dollar sign in the ticks
             callback: function (value, index, ticks) {
-              return value.toFixed(1);
+              return value.toFixed(1) + "%";
+            }
+          }
+        }
+      },
+      // Add % to the tooltip
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              let label = context.dataset.label || "";
+
+              if (label) {
+                label += ": ";
+              }
+
+              if (context.parsed.y !== null) {
+                label += context.parsed.y.toFixed(1) + "%";
+              }
+
+              return label;
             }
           }
         }
@@ -99,25 +151,73 @@ function createCostVsProfit() {
     }
   };
 
+  // Config Costs vs Earnings
+  const configCostsVsEarnings = {
+    type: "line",
+    data: dataCostsVsEarnings,
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          ticks: {
+            // Include a dollar sign in the ticks
+            callback: function (value, index, ticks) {
+              const million = formatToMillion(value);
+
+              return million;
+            }
+          }
+        }
+      },
+      // Add % to the tooltip
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              let label = context.dataset.label || "";
+
+              if (label) {
+                label += ": ";
+              }
+
+              if (context.parsed.y !== null) {
+                label += formatPrice(context.parsed.y);
+              }
+
+              return label;
+            }
+          }
+        }
+      }
+    }
+  };
+
+  // Create costsVs Profit chart
+  createChart("costVsProfit", configCostsVsEarnings);
+  // Create earnings chart
+  createChart("earningsP", config);
+}
+
+function createChart(chartId, configData) {
   // Get element
-  const ctx = document.getElementById("costVsProfit");
+  const ctx = document.getElementById(chartId);
 
   // Clean canvas if exists
-  if (profitChart.value) {
-    profitChart.value.destroy();
+  if (profitChart.value[chartId]) {
+    profitChart.value[chartId].destroy();
   }
 
-  profitChart.value = new Chart(ctx, config);
+  profitChart.value[chartId] = new Chart(ctx, configData);
 }
 
 // ----- Define Hooks ------------
 onMounted(() => {
-  createCostVsProfit();
+  createearningsP();
 });
 
 // ----- Define Watcher ------------
 watch(sells, () => {
-  createCostVsProfit();
+  createearningsP();
 });
 
 useHead({
