@@ -87,7 +87,7 @@
               v-model="form.date"
             />
             <div v-if="submitting" class="btn bg-primary text-white text-center">loading...</div>
-            <FormKit v-else type="submit" label="Agregar" outer-class="btn bg-primary text-white text-center" />
+            <FormKit v-else type="submit" label="Agregar" input-class="btn bg-primary text-white text-center w-full" />
           </FormKit>
         </div>
       </Transition>

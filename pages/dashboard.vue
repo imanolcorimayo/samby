@@ -16,17 +16,23 @@
       </div>
     </div>
   </div>
+  <Loader v-if="!areSellsFetched" />
 </template>
 
 <script setup>
 import { Chart } from "chart.js/auto";
+import isBetween from "dayjs/plugin/isBetween"; // ES 2015
 
 // ----- Define Useful Properties --------
 const { $dayjs } = useNuxtApp();
+$dayjs.extend(isBetween);
 
 // ----- Define Pinia Vars --------
 const sellsStore = useSellsStore();
 const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
+
+// ----- Define Vars --------
+const profitChart = ref(null);
 
 // Function will manage if the data is already fetched
 sellsStore.fetchData();
@@ -35,72 +41,73 @@ sellsStore.fetchData();
 function createCostVsProfit() {
   const totalCosts = [];
   const totalSells = [];
+  const totalProfit = [];
 
-  // Order history first
-  const aux = Object.assign([], sells.value); // Auxiliary to don't affect history.value
-  const labels = aux.reverse().map((sell) => {
-    const date = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+  // Create weekly labels for the chart starting every Sunday
+  const labels = [];
+  for (let i = 8; i >= 0; i--) {
+    // Create date
+    const startDate = $dayjs().subtract(i, "week").startOf("week");
+    const endDate = $dayjs().subtract(i, "week").endOf("week");
 
-    // Format legible date
-    /* const month = date.format("MMM");
-    const year = date.format("YYYY");
+    // Add labels
+    labels.push(startDate.format("DD/MM"));
 
-    // Calculate total paid and total owed
-    const paidRecurrentAmount = monthly.payments.reduce((total, num) => {
-      // Check if payment is a recurrent payment and if it's paid
-      const isRecurrentPayment = recurrentPayments.value.filter((el) => el.id == num.payment_id).length;
-      if (num.isPaid && isRecurrentPayment > 0) {
-        return total + num.amount;
-      }
-      return total;
-    }, 0);
-    const paidWithOneTime = monthly.payments.reduce((total, num) => {
-      if (num.isPaid) {
-        return total + num.amount;
-      }
-      return total;
-    }, 0);
+    // Filter sells in week
+    const sellsInWeek = sells.value.filter((sell) => {
+      const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
 
-    totalPaid.push(paidRecurrentAmount);
-    totalOneTime.push(paidWithOneTime - paidRecurrentAmount);
-    total.push(paidWithOneTime);
+      return sellDate && sellDate.isBetween(startDate, endDate, null, "[]");
+    });
 
-    return `${month} - ${year}`; */
-  });
-  /* const data = {
+    const costsInWeek = sellsInWeek.reduce((acc, sell) => acc + sell.buyingPrice * sell.quantity, 0);
+    const sellsAmountInWeek = sellsInWeek.reduce((acc, sell) => acc + sell.sellingPrice * sell.quantity, 0);
+    const totalProfitInWeek = costsInWeek ? ((sellsAmountInWeek - costsInWeek) * 100) / costsInWeek : 0;
+
+    totalCosts.push(costsInWeek);
+    totalSells.push(sellsAmountInWeek);
+    totalProfit.push(totalProfitInWeek.toFixed(1));
+  }
+
+  const data = {
     labels: labels,
     datasets: [
       {
-        label: "Total Recurrent Paid",
-        data: totalPaid,
+        label: "% Ganancia",
+        data: totalProfit,
         fill: false,
         borderColor: "rgb(75, 192, 192)",
-        tension: 0.1
-      },
-      {
-        label: "Total One Time",
-        data: totalOneTime,
-        borderColor: "rgb(255, 99, 132)",
-        fill: false,
-        tension: 0.1
-      },
-      {
-        label: "Total (Recurrent + One Time)",
-        data: total,
-        borderColor: "rgb(54, 162, 235)",
-        fill: false,
         tension: 0.1
       }
     ]
   };
   const config = {
     type: "line",
-    data: data
+    data: data,
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          ticks: {
+            // Include a dollar sign in the ticks
+            callback: function (value, index, ticks) {
+              return value.toFixed(1);
+            }
+          }
+        }
+      }
+    }
   };
 
-  const ctx = document.getElementById("monthlyTotals");
+  // Get element
+  const ctx = document.getElementById("costVsProfit");
 
-  new Chart(ctx, config); */
+  // Clean canvas if exists
+  if (profitChart.value) {
+    profitChart.value.destroy();
+  }
+
+  profitChart.value = new Chart(ctx, config);
 }
 
 // ----- Define Hooks ------------

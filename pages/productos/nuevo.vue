@@ -46,7 +46,12 @@
       v-model="form.unit"
     />
     <div v-show="submitting" class="btn bg-primary text-white text-center">loading...</div>
-    <FormKit v-show="!submitting" type="submit" label="Agregar" outer-class="btn bg-primary text-white text-center" />
+    <FormKit
+      v-show="!submitting"
+      type="submit"
+      label="Agregar"
+      input-class="btn bg-primary text-white text-center w-full"
+    />
   </FormKit>
   <div v-if="submitted" class="w-full flex flex-col gap-[2rem] flex-1 min-h-full justify-center">
     <div class="flex flex-col items-center gap-[1rem]">
