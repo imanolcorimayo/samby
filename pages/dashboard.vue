@@ -49,6 +49,32 @@
             <canvas id="earningsP" width="400" height="200"></canvas>
           </div>
         </div>
+        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
+          <div class="flex flex-col">
+            <span class="font-semibold text-[1.143rem]">Ranking de productos</span>
+            <span class="text-gray-500">Comparacion de todos los productos durante los 2 meses</span>
+          </div>
+          <table class="w-full">
+            <thead>
+              <tr class="text-left border-b text-gray-400 font-normal">
+                <th class="text-sm text-center"></th>
+                <th class="text-sm text-left">Nombre</th>
+                <th class="text-sm text-center"># Ventas</th>
+                <th class="text-sm text-center">G. Total</th>
+                <th class="text-sm text-center">% Gan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b" v-for="(p, index) in productsTable" :key="index">
+                <td class="py-2 font-medium">{{ index + 1 }}</td>
+                <td class="py-2 font-medium">{{ p.name }}</td>
+                <td class="py-2 text-center">{{ p.totalQuantity }}</td>
+                <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(p.totalEarnings) }}</td>
+                <td class="py-2 text-center">{{ p.earningP.toFixed(1) }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -113,25 +139,29 @@ function createEarningsP() {
       const productsTableAux = productsTable.value.map((product) => product.id);
       const productIndex = productsTableAux.indexOf(sell.product.id);
 
-      const earningsPerProduct = sell.sellingPrice * sell.quantity - sell.buyingPrice * sell.quantity;
+      const totalSelling = sell.sellingPrice * sell.quantity;
+      const totalBuying = sell.buyingPrice * sell.quantity;
+      const earningsPerProduct = totalSelling - totalBuying;
+      const earningP = (earningsPerProduct * 100) / (sell.buyingPrice * sell.quantity);
 
       // If product does not exist, add it
       if (productIndex == -1) {
         productsTable.value.push({
           id: sell.product.id,
           name: sell.product.name,
-          totalEarnings: earningsPerProduct
-        });
-
-        console.log({
-          id: sell.product.id,
-          name: sell.product.name,
-          totalEarnings: earningsPerProduct
+          totalEarnings: earningsPerProduct,
+          totalSelling,
+          totalBuying,
+          totalQuantity: parseFloat(sell.quantity),
+          earningP: earningP
         });
       } else {
-        console.log("productIndex", productIndex);
-        console.log("productsTable.value[productIndex]", productsTable.value[productIndex]);
         productsTable.value[productIndex].totalEarnings += earningsPerProduct;
+        productsTable.value[productIndex].totalSelling += totalSelling;
+        productsTable.value[productIndex].totalBuying += totalBuying;
+        productsTable.value[productIndex].totalQuantity += parseFloat(sell.quantity);
+        productsTable.value[productIndex].earningP =
+          (productsTable.value[productIndex].totalEarnings * 100) / productsTable.value[productIndex].totalBuying;
       }
     });
 
