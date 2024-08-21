@@ -3,6 +3,31 @@
     <Navigator />
     <div class="flex flex-col gap-4">
       <span class="text-[1.143rem] font-semibold">Resumen</span>
+      <div class="flex flex-between gap-[2rem]">
+        <div class="flex-1 ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
+          <div class="flex flex-col justify-between h-full gap-3">
+            <div class="flex justify-between">
+              <span class="font-medium">Ganancia total</span>
+              <FlowbiteDollarOutline class="text-gray-500 text-xl" />
+            </div>
+            <span class="font-semibold text-[1.143rem]">{{ formatPrice(totalEarnings) }}</span>
+          </div>
+        </div>
+        <div class="flex-1 ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
+          <div class="flex flex-col justify-between h-full gap-3">
+            <div class="flex justify-between">
+              <span class="font-medium">Mejor Producto</span>
+              <PhTrendUpBold class="text-gray-500 text-xl" />
+            </div>
+            <div class="flex flex-col">
+              <span class="font-semibold text-[1.143rem]">{{ bestProduct?.name }}</span>
+              <span class="text-sm font-medium text-gray-400"
+                >Ganancia: {{ bestProduct ? formatPrice(bestProduct?.totalEarnings) : 0 }}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="flex flex-col gap-[2rem]">
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
           <div class="flex flex-col">
@@ -33,6 +58,8 @@
 <script setup>
 import { Chart } from "chart.js/auto";
 import isBetween from "dayjs/plugin/isBetween"; // ES 2015
+import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
+import PhTrendUpBold from "~icons/ph/trend-up-bold";
 
 // ----- Define Useful Properties --------
 const { $dayjs } = useNuxtApp();
@@ -44,15 +71,19 @@ const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
 
 // ----- Define Vars --------
 const profitChart = ref({});
+const totalEarnings = ref(0);
+const productsTable = ref([]);
+const bestProduct = ref({});
 
 // Function will manage if the data is already fetched
 sellsStore.fetchData();
 
 // ----- Define Methods ------------
-function createearningsP() {
+function createEarningsP() {
   const totalCosts = [];
   const totalSells = [];
   const totalProfit = [];
+  totalEarnings.value = 0;
 
   // Create weekly labels for the chart starting every Sunday
   const labels = [];
@@ -71,14 +102,54 @@ function createearningsP() {
       return sellDate && sellDate.isBetween(startDate, endDate, null, "[]");
     });
 
-    const costsInWeek = sellsInWeek.reduce((acc, sell) => acc + sell.buyingPrice * sell.quantity, 0);
-    const sellsAmountInWeek = sellsInWeek.reduce((acc, sell) => acc + sell.sellingPrice * sell.quantity, 0);
+    let costsInWeek = 0;
+    let sellsAmountInWeek = 0;
+    sellsInWeek.forEach((sell) => {
+      // Update costs and sells
+      costsInWeek += sell.buyingPrice * sell.quantity;
+      sellsAmountInWeek += sell.sellingPrice * sell.quantity;
+
+      // The problem is here: Add to products table
+      const productsTableAux = productsTable.value.map((product) => product.id);
+      const productIndex = productsTableAux.indexOf(sell.product.id);
+
+      const earningsPerProduct = sell.sellingPrice * sell.quantity - sell.buyingPrice * sell.quantity;
+
+      // If product does not exist, add it
+      if (productIndex == -1) {
+        productsTable.value.push({
+          id: sell.product.id,
+          name: sell.product.name,
+          totalEarnings: earningsPerProduct
+        });
+
+        console.log({
+          id: sell.product.id,
+          name: sell.product.name,
+          totalEarnings: earningsPerProduct
+        });
+      } else {
+        console.log("productIndex", productIndex);
+        console.log("productsTable.value[productIndex]", productsTable.value[productIndex]);
+        productsTable.value[productIndex].totalEarnings += earningsPerProduct;
+      }
+    });
+
     const totalProfitInWeek = costsInWeek ? ((sellsAmountInWeek - costsInWeek) * 100) / costsInWeek : 0;
 
     totalCosts.push(costsInWeek);
     totalSells.push(sellsAmountInWeek);
     totalProfit.push(totalProfitInWeek.toFixed(1));
+
+    // Add to total earnings
+    totalEarnings.value += sellsAmountInWeek - costsInWeek;
   }
+
+  // Sort products table
+  productsTable.value.sort((a, b) => b.totalEarnings - a.totalEarnings);
+
+  // Get best product
+  bestProduct.value = productsTable.value[0];
 
   // Data Eagnings percentage
   const data = {
@@ -212,12 +283,12 @@ function createChart(chartId, configData) {
 
 // ----- Define Hooks ------------
 onMounted(() => {
-  createearningsP();
+  createEarningsP();
 });
 
 // ----- Define Watcher ------------
 watch(sells, () => {
-  createearningsP();
+  createEarningsP();
 });
 
 useHead({

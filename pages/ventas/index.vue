@@ -39,7 +39,12 @@
               <span class="font-semibold">Ganancia: </span>
               <div class="flex gap-[0.285rem]">
                 <span>{{ formatPrice((sell.sellingPrice - sell.buyingPrice) * sell.quantity) }}</span>
-                <span class="font-semibold text-success"
+                <span
+                  class="font-semibold"
+                  :class="{
+                    'text-success': parseInt(sell.sellingPrice) > parseInt(sell.buyingPrice),
+                    'text-danger': parseInt(sell.sellingPrice) <= parseInt(sell.buyingPrice)
+                  }"
                   >({{ (((sell.sellingPrice - sell.buyingPrice) * 100) / sell.buyingPrice).toFixed(1) }}%)</span
                 >
               </div>
