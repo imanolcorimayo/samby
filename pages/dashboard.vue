@@ -51,6 +51,32 @@
         </div>
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
           <div class="flex flex-col">
+            <span class="font-semibold text-[1.143rem]">Ranking dias de venta</span>
+            <span class="text-gray-500">Comparacion de dias de venta</span>
+          </div>
+          <table class="w-full">
+            <thead>
+              <tr class="text-left border-b text-gray-400 font-normal">
+                <th class="text-sm text-center"></th>
+                <th class="text-sm text-left">Fecha</th>
+                <th class="text-sm text-center">Tot. Facturado</th>
+                <th class="text-sm text-center">G. Total</th>
+                <th class="text-sm text-center">% Gan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b" v-for="(d, index) in dayOfSellsTable" :key="`sell-${index}`">
+                <td class="py-2 font-medium">{{ index + 1 }}</td>
+                <td class="py-2 font-medium">{{ d.dateFormatted }}</td>
+                <td class="py-2 text-center">{{ formatPrice(d.totalSelling) }}</td>
+                <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(d.totalEarnings) }}</td>
+                <td class="py-2 text-center">{{ d.earningP.toFixed(1) }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
+          <div class="flex flex-col">
             <span class="font-semibold text-[1.143rem]">Ranking de productos</span>
             <span class="text-gray-500">Comparacion de todos los productos durante los 2 meses</span>
           </div>
@@ -99,6 +125,7 @@ const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
 const profitChart = ref({});
 const totalEarnings = ref(0);
 const productsTable = ref([]);
+const dayOfSellsTable = ref([]);
 const bestProduct = ref({});
 
 // Function will manage if the data is already fetched
@@ -134,35 +161,6 @@ function createEarningsP() {
       // Update costs and sells
       costsInWeek += sell.buyingPrice * sell.quantity;
       sellsAmountInWeek += sell.sellingPrice * sell.quantity;
-
-      // The problem is here: Add to products table
-      const productsTableAux = productsTable.value.map((product) => product.id);
-      const productIndex = productsTableAux.indexOf(sell.product.id);
-
-      const totalSelling = sell.sellingPrice * sell.quantity;
-      const totalBuying = sell.buyingPrice * sell.quantity;
-      const earningsPerProduct = totalSelling - totalBuying;
-      const earningP = (earningsPerProduct * 100) / (sell.buyingPrice * sell.quantity);
-
-      // If product does not exist, add it
-      if (productIndex == -1) {
-        productsTable.value.push({
-          id: sell.product.id,
-          name: sell.product.name,
-          totalEarnings: earningsPerProduct,
-          totalSelling,
-          totalBuying,
-          totalQuantity: parseFloat(sell.quantity),
-          earningP: earningP
-        });
-      } else {
-        productsTable.value[productIndex].totalEarnings += earningsPerProduct;
-        productsTable.value[productIndex].totalSelling += totalSelling;
-        productsTable.value[productIndex].totalBuying += totalBuying;
-        productsTable.value[productIndex].totalQuantity += parseFloat(sell.quantity);
-        productsTable.value[productIndex].earningP =
-          (productsTable.value[productIndex].totalEarnings * 100) / productsTable.value[productIndex].totalBuying;
-      }
     });
 
     const totalProfitInWeek = costsInWeek ? ((sellsAmountInWeek - costsInWeek) * 100) / costsInWeek : 0;
@@ -174,12 +172,6 @@ function createEarningsP() {
     // Add to total earnings
     totalEarnings.value += sellsAmountInWeek - costsInWeek;
   }
-
-  // Sort products table
-  productsTable.value.sort((a, b) => b.totalEarnings - a.totalEarnings);
-
-  // Get best product
-  bestProduct.value = productsTable.value[0];
 
   // Data Eagnings percentage
   const data = {
@@ -299,6 +291,108 @@ function createEarningsP() {
   createChart("earningsP", config);
 }
 
+function createProductsRanking() {
+  // Iterate weekly
+  for (let i = 8; i >= 0; i--) {
+    // Create date
+    const startDate = $dayjs().subtract(i, "week").startOf("week");
+    const endDate = $dayjs().subtract(i, "week").endOf("week");
+
+    // Filter sells in week
+    const sellsInWeek = sells.value.filter((sell) => {
+      const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+
+      return sellDate && sellDate.isBetween(startDate, endDate, null, "[]");
+    });
+
+    sellsInWeek.forEach((sell) => {
+      // The problem is here: Add to products table
+      const productsTableAux = productsTable.value.map((product) => product.id);
+      const productIndex = productsTableAux.indexOf(sell.product.id);
+
+      const totalSelling = sell.sellingPrice * sell.quantity;
+      const totalBuying = sell.buyingPrice * sell.quantity;
+      const earningsPerProduct = totalSelling - totalBuying;
+      const earningP = (earningsPerProduct * 100) / (sell.buyingPrice * sell.quantity);
+
+      // If product does not exist, add it
+      if (productIndex == -1) {
+        productsTable.value.push({
+          id: sell.product.id,
+          name: sell.product.name,
+          totalEarnings: earningsPerProduct,
+          totalSelling,
+          totalBuying,
+          totalQuantity: parseFloat(sell.quantity),
+          earningP: earningP
+        });
+      } else {
+        productsTable.value[productIndex].totalEarnings += earningsPerProduct;
+        productsTable.value[productIndex].totalSelling += totalSelling;
+        productsTable.value[productIndex].totalBuying += totalBuying;
+        productsTable.value[productIndex].totalQuantity += parseFloat(sell.quantity);
+        productsTable.value[productIndex].earningP =
+          (productsTable.value[productIndex].totalEarnings * 100) / productsTable.value[productIndex].totalBuying;
+      }
+    });
+  }
+  // Sort products table
+  productsTable.value.sort((a, b) => b.totalEarnings - a.totalEarnings);
+
+  // Get best product
+  bestProduct.value = productsTable.value[0];
+}
+
+function createBestDayOfSellsRanking() {
+  // Iterate weekly
+  //for (let i = 8; i >= 0; i--) {
+  //  // Create date
+  //  const startDate = $dayjs().subtract(i, "week").startOf("week");
+  //  const endDate = $dayjs().subtract(i, "week").endOf("week");
+
+  // Filter sells in week
+  sells.value.forEach((sell) => {
+    const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+
+    // Check if day exist in the dayOfSellsTable variable
+    const dayIndex = dayOfSellsTable.value.findIndex((day) => day.date.isSame(sellDate, "day"));
+
+    // Get total selling price and buying price
+    const totalSellingPrice = sell.sellingPrice * sell.quantity;
+    const totalBuyingPrice = sell.buyingPrice * sell.quantity;
+
+    // Earnings per selling
+    const earningsPerSelling = totalSellingPrice - totalBuyingPrice;
+
+    // If day does not exist, add it
+    if (dayIndex == -1) {
+      dayOfSellsTable.value.push({
+        date: sellDate,
+        dateFormatted: sellDate.format("DD/MM/YYYY"),
+        totalEarnings: earningsPerSelling,
+        totalSelling: totalSellingPrice,
+        totalBuying: totalBuyingPrice,
+        totalQuantity: parseFloat(sell.quantity),
+        earningP: (earningsPerSelling * 100) / totalBuyingPrice
+      });
+    } else {
+      dayOfSellsTable.value[dayIndex].totalEarnings += earningsPerSelling;
+      dayOfSellsTable.value[dayIndex].totalSelling += totalSellingPrice;
+      dayOfSellsTable.value[dayIndex].totalBuying += totalBuyingPrice;
+      dayOfSellsTable.value[dayIndex].totalQuantity += parseFloat(sell.quantity);
+      dayOfSellsTable.value[dayIndex].earningP =
+        (dayOfSellsTable.value[dayIndex].totalEarnings * 100) / dayOfSellsTable.value[dayIndex].totalBuying;
+    }
+  });
+  //}
+  // Sort products table
+  dayOfSellsTable.value.sort((a, b) => b.totalEarnings - a.totalEarnings);
+
+  // Keep only 10 first days
+  dayOfSellsTable.value = dayOfSellsTable.value.slice(0, 10);
+  console.log("dayOfSellsTable.value: ", dayOfSellsTable.value);
+}
+
 function createChart(chartId, configData) {
   // Get element
   const ctx = document.getElementById(chartId);
@@ -314,11 +408,15 @@ function createChart(chartId, configData) {
 // ----- Define Hooks ------------
 onMounted(() => {
   createEarningsP();
+  createProductsRanking();
+  createBestDayOfSellsRanking();
 });
 
 // ----- Define Watcher ------------
 watch(sells, () => {
   createEarningsP();
+  createProductsRanking();
+  createBestDayOfSellsRanking();
 });
 
 useHead({
