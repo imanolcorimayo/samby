@@ -28,6 +28,32 @@
           </div>
         </div>
       </div>
+      <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
+        <div class="flex flex-col">
+          <span class="font-semibold text-[1.143rem]">Ranking dias de venta</span>
+          <span class="text-gray-500">Comparacion de dias de venta</span>
+        </div>
+        <table class="w-full">
+          <thead>
+            <tr class="text-left border-b text-gray-400 font-normal">
+              <th class="text-sm text-center"></th>
+              <th class="text-sm text-left">Fecha</th>
+              <th class="text-sm text-center">Tot. Facturado</th>
+              <th class="text-sm text-center">G. Total</th>
+              <th class="text-sm text-center">% Gan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b" v-for="(d, index) in dayOfSellsTable" :key="`sell-${index}`">
+              <td class="py-2 font-medium">{{ index + 1 }}</td>
+              <td class="py-2 font-medium">{{ d.dateFormatted }}</td>
+              <td class="py-2 text-center">{{ formatPrice(d.totalSelling) }}</td>
+              <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(d.totalEarnings) }}</td>
+              <td class="py-2 text-center">{{ d.earningP.toFixed(1) }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="flex flex-col gap-[2rem]">
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
           <div class="flex flex-col">
@@ -48,32 +74,6 @@
           <div>
             <canvas id="earningsP" width="400" height="200"></canvas>
           </div>
-        </div>
-        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
-          <div class="flex flex-col">
-            <span class="font-semibold text-[1.143rem]">Ranking dias de venta</span>
-            <span class="text-gray-500">Comparacion de dias de venta</span>
-          </div>
-          <table class="w-full">
-            <thead>
-              <tr class="text-left border-b text-gray-400 font-normal">
-                <th class="text-sm text-center"></th>
-                <th class="text-sm text-left">Fecha</th>
-                <th class="text-sm text-center">Tot. Facturado</th>
-                <th class="text-sm text-center">G. Total</th>
-                <th class="text-sm text-center">% Gan</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b" v-for="(d, index) in dayOfSellsTable" :key="`sell-${index}`">
-                <td class="py-2 font-medium">{{ index + 1 }}</td>
-                <td class="py-2 font-medium">{{ d.dateFormatted }}</td>
-                <td class="py-2 text-center">{{ formatPrice(d.totalSelling) }}</td>
-                <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(d.totalEarnings) }}</td>
-                <td class="py-2 text-center">{{ d.earningP.toFixed(1) }}%</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
           <div class="flex flex-col">
@@ -123,10 +123,22 @@ const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
 
 // ----- Define Vars --------
 const profitChart = ref({});
-const totalEarnings = ref(0);
 const productsTable = ref([]);
 const dayOfSellsTable = ref([]);
 const bestProduct = ref({});
+
+// Define Computed
+const totalEarnings = computed(() => {
+  // Create new variable to store sells of this week
+  const sellsThisWeek = sells.value.filter((sell) => {
+    const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+    const startDate = $dayjs().startOf("week");
+    const endDate = $dayjs().endOf("week");
+
+    return sellDate && sellDate.isBetween(startDate, endDate, null, "[]");
+  });
+  return sellsThisWeek.reduce((acc, sell) => acc + (sell.sellingPrice - sell.buyingPrice) * sell.quantity, 0);
+});
 
 // Function will manage if the data is already fetched
 sellsStore.fetchData();
@@ -136,7 +148,6 @@ function createEarningsP() {
   const totalCosts = [];
   const totalSells = [];
   const totalProfit = [];
-  totalEarnings.value = 0;
 
   // Create weekly labels for the chart starting every Sunday
   const labels = [];
@@ -168,9 +179,6 @@ function createEarningsP() {
     totalCosts.push(costsInWeek);
     totalSells.push(sellsAmountInWeek);
     totalProfit.push(totalProfitInWeek.toFixed(1));
-
-    // Add to total earnings
-    totalEarnings.value += sellsAmountInWeek - costsInWeek;
   }
 
   // Data Eagnings percentage
@@ -344,12 +352,6 @@ function createProductsRanking() {
 }
 
 function createBestDayOfSellsRanking() {
-  // Iterate weekly
-  //for (let i = 8; i >= 0; i--) {
-  //  // Create date
-  //  const startDate = $dayjs().subtract(i, "week").startOf("week");
-  //  const endDate = $dayjs().subtract(i, "week").endOf("week");
-
   // Filter sells in week
   sells.value.forEach((sell) => {
     const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
@@ -384,13 +386,12 @@ function createBestDayOfSellsRanking() {
         (dayOfSellsTable.value[dayIndex].totalEarnings * 100) / dayOfSellsTable.value[dayIndex].totalBuying;
     }
   });
-  //}
+
   // Sort products table
   dayOfSellsTable.value.sort((a, b) => b.totalEarnings - a.totalEarnings);
 
   // Keep only 10 first days
   dayOfSellsTable.value = dayOfSellsTable.value.slice(0, 10);
-  console.log("dayOfSellsTable.value: ", dayOfSellsTable.value);
 }
 
 function createChart(chartId, configData) {
