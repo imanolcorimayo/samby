@@ -2,7 +2,42 @@
   <div class="flex flex-col gap-[2rem] w-full">
     <Navigator />
     <div class="flex flex-col gap-4">
-      <span class="text-[1.143rem] font-semibold">Resumen</span>
+      <div class="flex justify-between">
+        <h1 class="font-semibold text-start">Resumen Financiero</h1>
+        <button v-if="!showFilters" @click="showFilters = true" class="btn bg-secondary shadow flex items-center gap-2">
+          <PepiconsPopEye /> Ver filtros
+        </button>
+        <button v-if="showFilters" @click="showFilters = false" class="btn bg-secondary shadow flex items-center gap-2">
+          <PhEyeClosedBold /> Esconder
+        </button>
+      </div>
+      <Transition>
+        <div class="flex gap-2" v-if="showFilters">
+          <FormKit
+            type="date"
+            name="start_date"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            input-class="w-full"
+            label="Desde"
+            placeholder="yyyy-mm-dd"
+            validation="required"
+            v-model="minDate"
+          />
+
+          <FormKit
+            type="date"
+            name="end_date"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            input-class="w-full"
+            label="Hasta"
+            placeholder="yyyy-mm-dd"
+            validation="required"
+            v-model="maxDate"
+          />
+        </div>
+      </Transition>
       <div class="flex flex-between gap-[2rem]">
         <div class="flex-1 ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
           <div class="flex flex-col justify-between h-full gap-3">
@@ -112,6 +147,8 @@ import { Chart } from "chart.js/auto";
 import isBetween from "dayjs/plugin/isBetween"; // ES 2015
 import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
 import PhTrendUpBold from "~icons/ph/trend-up-bold";
+import PhEyeClosedBold from "~icons/ph/eye-closed-bold";
+import PepiconsPopEye from "~icons/pepicons-pop/eye";
 
 // ----- Define Useful Properties --------
 const { $dayjs } = useNuxtApp();
@@ -122,6 +159,9 @@ const sellsStore = useSellsStore();
 const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
 
 // ----- Define Vars --------
+const minDate = ref($dayjs().startOf("week").subtract(2, "week").format("YYYY-MM-DD"));
+const maxDate = ref($dayjs().endOf("week").format("YYYY-MM-DD"));
+const showFilters = ref(false);
 const profitChart = ref({});
 const productsTable = ref([]);
 const dayOfSellsTable = ref([]);
@@ -132,10 +172,10 @@ const totalEarnings = computed(() => {
   // Create new variable to store sells of this week
   const sellsThisWeek = sells.value.filter((sell) => {
     const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
-    const startDate = $dayjs().startOf("week");
-    const endDate = $dayjs().endOf("week");
+    const localStartDate = $dayjs(minDate.value, { format: "YYYY-MM-DD" }).startOf("week");
+    const localEndDate = $dayjs(maxDate.value, { format: "YYYY-MM-DD" }).endOf("week");
 
-    return sellDate && sellDate.isBetween(startDate, endDate, null, "[]");
+    return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
   });
   return sellsThisWeek.reduce((acc, sell) => acc + (sell.sellingPrice - sell.buyingPrice) * sell.quantity, 0);
 });
@@ -153,17 +193,21 @@ function createEarningsP() {
   const labels = [];
   for (let i = 8; i >= 0; i--) {
     // Create date
-    const startDate = $dayjs().subtract(i, "week").startOf("week");
-    const endDate = $dayjs().subtract(i, "week").endOf("week");
+    const dates = getStartAndEndPerWeek(maxDate.value, minDate.value, i);
+
+    // If dates are not valid, continue
+    if (!dates) continue;
+
+    const { localStartDate, localEndDate } = dates;
 
     // Add labels
-    labels.push(startDate.format("DD/MM"));
+    labels.push(localStartDate.format("DD/MM"));
 
     // Filter sells in week
     const sellsInWeek = sells.value.filter((sell) => {
       const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
 
-      return sellDate && sellDate.isBetween(startDate, endDate, null, "[]");
+      return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
     });
 
     let costsInWeek = 0;
@@ -300,17 +344,25 @@ function createEarningsP() {
 }
 
 function createProductsRanking() {
+  // Clean products table
+  productsTable.value = [];
   // Iterate weekly
   for (let i = 8; i >= 0; i--) {
     // Create date
-    const startDate = $dayjs().subtract(i, "week").startOf("week");
-    const endDate = $dayjs().subtract(i, "week").endOf("week");
+    const dates = getStartAndEndPerWeek(maxDate.value, minDate.value, i);
+
+    // If dates are not valid, continue
+    if (!dates) continue;
+
+    const { localStartDate, localEndDate } = dates;
+
+    console.log(localStartDate.format("DD/MM/YYYY"), localEndDate.format("DD/MM/YYYY"));
 
     // Filter sells in week
     const sellsInWeek = sells.value.filter((sell) => {
       const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
 
-      return sellDate && sellDate.isBetween(startDate, endDate, null, "[]");
+      return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
     });
 
     sellsInWeek.forEach((sell) => {
@@ -352,6 +404,8 @@ function createProductsRanking() {
 }
 
 function createBestDayOfSellsRanking() {
+  // Clean day of sells table
+  dayOfSellsTable.value = [];
   // Filter sells in week
   sells.value.forEach((sell) => {
     const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
@@ -406,6 +460,32 @@ function createChart(chartId, configData) {
   profitChart.value[chartId] = new Chart(ctx, configData);
 }
 
+function getStartAndEndPerWeek(maxDate, minDate, nWeeksBack) {
+  // Create date
+  let localStartDate = $dayjs(maxDate, { format: "YYYY-MM-DD" }).subtract(nWeeksBack, "week").startOf("week");
+  const localEndDate = $dayjs(maxDate, { format: "YYYY-MM-DD" }).subtract(nWeeksBack, "week").endOf("week");
+
+  // If local start date is within the week of minDate continue
+  // Get first weekday of minDate
+  const firstWeekDay = $dayjs(minDate, { format: "YYYY-MM-DD" }).startOf("week");
+
+  // If firstWeekDay is after localStartDate, assign firstWeekDay to localStartDate
+  if (
+    localStartDate.isBefore($dayjs(minDate, { format: "YYYY-MM-DD" })) &&
+    localStartDate.isSame(firstWeekDay) &&
+    localStartDate.isBefore($dayjs(maxDate, { format: "YYYY-MM-DD" })) // Safe check
+  ) {
+    localStartDate = $dayjs(minDate, { format: "YYYY-MM-DD" });
+  }
+
+  // If local start date is not within the week of minDate and is still before min date, continue
+  if (localStartDate.isBefore($dayjs(minDate, { format: "YYYY-MM-DD" }))) {
+    return false;
+  }
+
+  return { localStartDate, localEndDate };
+}
+
 // ----- Define Hooks ------------
 onMounted(() => {
   createEarningsP();
@@ -418,6 +498,16 @@ watch(sells, () => {
   createEarningsP();
   createProductsRanking();
   createBestDayOfSellsRanking();
+});
+
+watch([minDate, maxDate], (newValues) => {
+  // Check start date is before end date
+  if ($dayjs(newValues[0]).isAfter($dayjs(newValues[1]))) {
+    minDate.value = maxDate.value;
+  }
+
+  createEarningsP();
+  createProductsRanking();
 });
 
 useHead({

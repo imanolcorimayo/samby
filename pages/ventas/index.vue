@@ -3,7 +3,7 @@
     <Navigator />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
-        <span class="text-[1.143rem] font-semibold">Lista de ventas</span>
+        <h1 class="font-semibold">Lista de ventas</h1>
         <NuxtLink to="/ventas/nuevo" class="btn bg-primary text-white flex items-center"
           ><IcRoundPlus class="text-[1.143rem]" /> Nueva venta
         </NuxtLink>
