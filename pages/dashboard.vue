@@ -136,6 +136,18 @@
             </tbody>
           </table>
         </div>
+        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
+          <div class="flex flex-col">
+            <span class="font-semibold text-[1.143rem]">Precio semanal por producto</span>
+            <span class="text-gray-500"
+              >Se calcula un promedio del precio del producto cada semana para conocer la variacion respecto al
+              tiempo</span
+            >
+          </div>
+          <div>
+            <canvas id="weeklyPricePerProduct" width="400" :height="width >= 768 ? '200' : '800'"></canvas>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -154,9 +166,18 @@ import PepiconsPopEye from "~icons/pepicons-pop/eye";
 const { $dayjs } = useNuxtApp();
 $dayjs.extend(isBetween);
 
+// Use windows size
+const { width } = useWindowSize();
+
 // ----- Define Pinia Vars --------
 const sellsStore = useSellsStore();
 const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
+const productsStore = useProductsStore();
+const { getProducts: products } = storeToRefs(productsStore);
+
+// Function will manage if the data is already fetched
+productsStore.fetchData();
+sellsStore.fetchData();
 
 // ----- Define Vars --------
 const minDate = ref($dayjs().startOf("week").subtract(2, "week").format("YYYY-MM-DD"));
@@ -164,6 +185,7 @@ const maxDate = ref($dayjs().endOf("week").format("YYYY-MM-DD"));
 const showFilters = ref(false);
 const profitChart = ref({});
 const productsTable = ref([]);
+const productPrices = ref([]);
 const dayOfSellsTable = ref([]);
 const bestProduct = ref({});
 
@@ -172,16 +194,13 @@ const totalEarnings = computed(() => {
   // Create new variable to store sells of this week
   const sellsThisWeek = sells.value.filter((sell) => {
     const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
-    const localStartDate = $dayjs(minDate.value, { format: "YYYY-MM-DD" }).startOf("week");
-    const localEndDate = $dayjs(maxDate.value, { format: "YYYY-MM-DD" }).endOf("week");
+    const localStartDate = $dayjs(minDate.value, { format: "YYYY-MM-DD" });
+    const localEndDate = $dayjs(maxDate.value, { format: "YYYY-MM-DD" });
 
     return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
   });
   return sellsThisWeek.reduce((acc, sell) => acc + (sell.sellingPrice - sell.buyingPrice) * sell.quantity, 0);
 });
-
-// Function will manage if the data is already fetched
-sellsStore.fetchData();
 
 // ----- Define Methods ------------
 function createEarningsP() {
@@ -356,8 +375,6 @@ function createProductsRanking() {
 
     const { localStartDate, localEndDate } = dates;
 
-    console.log(localStartDate.format("DD/MM/YYYY"), localEndDate.format("DD/MM/YYYY"));
-
     // Filter sells in week
     const sellsInWeek = sells.value.filter((sell) => {
       const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
@@ -486,11 +503,145 @@ function getStartAndEndPerWeek(maxDate, minDate, nWeeksBack) {
   return { localStartDate, localEndDate };
 }
 
+function createWeeklyPricePerProduct() {
+  // Clean products table
+  productPrices.value = [];
+
+  // First create all default products
+  if (products.value) {
+    products.value.forEach((product) => {
+      productPrices.value.push({
+        id: product.id,
+        name: product.productName,
+        sumBuyingPrice: 0,
+        timesAdded: 0
+      });
+    });
+  }
+
+  // Iterate weekly
+  const labels = [];
+  for (let i = 8; i >= 0; i--) {
+    // Create date
+    const dates = getStartAndEndPerWeek(maxDate.value, minDate.value, i);
+
+    // If dates are not valid, continue
+    if (!dates) continue;
+
+    const { localStartDate, localEndDate } = dates;
+
+    // Add labels
+    labels.push(localStartDate.format("DD/MM"));
+
+    // Filter sells in week. Here, each sell contains the price of the product
+    const sellsInWeek = sells.value.filter((sell) => {
+      const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+
+      return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
+    });
+
+    sellsInWeek.forEach((sell) => {
+      // The problem is here: Add to products table
+      const productsTableAux = productPrices.value.map((product) => product.id);
+      const productIndex = productsTableAux.indexOf(sell.product.id);
+
+      // If product does not exist, add it
+      if (productIndex == -1) {
+        productPrices.value.push({
+          id: sell.product.id,
+          name: sell.product.name,
+          sumBuyingPrice: parseInt(sell.buyingPrice), // Avg is calculated at the end
+          timesAdded: 1
+        });
+      } else {
+        // If it already exists, update the values
+        productPrices.value[productIndex].sumBuyingPrice += parseInt(sell.buyingPrice);
+        productPrices.value[productIndex].timesAdded += 1;
+      }
+    });
+
+    // Calculate average price per product, and push them into a prices array
+    productPrices.value.forEach((product) => {
+      product.avgBuyingPrice = product.timesAdded ? product.sumBuyingPrice / product.timesAdded : 0;
+
+      // Check it key prices exits in product
+      if (!product.prices) {
+        product.prices = [];
+      }
+
+      // Add price to product
+      product.prices.push(product.avgBuyingPrice);
+
+      // Clean sumBuyingPrice and timesAdded so it iterates again and calculates the new average
+      product.sumBuyingPrice = 0;
+      product.timesAdded = 0;
+    });
+  }
+
+  // Create data object to create a chart with each product
+  const data = {
+    labels,
+    datasets: productPrices.value.map((product) => {
+      return {
+        label: product.name,
+        data: product.prices,
+        fill: false,
+        tension: 0.1
+      };
+    })
+  };
+
+  // Create config object to create a chart with each product
+  const config = {
+    type: "line",
+    data: data,
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          ticks: {
+            // Include a dollar sign in the ticks
+            /* callback: function (value, index, ticks) {
+              const million = formatToMillion(value);
+
+              return million;
+            } */
+          }
+        }
+      },
+      // Add % to the tooltip
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              let label = context.dataset.label || "";
+
+              if (label) {
+                label += ": ";
+              }
+
+              if (context.parsed.y !== null) {
+                label += formatPrice(context.parsed.y);
+              }
+
+              return label;
+            }
+          }
+        }
+      }
+    }
+  };
+
+  // Create weekly price per product chart
+  createChart("weeklyPricePerProduct", config);
+}
+
 // ----- Define Hooks ------------
 onMounted(() => {
   createEarningsP();
   createProductsRanking();
   createBestDayOfSellsRanking();
+  createWeeklyPricePerProduct();
 });
 
 // ----- Define Watcher ------------
@@ -498,6 +649,7 @@ watch(sells, () => {
   createEarningsP();
   createProductsRanking();
   createBestDayOfSellsRanking();
+  createWeeklyPricePerProduct();
 });
 
 watch([minDate, maxDate], (newValues) => {
@@ -508,6 +660,7 @@ watch([minDate, maxDate], (newValues) => {
 
   createEarningsP();
   createProductsRanking();
+  createWeeklyPricePerProduct();
 });
 
 useHead({
