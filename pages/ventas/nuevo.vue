@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-3 w-full" v-if="products.length">
+  <div class="flex flex-col gap-3 w-full">
     <div class="flex justify-between items-center">
       <div class="flex flex-col gap-0">
         <h1 class="text-start">Agregar nueva venta</h1>
@@ -10,12 +10,42 @@
         class="flex items-center gap-[0.571rem] bg-secondary border-[2px] border-primary rounded-[0.428rem] w-fit h-fit btn"
       >
         <EvaArrowBackOutline class="font-bold" />
-        <span class="font-medium">Ventas</span>
+        <span class="font-medium" ref="backButton">Ventas</span>
       </NuxtLink>
     </div>
     <div
+      class="flex sm:flex-row gap-2 w-full"
+      :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
+    >
+      <div class="w-full">
+        <div class="absolute p-[0.714rem]">
+          <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
+        </div>
+        <FormKit
+          type="text"
+          name="search"
+          input-class="w-full pl-[2.5rem!important]"
+          label-class="font-medium"
+          messages-class="text-red-500 text-[0.75rem]"
+          placeholder="Ej: Manzana"
+          v-model="search"
+        />
+      </div>
+      <button
+        @click="search = ''"
+        class="btn bg-secondary border border-red-200 flex items-center gap-2 hover:bg-danger hover:text-white text-nowrap"
+        v-if="search"
+      >
+        <IcTwotoneClear class="text-red-200" />
+        Limpiar
+      </button>
+    </div>
+    <!-- This element only avoids elements reordering  -->
+    <div v-if="!buttonIsVisible" class="h-[3.071rem]"></div>
+    <div
+      v-if="productsCleaned.length"
       class="flex flex-col bg-secondary shadow overflow-hidden"
-      v-for="(product, index) in products"
+      v-for="(product, index) in productsCleaned"
       :class="{
         'border border-primary rounded-[0.857rem]': selectedProduct[product.id] || productSold[product.id],
         'rounded-[0.428rem]': !selectedProduct[product.id]
@@ -92,21 +122,27 @@
         </div>
       </Transition>
     </div>
+    <div class="flex" v-else-if="!areProductsFetched">Cargando productos...</div>
+    <div class="flex" v-else>No se encontraron productos</div>
   </div>
-  <div class="flex" v-else-if="!areProductsFetched">Cargando productos...</div>
-  <div class="flex" v-else="areProductsFetched">No se encontraron productos</div>
   <Loader v-if="submitting" />
 </template>
 
 <script setup>
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import EvaArrowBackOutline from "~icons/eva/arrow-back-outline";
+import AntDesignSearchOutlined from "~icons/ant-design/search-outlined";
+import IcTwotoneClear from "~icons/ic/twotone-clear";
+
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 // ----- Define Useful Properties -------
 const { $dayjs } = useNuxtApp();
 
 // ----- Define Vars -------
+const selectedProduct = ref({});
+const search = ref("");
+const productSold = ref({});
 const submitting = ref(false);
 const form = ref({
   quantity: "",
@@ -114,6 +150,12 @@ const form = ref({
   sellingPrice: "",
   date: $dayjs().format("YYYY-MM-DD")
 });
+
+// Refs
+const backButton = ref(null);
+
+// VueUse
+const buttonIsVisible = useElementVisibility(backButton);
 
 // ----- Define Pinia Vars --------
 const productsStore = useProductsStore();
@@ -125,9 +167,12 @@ const { getSells: sells } = storeToRefs(sellsStore);
 productsStore.fetchData();
 sellsStore.fetchData();
 
-// ----- Define Vars -------
-const selectedProduct = ref({});
-const productSold = ref({});
+// ----- Define Computed -------
+const productsCleaned = computed(() => {
+  return products.value.filter((product) => {
+    return product.productName.toLowerCase().includes(search.value.toLowerCase());
+  });
+});
 
 // ----- Define Hooks -------
 onMounted(() => {

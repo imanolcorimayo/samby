@@ -3,11 +3,54 @@
     <Navigator />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
-        <h1 class="font-semibold">Lista de ventas</h1>
-        <NuxtLink to="/ventas/nuevo" class="btn bg-primary text-white flex items-center"
-          ><IcRoundPlus class="text-[1.143rem]" /> Nueva venta
+        <h1 class="text-start font-semibold">Lista de ventas</h1>
+        <NuxtLink to="/ventas/nuevo" class="btn bg-primary text-white flex items-center text-nowrap"
+          ><IcRoundPlus class="text-[1.143rem]" ref="newButton" /> Nueva venta
         </NuxtLink>
       </div>
+      <div
+        class="flex flex-col sm:flex-row gap-2 w-full"
+        :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
+      >
+        <div class="w-full">
+          <div class="absolute p-[0.714rem]">
+            <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
+          </div>
+          <FormKit
+            type="text"
+            name="search"
+            input-class="w-full pl-[2.5rem!important]"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            placeholder="Ej: Manzana"
+            v-model="search"
+          />
+        </div>
+        <div class="flex justify-between w-fit gap-3 w-full">
+          <FormKit
+            type="date"
+            name="filter_date"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            input-class="w-full"
+            placeholder="yyyy-mm-dd"
+            v-model="filterDate"
+          />
+          <button
+            @click="
+              search = '';
+              filterDate = '';
+            "
+            class="btn bg-secondary border border-red-200 flex items-center gap-2 hover:bg-danger hover:text-white text-nowrap"
+            v-if="search || filterDate"
+          >
+            <IcTwotoneClear class="text-red-200" />
+            Limpiar
+          </button>
+        </div>
+      </div>
+      <!-- This element only avoids elements reordering  -->
+      <div v-if="!buttonIsVisible" class="h-[6.785rem] sm:h-[3.071rem]"></div>
       <div class="flex flex-col gap-[0.571rem]" v-if="sellsCleaned.length">
         <div
           class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow"
@@ -61,6 +104,12 @@
 
 <script setup>
 import IcRoundPlus from "~icons/ic/round-plus";
+import AntDesignSearchOutlined from "~icons/ant-design/search-outlined";
+import IcTwotoneClear from "~icons/ic/twotone-clear";
+
+// ----- Define Useful Properties -------
+const { $dayjs } = useNuxtApp();
+
 // ----- Define Pinia Vars --------
 const sellsStore = useSellsStore();
 const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
@@ -71,9 +120,36 @@ const { getProducts: products } = storeToRefs(productsStore);
 productsStore.fetchData();
 sellsStore.fetchData();
 
+// ----- Define Vars -------
+const search = ref("");
+const filterDate = ref("");
+
+// Refs
+const newButton = ref(null);
+
+// VueUse
+const buttonIsVisible = useElementVisibility(newButton);
+
 // ----- Define Computed -------
 const sellsCleaned = computed(() => {
-  return sells.value.map((sell) => {
+  // Check sells
+  if (!sells.value) return [];
+
+  // Filter sells based on search
+  let searchSells = sells.value;
+  if (search.value || filterDate.value) {
+    searchSells = sells.value.filter((sell) => {
+      // Check if name includes search
+      const nameIncludes = sell.product.name.toLowerCase().includes(search.value.toLowerCase());
+
+      // Check if date matches with filterDate
+      const dateMatches = filterDate.value ? $dayjs(sell.date).format("YYYY-MM-DD") === filterDate.value : true;
+
+      return nameIncludes && dateMatches;
+    });
+  }
+
+  return searchSells.map((sell) => {
     let objectToReturn = {
       ...sell
     };
@@ -91,6 +167,8 @@ const sellsCleaned = computed(() => {
 });
 
 // ----- Define Methods -------
+
+// ----- Define Watchers -------
 
 useHead({
   title: "Lista de ventas"

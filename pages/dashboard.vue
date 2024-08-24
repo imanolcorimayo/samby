@@ -4,7 +4,11 @@
     <div class="flex flex-col gap-4">
       <div class="flex justify-between">
         <h1 class="font-semibold text-start">Resumen Financiero</h1>
-        <button v-if="!showFilters" @click="showFilters = true" class="btn bg-secondary shadow flex items-center gap-2">
+        <button
+          v-if="!showFilters"
+          @click="showFilters = true"
+          class="btn bg-secondary shadow flex items-center gap-2 text-nowrap"
+        >
           <PepiconsPopEye /> Ver filtros
         </button>
         <button v-if="showFilters" @click="showFilters = false" class="btn bg-secondary shadow flex items-center gap-2">
@@ -68,26 +72,28 @@
           <span class="font-semibold text-[1.143rem]">Ranking dias de venta</span>
           <span class="text-gray-500">Comparacion de dias de venta</span>
         </div>
-        <table class="w-full">
-          <thead>
-            <tr class="text-left border-b text-gray-400 font-normal">
-              <th class="text-sm text-center"></th>
-              <th class="text-sm text-left">Fecha</th>
-              <th class="text-sm text-center">Tot. Facturado</th>
-              <th class="text-sm text-center">G. Total</th>
-              <th class="text-sm text-center">% Gan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="border-b" v-for="(d, index) in dayOfSellsTable" :key="`sell-${index}`">
-              <td class="py-2 font-medium">{{ index + 1 }}</td>
-              <td class="py-2 font-medium">{{ d.dateFormatted }}</td>
-              <td class="py-2 text-center">{{ formatPrice(d.totalSelling) }}</td>
-              <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(d.totalEarnings) }}</td>
-              <td class="py-2 text-center">{{ d.earningP.toFixed(1) }}%</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="w-full overflow-auto">
+          <table>
+            <thead>
+              <tr class="text-left border-b text-gray-400 font-normal">
+                <th class="text-sm text-center"></th>
+                <th class="text-sm text-left">Fecha</th>
+                <th class="text-sm text-center">Tot. Facturado</th>
+                <th class="text-sm text-center">G. Total</th>
+                <th class="text-sm text-center">% Gan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b" v-for="(d, index) in dayOfSellsTable" :key="`sell-${index}`">
+                <td class="py-2 font-medium">{{ index + 1 }}</td>
+                <td class="py-2 font-medium">{{ d.dateFormatted }}</td>
+                <td class="py-2 text-center">{{ formatPrice(d.totalSelling) }}</td>
+                <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(d.totalEarnings) }}</td>
+                <td class="py-2 text-center">{{ d.earningP.toFixed(1) }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div class="flex flex-col gap-[2rem]">
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
@@ -145,7 +151,7 @@
             >
           </div>
           <div>
-            <canvas id="weeklyPricePerProduct" width="400" :height="width >= 768 ? '200' : '800'"></canvas>
+            <canvas id="weeklyPricePerProduct" width="400" :height="width >= 768 ? '200' : '1000'"></canvas>
           </div>
         </div>
       </div>
