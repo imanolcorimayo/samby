@@ -586,7 +586,9 @@ function createWeeklyPricePerProduct() {
         label: product.name,
         data: product.prices,
         fill: false,
-        tension: 0.1
+        tension: 0.1,
+        // Increase point
+        pointRadius: 5
       };
     })
   };
@@ -596,6 +598,9 @@ function createWeeklyPricePerProduct() {
     type: "line",
     data: data,
     options: {
+      interaction: {
+        mode: "dataset"
+      },
       responsive: true,
       scales: {
         y: {
