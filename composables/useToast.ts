@@ -1,4 +1,5 @@
 import { toast } from "vue3-toastify";
+import type { ToastEvents } from "~/interfaces";
 
 enum Methods {
   "sendMail",
@@ -10,12 +11,6 @@ interface Method {
   position?: String;
   autoClose?: Number;
   onClick?: Function | Methods;
-}
-
-enum ToastEvents {
-  "success" = "success",
-  "error" = "error",
-  "info" = "info"
 }
 
 /**

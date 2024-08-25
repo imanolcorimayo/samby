@@ -18,3 +18,23 @@ export const formatToMillion = (price: Number) => {
     }).format(million) + "M"
   );
 };
+
+export const validateSell = (sell: any) => {
+  const { $dayjs } = useNuxtApp();
+
+  if (!sell) return false;
+
+  // Validate it has quantity
+  if (!sell.quantity) return false;
+
+  // Validate is has buyingPrice and it's a float number
+  if (!sell.buyingPrice || isNaN(sell.buyingPrice)) return false;
+
+  // Validate is has sellingPrice and it's a float number
+  if (!sell.sellingPrice || isNaN(sell.sellingPrice)) return false;
+
+  // Validate is has date and validate date format using dayjs
+  if (!sell.date || !$dayjs(sell.date, { format: "YYYY-MM-DD" }).isValid()) return false;
+
+  return true;
+};

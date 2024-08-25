@@ -2,8 +2,9 @@
   <ModalStructure ref="mainModal">
     <template #header>
       <div class="flex flex-col cursor-pointer w-full">
-        <span class="font-semibold text-xl">Palta</span>
-        <span class="text-gray-500">Unidad: Bolsa</span>
+        <span class="font-semibold text-xl">{{ currentProduct.productName }}</span>
+        <span class="text-gray-500" v-if="currentProduct.description">{{ currentProduct.description }}</span>
+        <span class="text-gray-500">Unidad: {{ currentProduct.unit }}</span>
       </div>
     </template>
     <template #default>
@@ -12,7 +13,7 @@
         id="ventas-nuevo"
         :form-class="'flex flex-col gap-4 w-full'"
         submit-label="Nueva Venta"
-        @submit="() => updateSell('some', 'other')"
+        @submit="updateSell"
         :actions="false"
       >
         <FormKit
@@ -73,7 +74,8 @@
 
       <div v-if="submitting" class="btn bg-danger text-white text-nowrap">loading...</div>
       <button
-        @click="deleteSell('Some')"
+        v-else
+        @click="deleteSell()"
         class="flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
       >
         <TablerTrash /> Borrar
@@ -85,15 +87,19 @@
 </template>
 
 <script setup>
+import { ToastEvents } from "~/interfaces";
 import TablerTrash from "~icons/tabler/trash";
 
 // ----- Define Pinia Vars -----
 const sellsStore = useSellsStore();
 const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
+const productsStore = useProductsStore();
+const { getProducts: products, areProductsFetched } = storeToRefs(productsStore);
 
 // ----- Define Vars -----
 const submitting = ref(false);
 const currentSell = ref(null);
+const currentProduct = ref(null);
 const form = ref({
   quantity: 0,
   buyingPrice: 0,
@@ -106,46 +112,117 @@ const mainModal = ref(null);
 const confirmDialogue = ref(null);
 
 // ----- Define Methods -----
-async function updateSell(id, productName) {
+async function updateSell() {
+  // Prevent multiple submits
+  if (submitting.value) {
+    return;
+  }
+  submitting.value = true;
+
   // Confirm dialogue
   const confirmed = await confirmDialogue.value.openDialog({ edit: true });
 
   if (!confirmed) {
+    submitting.value = false;
     return;
   }
 
-  // Clean currentSell
+  // Check currentSell is not null
+  if (!currentSell.value) {
+    useToast("error", "Parece que ha ocurrido un error, por favor intenta nuevamente.");
+    return;
+  }
+
+  // Verify the sell isn't the same as before
+  if (
+    form.value.quantity === currentSell.value.quantity &&
+    form.value.buyingPrice === currentSell.value.buyingPrice &&
+    form.value.sellingPrice === currentSell.value.sellingPrice &&
+    form.value.date === currentSell.value.date
+  ) {
+    useToast("error", "No se han realizado cambios en la venta.");
+    return;
+  }
+
+  // Update
+  const updated = await sellsStore.updateSell(
+    {
+      quantity: form.value.quantity,
+      buyingPrice: form.value.buyingPrice,
+      sellingPrice: form.value.sellingPrice,
+      date: form.value.date
+    },
+    currentSell.value.id
+  );
+
+  if (!updated) {
+    useToast("error", "No se ha podido actualizar la venta, por favor intenta nuevamente.");
+    return;
+  }
+
+  // Clean currentSell, currentProduct and submitting object
   currentSell.value = null;
+  currentProduct.value = null;
+  submitting.value = false;
 
   // Close modal
   mainModal.value.closeModal();
+
+  // Show success message
+  useToast(ToastEvents.success, "Venta actualizada correctamente.");
 }
 
-async function deleteSell(id) {
+async function deleteSell() {
+  // Prevent multiple submits
+  if (submitting.value) {
+    return;
+  }
+  submitting.value = true;
+
   // Confirm dialogue
   const confirmed = await confirmDialogue.value.openDialog();
 
   if (!confirmed) {
+    submitting.value = false;
+    return;
+  }
+
+  // Check currentSell is not null
+  if (!currentSell.value) {
+    useToast("error", "Parece que ha ocurrido un error, por favor intenta nuevamente.");
     return;
   }
 
   // Delete
-  console.log("DELETED");
+  const deleted = await sellsStore.deleteSell(currentSell.value.id);
 
-  // Use toast to show success message
-  useToast("success", "Venta eliminada correctamente.");
+  if (!deleted) {
+    useToast("error", "No se ha podido eliminar la venta, por favor intenta nuevamente.");
+    return;
+  }
 
-  // Clean currentSell
+  // Clean currentSell and submitting
   currentSell.value = null;
+  currentProduct.value = null;
+  submitting.value = false;
 
   // Close modal
   mainModal.value.closeModal();
+
+  // Use toast to show success message
+  useToast("success", "Venta eliminada correctamente.");
 }
 
 const showModal = (sellId) => {
   // Check sells are fetched
   if (!areSellsFetched.value) {
     useToast("error", "Parece que las ventas no han sido cargadas aún, por favor intenta nuevamente.");
+    return;
+  }
+
+  // Check products are fetched
+  if (!areProductsFetched.value) {
+    useToast("error", "Parece que los productos no han sido cargados aún, por favor intenta nuevamente.");
     return;
   }
 
@@ -174,17 +251,23 @@ const showModal = (sellId) => {
     date: sell.date
   };
 
+  // Get current product
+  const product = products.value.find((product) => product.id === sell.product.id);
+
+  // Check if product exists
+  if (!product) {
+    useToast("error", "Parece que el producto no existe, por favor intenta nuevamente.");
+    return;
+  }
+
+  // Set current product
+  currentProduct.value = product;
+
   // Show modal
   mainModal.value.showModal();
 };
 
 // ----- Define Hooks -----
-onMounted(() => {
-  if (mainModal.value) {
-    // Show modal
-    mainModal.value.showModal();
-  }
-});
 
 // ----- Define Expose -----
 defineExpose({ showModal });

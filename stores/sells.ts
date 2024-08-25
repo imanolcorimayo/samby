@@ -12,7 +12,7 @@ import {
   deleteDoc,
   orderBy
 } from "firebase/firestore";
-import type { User } from "firebase/auth";
+import { ToastEvents } from "~/interfaces";
 
 const defaultObject = {
   fetched: false,
@@ -77,6 +77,51 @@ export const useSellsStore = defineStore("sells", {
     },
     async addSell(sell: any) {
       this.$state.sells.push(sell);
+    },
+    async updateSell(sell: any, sellId: string) {
+      const db = useFirestore();
+      const sellReference = doc(db, "venta", sellId);
+      const sellIndex = this.$state.sells.findIndex((el: any) => el.id == sellId);
+
+      // Validate sell object
+      const isSellValid = validateSell(sell);
+
+      if (!isSellValid) {
+        useToast(ToastEvents.error, "La venta no es válida");
+        return false;
+      }
+
+      try {
+        // Update doc using paymentRef only if it's not one time payment
+        await updateDoc(sellReference, sell);
+        this.$state.sells[sellIndex] = Object.assign({}, { ...this.$state.sells[sellIndex], ...sell });
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    },
+    async deleteSell(sellId: string) {
+      const db = useFirestore();
+
+      try {
+        // Remove first from main payment object
+        await deleteDoc(doc(db, "venta", sellId));
+
+        // Get index of the sell in the current store
+        const index = this.$state.sells.findIndex((sell) => sell.id === sellId);
+
+        // Remove from the store
+        if (index > -1) {
+          this.$state.sells.splice(index, 1);
+        }
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
     }
   }
 });
