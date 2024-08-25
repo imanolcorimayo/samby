@@ -203,7 +203,6 @@ function getLastSellDate() {
 }
 
 function showSellsDetails(id) {
-  console.log("SHOW SELLS DETAILS");
   // Check sellsDetails is defined
   if (!sellsDetails.value) return;
 

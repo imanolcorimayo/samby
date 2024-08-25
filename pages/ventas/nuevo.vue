@@ -348,14 +348,6 @@ watch(sells, () => {
   setProductSold(sells.value);
 });
 
-watch(
-  form,
-  (newValue) => {
-    console.log(newValue.quality);
-  },
-  { deep: true }
-);
-
 useHead({
   title: "Nueva venta"
 });
