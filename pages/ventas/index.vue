@@ -62,8 +62,6 @@
           <div class="flex justify-between">
             <div class="flex flex-col">
               <span class="font-semibold text-[1.143rem]">{{ sell.product?.productName }}</span>
-              <span class="text-xs text-gray-500">Venta id: {{ sell.id }}</span>
-              <span class="text-xs text-gray-500">Producto id: {{ sell.product?.id }}</span>
             </div>
             <span class="font-medium text-[1.143rem]">{{ formatPrice(sell.sellingPrice * sell.quantity) }}</span>
           </div>
@@ -95,7 +93,19 @@
               </div>
             </div>
           </div>
-          <span class="">Fecha: {{ sell.date }}</span>
+          <div class="flex justify-between">
+            <span class="">Fecha: {{ sell.date }}</span>
+            <div class="flex items-center gap-2" v-if="sell.quality == 'baja'">
+              <span>Calidad:</span> <AkarIconsCircleXFill class="text-[1.285rem] text-danger" />
+            </div>
+            <div class="flex items-center gap-2" v-else-if="sell.quality == 'intermedia'">
+              <span>Calidad:</span> <FluentStarHalf12Regular class="text-[1.428rem] text-[#fcd53f]" />
+            </div>
+            <div class="flex items-center gap-2" v-else-if="sell.quality == 'buena'">
+              <span>Calidad:</span> <IconoirStarSolid class="text-[1.285rem] text-[#fcd53f]" />
+            </div>
+            <div class="flex items-center gap-2" v-else><span>Calidad:</span> <span class="font-medium">N/A</span></div>
+          </div>
         </div>
       </div>
       <div class="flex" v-else-if="!areSellsFetched">Cargando ventas...</div>
@@ -108,6 +118,10 @@
 import IcRoundPlus from "~icons/ic/round-plus";
 import AntDesignSearchOutlined from "~icons/ant-design/search-outlined";
 import IcTwotoneClear from "~icons/ic/twotone-clear";
+
+import FluentStarHalf12Regular from "~icons/fluent/star-half-12-regular";
+import IconoirStarSolid from "~icons/iconoir/star-solid";
+import AkarIconsCircleXFill from "~icons/akar-icons/circle-x-fill";
 
 // ----- Define Useful Properties -------
 const { $dayjs } = useNuxtApp();

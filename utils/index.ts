@@ -27,6 +27,9 @@ export const validateSell = (sell: any) => {
   // Validate it has quantity
   if (!sell.quantity) return false;
 
+  // Validate quality
+  if (!sell.quality) return false;
+
   // Validate is has buyingPrice and it's a float number
   if (!sell.buyingPrice || isNaN(sell.buyingPrice)) return false;
 

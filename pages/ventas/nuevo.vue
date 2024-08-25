@@ -116,6 +116,67 @@
               validation="required"
               v-model="form.date"
             />
+            <div class="flex flex-col gap-[0.143rem]">
+              <span class="font-medium">Calidad del producto</span>
+              <div class="flex gap-2 justify-between">
+                <div class="flex-1 w-full">
+                  <input
+                    v-model="form.quality"
+                    class="hidden"
+                    type="radio"
+                    id="baja"
+                    name="quality"
+                    value="baja"
+                    checked
+                  />
+                  <label
+                    :class="{
+                      'ring-2 ring-primary': form.quality === 'baja'
+                    }"
+                    class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
+                    for="baja"
+                  >
+                    <AkarIconsCircleXFill class="text-[1.285rem] text-danger" />
+                    <span>Baja</span>
+                  </label>
+                </div>
+
+                <div class="flex-1 w-full">
+                  <input
+                    v-model="form.quality"
+                    class="hidden"
+                    type="radio"
+                    id="intermedia"
+                    name="quality"
+                    value="intermedia"
+                  />
+                  <label
+                    :class="{
+                      'ring-2 ring-primary': form.quality === 'intermedia'
+                    }"
+                    class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
+                    for="intermedia"
+                  >
+                    <FluentStarHalf12Regular class="text-[1.428rem] text-[#fcd53f]" />
+                    <span>Intermedia</span>
+                  </label>
+                </div>
+
+                <div class="flex-1 w-full">
+                  <input v-model="form.quality" class="hidden" type="radio" id="buena" name="quality" value="buena" />
+                  <label
+                    :class="{
+                      'ring-2 ring-primary': form.quality === 'buena'
+                    }"
+                    class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
+                    for="buena"
+                  >
+                    <IconoirStarSolid class="text-[1.285rem] text-[#fcd53f]" />
+                    <span>Buena</span>
+                  </label>
+                </div>
+              </div>
+            </div>
             <div v-if="submitting" class="btn bg-primary text-white text-center">loading...</div>
             <FormKit v-else type="submit" label="Agregar" input-class="btn bg-primary text-white text-center w-full" />
           </FormKit>
@@ -133,6 +194,9 @@ import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import EvaArrowBackOutline from "~icons/eva/arrow-back-outline";
 import AntDesignSearchOutlined from "~icons/ant-design/search-outlined";
 import IcTwotoneClear from "~icons/ic/twotone-clear";
+import FluentStarHalf12Regular from "~icons/fluent/star-half-12-regular";
+import IconoirStarSolid from "~icons/iconoir/star-solid";
+import AkarIconsCircleXFill from "~icons/akar-icons/circle-x-fill";
 
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
@@ -146,6 +210,7 @@ const productSold = ref({});
 const submitting = ref(false);
 const form = ref({
   quantity: "",
+  quality: "buena",
   buyingPrice: "",
   sellingPrice: "",
   date: $dayjs().format("YYYY-MM-DD")
@@ -187,6 +252,8 @@ async function submitHandler(productId, productName) {
   // Set submitting to avoid having multiple requests
   submitting.value = true;
 
+  // Validate form
+  validateSell(form.value);
   // Get Firestore and Current User
   const db = useFirestore();
   const user = useCurrentUser();
@@ -215,6 +282,7 @@ async function submitHandler(productId, productName) {
   // Clean values
   form.value = {
     quantity: "",
+    quality: "buena",
     buyingPrice: "",
     sellingPrice: "",
     date: $dayjs().format("YYYY-MM-DD")
@@ -279,6 +347,14 @@ watch(products, () => {
 watch(sells, () => {
   setProductSold(sells.value);
 });
+
+watch(
+  form,
+  (newValue) => {
+    console.log(newValue.quality);
+  },
+  { deep: true }
+);
 
 useHead({
   title: "Nueva venta"

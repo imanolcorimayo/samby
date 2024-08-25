@@ -1,10 +1,16 @@
 <template>
   <ModalStructure ref="mainModal">
     <template #header>
-      <div class="flex flex-col cursor-pointer w-full">
-        <span class="font-semibold text-xl">{{ currentProduct.productName }}</span>
-        <span class="text-gray-500" v-if="currentProduct.description">{{ currentProduct.description }}</span>
-        <span class="text-gray-500">Unidad: {{ currentProduct.unit }}</span>
+      <div class="flex flex-col gap-2 w-full">
+        <div class="flex flex-col cursor-pointer w-full">
+          <span class="font-semibold text-xl">{{ currentProduct.productName }}</span>
+          <span class="text-gray-500" v-if="currentProduct.description">{{ currentProduct.description }}</span>
+          <span class="text-gray-500">Unidad: {{ currentProduct.unit }}</span>
+        </div>
+        <div class="flex flex-col cursor-pointer w-full">
+          <span class="text-xs text-gray-500">Venta id: {{ currentSell.id }}</span>
+          <span class="text-xs text-gray-500">Producto id: {{ currentSell.product?.id }}</span>
+        </div>
       </div>
     </template>
     <template #default>
@@ -60,6 +66,60 @@
           validation="required"
           v-model="form.date"
         />
+        <div class="flex flex-col gap-[0.143rem]">
+          <span class="font-medium">Calidad del producto</span>
+          <span class="font-medium text-xs text-danger" v-if="!form.quality">(no seleccionado)</span>
+          <div class="flex gap-2 justify-between m-1">
+            <div class="flex-1 w-full">
+              <input v-model="form.quality" class="hidden" type="radio" id="baja" name="quality" value="baja" checked />
+              <label
+                :class="{
+                  'ring-2 ring-primary': form.quality === 'baja'
+                }"
+                class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
+                for="baja"
+              >
+                <AkarIconsCircleXFill class="text-[1.285rem] text-danger" />
+                <span>Baja</span>
+              </label>
+            </div>
+
+            <div class="flex-1 w-full">
+              <input
+                v-model="form.quality"
+                class="hidden"
+                type="radio"
+                id="intermedia"
+                name="quality"
+                value="intermedia"
+              />
+              <label
+                :class="{
+                  'ring-2 ring-primary': form.quality === 'intermedia'
+                }"
+                class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
+                for="intermedia"
+              >
+                <FluentStarHalf12Regular class="text-[1.428rem] text-[#fcd53f]" />
+                <span>Intermedia</span>
+              </label>
+            </div>
+
+            <div class="flex-1 w-full">
+              <input v-model="form.quality" class="hidden" type="radio" id="buena" name="quality" value="buena" />
+              <label
+                :class="{
+                  'ring-2 ring-primary': form.quality === 'buena'
+                }"
+                class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
+                for="buena"
+              >
+                <IconoirStarSolid class="text-[1.285rem] text-[#fcd53f]" />
+                <span>Buena</span>
+              </label>
+            </div>
+          </div>
+        </div>
       </FormKit>
     </template>
     <template #footer>
@@ -89,6 +149,9 @@
 <script setup>
 import { ToastEvents } from "~/interfaces";
 import TablerTrash from "~icons/tabler/trash";
+import FluentStarHalf12Regular from "~icons/fluent/star-half-12-regular";
+import IconoirStarSolid from "~icons/iconoir/star-solid";
+import AkarIconsCircleXFill from "~icons/akar-icons/circle-x-fill";
 
 // ----- Define Pinia Vars -----
 const sellsStore = useSellsStore();
@@ -102,6 +165,7 @@ const currentSell = ref(null);
 const currentProduct = ref(null);
 const form = ref({
   quantity: 0,
+  quality: false,
   buyingPrice: 0,
   sellingPrice: 0,
   date: ""
@@ -136,10 +200,12 @@ async function updateSell() {
   // Verify the sell isn't the same as before
   if (
     form.value.quantity === currentSell.value.quantity &&
+    form.value.quality === currentSell.value.quality &&
     form.value.buyingPrice === currentSell.value.buyingPrice &&
     form.value.sellingPrice === currentSell.value.sellingPrice &&
     form.value.date === currentSell.value.date
   ) {
+    submitting.value = false;
     useToast("error", "No se han realizado cambios en la venta.");
     return;
   }
@@ -148,6 +214,7 @@ async function updateSell() {
   const updated = await sellsStore.updateSell(
     {
       quantity: form.value.quantity,
+      quality: form.value.quality,
       buyingPrice: form.value.buyingPrice,
       sellingPrice: form.value.sellingPrice,
       date: form.value.date
@@ -246,6 +313,7 @@ const showModal = (sellId) => {
   // Fill form
   form.value = {
     quantity: sell.quantity,
+    quality: sell.quality ? sell.quality : false,
     buyingPrice: sell.buyingPrice,
     sellingPrice: sell.sellingPrice,
     date: sell.date

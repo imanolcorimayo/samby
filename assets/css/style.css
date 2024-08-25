@@ -163,3 +163,12 @@ textarea:disabled {
   color: #333;
   cursor: not-allowed;
 }
+
+/* Hide the default radio button */
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -o-appearance: none;
+  outline: none;
+}
