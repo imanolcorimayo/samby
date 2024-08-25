@@ -9,7 +9,7 @@
         </NuxtLink>
       </div>
       <div
-        class="flex flex-col sm:flex-row gap-2 w-full"
+        class="flex flex-row gap-2 w-full"
         :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
       >
         <div class="w-full">
@@ -26,8 +26,9 @@
             v-model="search"
           />
         </div>
-        <div class="flex justify-between w-fit gap-3 w-full">
+        <div class="flex-1 flex justify-between gap-3 w-full sm:w-fit">
           <FormKit
+            outer-class="w-full sm:w-fit"
             type="date"
             name="filter_date"
             label-class="font-medium"
@@ -45,12 +46,11 @@
             v-if="search || filterDate"
           >
             <IcTwotoneClear class="text-red-200" />
-            Limpiar
           </button>
         </div>
       </div>
       <!-- This element only avoids elements reordering  -->
-      <div v-if="!buttonIsVisible" class="h-[6.785rem] sm:h-[3.071rem]"></div>
+      <div v-if="!buttonIsVisible" class="h-[3.071rem]"></div>
       <div class="flex flex-col gap-[0.571rem]" v-if="sellsCleaned.length">
         <div
           class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow"
@@ -166,9 +166,31 @@ const sellsCleaned = computed(() => {
   });
 });
 
+// ----- Define Hooks -------
+onMounted(() => {
+  console.log("SOME");
+  // Find last sell date and assign to filterDate
+  getLastSellDate();
+});
+
 // ----- Define Methods -------
+function getLastSellDate() {
+  // Find last sell date and assign to filterDate
+  if (sells.value) {
+    // Loop through sells to find the last date
+    sells.value.forEach((sell) => {
+      if (!filterDate.value || $dayjs(sell.date).isAfter($dayjs(filterDate.value))) {
+        filterDate.value = $dayjs(sell.date).format("YYYY-MM-DD");
+      }
+    });
+  }
+}
 
 // ----- Define Watchers -------
+watch(sells, (newValue) => {
+  // Find last sell date and assign to filterDate
+  getLastSellDate();
+});
 
 useHead({
   title: "Lista de ventas"

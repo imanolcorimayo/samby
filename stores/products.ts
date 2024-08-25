@@ -16,7 +16,7 @@ import type { User } from "firebase/auth";
 
 const defaultObject = {
   fetched: false,
-  products: false
+  products: []
 };
 export const useProductsStore = defineStore("products", {
   state: (): any => {

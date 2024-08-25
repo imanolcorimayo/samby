@@ -73,7 +73,7 @@
           <span class="text-gray-500">Comparacion de dias de venta</span>
         </div>
         <div class="w-full overflow-auto">
-          <table>
+          <table class="w-full">
             <thead>
               <tr class="text-left border-b text-gray-400 font-normal">
                 <th class="text-sm text-center"></th>
