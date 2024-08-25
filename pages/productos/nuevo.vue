@@ -92,7 +92,6 @@ const form = ref({
 
 // ----- Define Methods -------
 async function submitHandler() {
-  console.log("#submitHandler");
   // If submitting, return
   if (submitting.value) return;
 

@@ -150,3 +150,16 @@ textarea {
   width: 100%;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
+
+/* Style disabled inputs */
+input[type="text"]:disabled,
+input[type="email"]:disabled,
+input[type="password"]:disabled,
+input[type="number"]:disabled,
+input[type="date"]:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: #f0f3f4;
+  color: #333;
+  cursor: not-allowed;
+}

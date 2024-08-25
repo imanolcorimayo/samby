@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col gap-[2rem] w-full">
+    <SellsDetails ref="sellsDetails" />
     <Navigator />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
@@ -53,9 +54,10 @@
       <div v-if="!buttonIsVisible" class="h-[3.071rem]"></div>
       <div class="flex flex-col gap-[0.571rem]" v-if="sellsCleaned.length">
         <div
-          class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow"
+          class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow cursor-pointer"
           v-for="(sell, index) in sellsCleaned"
           :key="index"
+          @click="showSellsDetails(sell.id)"
         >
           <div class="flex justify-between">
             <div class="flex flex-col">
@@ -126,6 +128,7 @@ const filterDate = ref("");
 
 // Refs
 const newButton = ref(null);
+const sellsDetails = ref(null);
 
 // VueUse
 const buttonIsVisible = useElementVisibility(newButton);
@@ -168,7 +171,6 @@ const sellsCleaned = computed(() => {
 
 // ----- Define Hooks -------
 onMounted(() => {
-  console.log("SOME");
   // Find last sell date and assign to filterDate
   getLastSellDate();
 });
@@ -184,6 +186,14 @@ function getLastSellDate() {
       }
     });
   }
+}
+
+function showSellsDetails(id) {
+  console.log("SHOW SELLS DETAILS");
+  // Check sellsDetails is defined
+  if (!sellsDetails.value) return;
+
+  sellsDetails.value.showModal(id);
 }
 
 // ----- Define Watchers -------
