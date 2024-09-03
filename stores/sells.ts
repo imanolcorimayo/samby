@@ -45,8 +45,8 @@ export const useSellsStore = defineStore("sells", {
         return;
       }
 
-      // Month start and end
-      const currentMonthStart = $dayjs().startOf("month");
+      // Get one month back
+      const previousMonthStart = $dayjs().subtract(1, "month").startOf("month");
       const currentMonthEnd = $dayjs().endOf("month");
 
       // collection based on user
@@ -60,7 +60,7 @@ export const useSellsStore = defineStore("sells", {
       const querySnapshot = await getDocs(
         query(
           collection(db, collectionName),
-          where("createdAt", ">=", currentMonthStart.toDate()),
+          where("createdAt", ">=", previousMonthStart.toDate()),
           where("createdAt", "<=", currentMonthEnd.toDate())
         )
       );
@@ -110,7 +110,7 @@ export const useSellsStore = defineStore("sells", {
         await deleteDoc(doc(db, "venta", sellId));
 
         // Get index of the sell in the current store
-        const index = this.$state.sells.findIndex((sell) => sell.id === sellId);
+        const index = this.$state.sells.findIndex((sell: any) => sell.id === sellId);
 
         // Remove from the store
         if (index > -1) {
