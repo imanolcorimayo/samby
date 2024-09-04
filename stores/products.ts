@@ -45,19 +45,9 @@ export const useProductsStore = defineStore("products", {
         return;
       }
 
-      // Month start and end
-      const currentMonthStart = $dayjs().startOf("month");
-      const currentMonthEnd = $dayjs().endOf("month");
-
       // Connect with firebase and get payments structure
       const db = useFirestore();
-      const querySnapshot = await getDocs(
-        query(
-          collection(db, "producto"),
-          where("createdAt", ">=", currentMonthStart.toDate()),
-          where("createdAt", "<=", currentMonthEnd.toDate())
-        )
-      );
+      const querySnapshot = await getDocs(query(collection(db, "producto")));
 
       querySnapshot.forEach((doc) => {
         products.push({
