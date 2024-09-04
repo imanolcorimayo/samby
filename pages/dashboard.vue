@@ -190,7 +190,7 @@ productsStore.fetchData();
 sellsStore.fetchData();
 
 // ----- Define Vars --------
-const minDate = ref($dayjs().startOf("week").subtract(1, "month").format("YYYY-MM-DD"));
+const minDate = ref($dayjs().subtract(1, "month").startOf("week").format("YYYY-MM-DD"));
 const maxDate = ref($dayjs().endOf("week").format("YYYY-MM-DD"));
 const showFilters = ref(false);
 const profitChart = ref({});
