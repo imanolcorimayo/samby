@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-[2rem] w-full">
     <Navigator />
     <div class="flex flex-col gap-4">
-      <div class="flex justify-between">
+      <div class="flex justify-between items-center">
         <h1 class="font-semibold text-start">Resumen Financiero</h1>
         <button
           v-if="!showFilters"
@@ -11,7 +11,11 @@
         >
           <PepiconsPopEye /> Ver filtros
         </button>
-        <button v-if="showFilters" @click="showFilters = false" class="btn bg-secondary shadow flex items-center gap-2">
+        <button
+          v-if="showFilters"
+          @click="showFilters = false"
+          class="btn bg-secondary shadow flex items-center gap-2 h-fit"
+        >
           <PhEyeClosedBold /> Esconder
         </button>
       </div>
@@ -186,7 +190,7 @@ productsStore.fetchData();
 sellsStore.fetchData();
 
 // ----- Define Vars --------
-const minDate = ref($dayjs().startOf("week").subtract(2, "week").format("YYYY-MM-DD"));
+const minDate = ref($dayjs().startOf("week").subtract(1, "month").format("YYYY-MM-DD"));
 const maxDate = ref($dayjs().endOf("week").format("YYYY-MM-DD"));
 const showFilters = ref(false);
 const profitChart = ref({});
