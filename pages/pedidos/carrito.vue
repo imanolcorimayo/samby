@@ -106,35 +106,37 @@ function confirmBuying() {
   window.open(url, "_blank");
 }
 
-function createMessage(products, address) {
-  // Verify address or add "N/A" if empty
-  const deliveryAddress = address ? address : "N/A";
+function createMessage(products) {
+  // Verify if the address is empty
+  const deliveryAddress = client.value.address ? client.value.address : "N/A";
 
-  // Start message with an empty string
-  let message = "";
+  // Add the introduction name
+  let message = `¡Hola, ${client.value.name}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
 
-  // Loop through products and format each entry according to the desired style
   products.forEach((product) => {
     const productPrice = formatPrice(product.price);
 
-    // Check if the quantity is fractional (e.g., "1/2" for half quantities)
+    // Verify if it's a fraction and add 1/2 if so
     const quantityText = product.quantity % 1 === 0 ? product.quantity : `${Math.floor(product.quantity)} + 1/2`;
 
-    message += `${quantityText} ${product.productName} ${productPrice}\n`;
+    message += `- ${quantityText} ${product.productName} ${productPrice}\n`;
   });
 
-  // Add delivery cost if necessary (assuming the delivery cost is a separate value)
-  const deliveryCost = shippingPrice.value ?? 1000; // Example value, adjust or pass it dynamically if needed
-  message += `\nCosto de Envío ${formatPrice(deliveryCost)}\n`;
+  // Añade el costo de envío
+  message += `\n🚚 Costo de Envío: ${formatPrice(shippingPrice.value)}\n`;
 
-  // Add the total amount at the end of the message
-  message += `Total: \n${formatPrice(totalWithShipping.value)}\n`;
+  // Añade el total
+  message += `💵 Total a Pagar: ${formatPrice(totalWithShipping.value)}\n`;
 
-  // Add delivery address
-  message += `Dirección de envio: \n${deliveryAddress}\n`;
+  // Añade la dirección de envío
+  message += `\n📍 Dirección de Envío: ${deliveryAddress}\n`;
+
+  // Cierra con un mensaje amigable
+  message += `\n¡Gracias por tu compra! Si necesitas algo más, no dudes en avisarnos. 😊`;
 
   return message;
 }
+
 function removeFromShopping(product) {
   ordersStore.removeProduct(product);
 
