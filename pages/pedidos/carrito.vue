@@ -48,7 +48,7 @@
       </div>
     </div>
     <div class="flex justify-between items-center gap-3">
-      <span class="font-bold text-xl">Total: {{ formatPrice(totalAmount) }}</span>
+      <span class="font-bold text-xl">Total: {{ formatPrice(totalWithShipping) }}</span>
       <button
         @click="confirmBuying"
         class="flex-1 btn bg-primary text-white flex items-center gap-2 justify-center text-nowrap text-start"
@@ -88,15 +88,16 @@ const client = ref({
 });
 const shippingPrice = ref(null);
 
+// ------- Define Computed --------
+const totalWithShipping = computed(() => totalAmount.value + (shippingPrice.value ?? 0));
+
 // ------- Define Methods --------
 function confirmBuying() {
   // Clean phone, keep only numbers
   const cleanPhone = client.value.phone.replace(/\D/g, "");
 
-  console.log(cleanPhone);
-
   // Message creation
-  const message = createMessage(products.value, client.value.address, totalAmount.value);
+  const message = createMessage(products.value, client.value.address);
 
   // Send message to wsp
   const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
@@ -105,7 +106,7 @@ function confirmBuying() {
   window.open(url, "_blank");
 }
 
-function createMessage(products, address, totalAmount) {
+function createMessage(products, address) {
   // Verify address or add "N/A" if empty
   const deliveryAddress = address ? address : "N/A";
 
@@ -117,20 +118,20 @@ function createMessage(products, address, totalAmount) {
     const productPrice = formatPrice(product.price);
 
     // Check if the quantity is fractional (e.g., "1/2" for half quantities)
-    const quantityText = product.quantity % 1 === 0 ? product.quantity : `${product.quantity * 2}/2`;
+    const quantityText = product.quantity % 1 === 0 ? product.quantity : `${Math.floor(product.quantity)} + 1/2`;
 
     message += `${quantityText} ${product.productName} ${productPrice}\n`;
   });
 
   // Add delivery cost if necessary (assuming the delivery cost is a separate value)
   const deliveryCost = shippingPrice.value ?? 1000; // Example value, adjust or pass it dynamically if needed
-  message += `Envío ${formatPrice(deliveryCost)}\n`;
+  message += `\nCosto de Envío ${formatPrice(deliveryCost)}\n`;
 
   // Add the total amount at the end of the message
-  message += `\n${formatPrice(totalAmount)}\n`;
+  message += `Total: \n${formatPrice(totalWithShipping.value)}\n`;
 
   // Add delivery address
-  message += `\n${deliveryAddress}\n`;
+  message += `Dirección de envio: \n${deliveryAddress}\n`;
 
   return message;
 }
