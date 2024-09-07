@@ -77,7 +77,6 @@ const user = await getCurrentUser();
 const route = useRoute();
 
 // ----- Define Pinia Vars ----------
-const indexStore = useIndexStore();
 
 // ---- Define Vars --------
 const showMenu = ref(false);

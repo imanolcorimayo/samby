@@ -112,6 +112,14 @@ select {
   padding: 0.714rem;
 }
 
+.btn-sm {
+  cursor: pointer;
+  font-weight: 500;
+  outline: none;
+  border-radius: 0.214rem;
+  padding: 0.428rem;
+}
+
 .vc-container {
   position: absolute;
 }

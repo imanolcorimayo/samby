@@ -1,18 +1,25 @@
 <template>
   <div class="flex-1 flex flex-col gap-[1rem] min-h-full w-full justify-center items-center">
     <NuxtLink
-      to="/ventas/nuevo"
+      to="/pedidos/nuevo"
       class="btn bg-primary w-full text-white text-center mx-auto max-w-[20rem] flex justify-center items-center gap-[0.512rem]"
     >
       <TablerPlus class="text-white" />
+      <span>Nuevo Pedido</span>
+    </NuxtLink>
+    <NuxtLink
+      to="/ventas/nuevo"
+      class="btn bg-secondary border-2 w-full text-center mx-auto max-w-[20rem] flex justify-center items-center gap-[0.512rem]"
+    >
+      <TablerPlus class="text-black" />
       <span>Agregar Venta</span>
     </NuxtLink>
     <NuxtLink
-      to="/ventas"
+      to="/pedidos"
       class="btn bg-secondary border-2 w-full text-center mx-auto max-w-[20rem] flex justify-center items-center gap-[0.512rem]"
     >
       <BxLogIn class="text-black" />
-      <span> Pagina Principal</span>
+      <span>Pagina Principal</span>
     </NuxtLink>
   </div>
 </template>
