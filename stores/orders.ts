@@ -34,8 +34,6 @@ export const useOrdersStore = defineStore("orders", {
       // Create the order object
       let order = [];
       for (const pId in productsQuantity) {
-        console.log(pId, productsQuantity[pId]);
-
         if (productsQuantity[pId] <= 0) {
           continue;
         }
@@ -53,8 +51,6 @@ export const useOrdersStore = defineStore("orders", {
           unit: product.unit,
           total: productsQuantity[pId] * product.price
         });
-
-        console.log("product: ", product);
       }
 
       // Save the order in the store

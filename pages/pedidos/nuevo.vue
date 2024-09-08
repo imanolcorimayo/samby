@@ -57,31 +57,37 @@
             <span class="font-semibold">{{ product.productName }}</span>
             <span class="text-gray-500">Unidad: {{ product.unit }}</span>
           </div>
-          <div v-if="!selectedProduct[product.id]">
-            <button @click="selectProduct(product.id)" class="p-[0.428rem] text-white rounded-full bg-gray-200">
-              <TablerPlus class="text-black text-[0.857rem]" />
-            </button>
-          </div>
-          <div v-else class="flex items-center gap-2">
-            <button
-              @click="manageProduct(product.id, 'remove')"
-              class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
-            >
-              <MiRemove v-if="productsQuantity[product.id] > 1" class="text-black text-[0.857rem]" />
-              <TablerTrash v-else class="text-black text-[0.857rem]" />
-            </button>
-            <input
-              @change="manageProduct(product.id, 'typing')"
-              type="number"
-              class="text-[0.857rem!important] w-[4rem!important] p-[0.428rem!important] rounded-[0.214rem] ring-1 ring-gray-500 text-center text-nowrap max-h-[2.143rem]"
-              v-model="productsQuantity[product.id]"
-            />
-            <button
-              @click="manageProduct(product.id, 'add')"
-              class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
-            >
-              <TablerPlus class="text-black text-[0.857rem]" />
-            </button>
+          <div class="flex flex-col items-end gap-3">
+            <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
+            <div v-if="!selectedProduct[product.id]">
+              <button
+                @click="selectProduct(product.id, product.step ?? 0.5)"
+                class="p-[0.428rem] text-white rounded-full bg-gray-200"
+              >
+                <TablerPlus class="text-black text-[0.857rem]" />
+              </button>
+            </div>
+            <div v-else class="flex items-center gap-2">
+              <button
+                @click="manageProduct(product.id, 'remove', product.step ?? 0.5)"
+                class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
+              >
+                <MiRemove v-if="productsQuantity[product.id] > 1" class="text-black text-[0.857rem]" />
+                <TablerTrash v-else class="text-black text-[0.857rem]" />
+              </button>
+              <input
+                @change="manageProduct(product.id, 'typing', product.step ?? 0.5)"
+                type="number"
+                class="text-[0.857rem!important] w-[4rem!important] p-[0.428rem!important] rounded-[0.214rem] ring-1 ring-gray-500 text-center text-nowrap max-h-[2.143rem]"
+                v-model="productsQuantity[product.id]"
+              />
+              <button
+                @click="manageProduct(product.id, 'add', product.step ?? 0.5)"
+                class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
+              >
+                <TablerPlus class="text-black text-[0.857rem]" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -102,6 +108,12 @@ import TablerTrash from "~icons/tabler/trash";
 
 // ----- Define Useful Properties -------
 
+// ----- Define Pinia Vars --------
+const productsStore = useProductsStore();
+const { products, areProductsFetched } = storeToRefs(productsStore);
+const ordersStore = useOrdersStore();
+const { getShoppingCart: shoppingCart } = storeToRefs(ordersStore);
+
 // ----- Define Vars -------
 const search = ref("");
 const selectedProduct = ref({});
@@ -115,11 +127,6 @@ const subtitle = ref(null);
 // VueUse
 const buttonIsVisible = useElementVisibility(subtitle);
 
-// ----- Define Pinia Vars --------
-const productsStore = useProductsStore();
-const { products, areProductsFetched } = storeToRefs(productsStore);
-const ordersStore = useOrdersStore();
-
 // Function will manage if the data is already fetched
 productsStore.fetchData();
 
@@ -132,15 +139,14 @@ const productsCleaned = computed(() => {
 
 // ----- Define Hooks -------
 onMounted(() => {
+  // Create selectedProduct object
+  createSelectedProduct();
   // Create productsQuantity object
-  productsQuantity.value = products.value.reduce((acc, product) => {
-    acc[product.id] = productsQuantity.value[product.id] || 0;
-    return acc;
-  }, {});
+  createProductQuantityObject();
 });
 
 // ----- Define Methods -------
-function manageProduct(productId, action) {
+function manageProduct(productId, action, productStep = 0.5) {
   // Clear the previous timeout if user clicks again within the delay
   if (actionTimeout.value) {
     clearTimeout(actionTimeout.value);
@@ -155,7 +161,7 @@ function manageProduct(productId, action) {
 
   if (action === "add") {
     // Manage add action
-    productsQuantity.value[productId] = parseFloat(productsQuantity.value[productId]) + 1;
+    productsQuantity.value[productId] = parseFloat(productsQuantity.value[productId]) + productStep;
 
     // Start the timer to save the shopping cart
     startTimerToSaveShoppingCart();
@@ -163,13 +169,13 @@ function manageProduct(productId, action) {
   }
 
   // If it's the last product, remove it and unselect it
-  if (productsQuantity.value[productId] <= 1) {
+  if (productsQuantity.value[productId] <= productStep) {
     productsQuantity.value[productId] = 0;
     selectedProduct.value[productId] = false;
   }
 
   // Manage remove action
-  productsQuantity.value[productId] = productsQuantity.value[productId] - 1;
+  productsQuantity.value[productId] = productsQuantity.value[productId] - productStep;
 
   // Start the timer to save the shopping cart
   startTimerToSaveShoppingCart();
@@ -183,27 +189,51 @@ function startTimerToSaveShoppingCart() {
   }, 1000); // 1 second delay
 }
 
-function selectProduct(id) {
+function selectProduct(id, productStep = 0.5) {
   // Switch the one selected
   selectedProduct.value[id] = true;
 
   // Add one to the quantity
-  productsQuantity.value[id] = 1;
+  productsQuantity.value[id] = productStep;
+
+  // Start the timer to save the shopping cart
+  startTimerToSaveShoppingCart();
+}
+
+function createProductQuantityObject() {
+  shoppingCart;
+
+  productsQuantity.value = products.value.reduce((acc, product) => {
+    let quantity = 0;
+
+    // Check if the product is already in the shopping cart
+    const isInShopping = shoppingCart.value.find((item) => item.productId === product.id);
+    if (isInShopping) {
+      quantity = isInShopping.quantity;
+    }
+
+    acc[product.id] = productsQuantity.value[product.id] || quantity;
+    return acc;
+  }, {});
+}
+
+function createSelectedProduct() {
+  selectedProduct.value = products.value.reduce((acc, product) => {
+    // Check if the product is already in the shopping cart
+    const isInShopping = shoppingCart.value.find((item) => item.productId === product.id);
+
+    acc[product.id] = isInShopping ? true : false;
+    return acc;
+  }, {});
 }
 
 // ----- Define Watchers -------
 watch(products, () => {
   // Create selectedProduct object
-  selectedProduct.value = products.value.reduce((acc, product) => {
-    acc[product.id] = false;
-    return acc;
-  }, {});
+  createSelectedProduct();
 
   // Create productsQuantity object
-  productsQuantity.value = products.value.reduce((acc, product) => {
-    acc[product.id] = productsQuantity.value[product.id] || 0;
-    return acc;
-  }, {});
+  createProductQuantityObject();
 });
 
 useHead({

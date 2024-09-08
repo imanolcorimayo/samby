@@ -1,4 +1,4 @@
-export const formatPrice = (price: Number) => {
+export const formatPrice = (price: number) => {
   return new Intl.NumberFormat("es-AR", {
     style: "currency",
     currency: "ARS",
@@ -6,7 +6,7 @@ export const formatPrice = (price: Number) => {
   }).format(price);
 };
 
-export const formatToMillion = (price: Number) => {
+export const formatToMillion = (price: number) => {
   // Transfor to million and round to 2 decimals
   const million = price / 1000000;
 
@@ -71,4 +71,22 @@ export const validateProduct = (product: any) => {
   }
 
   return true;
+};
+
+export const formatQuantity = (quantity: number) => {
+  const wholePart = Math.floor(quantity); // Get the whole number part
+  const decimalPart = quantity - wholePart; // Get the decimal/fractional part
+
+  // Handle different fractional parts
+  let fractionText = "";
+  if (decimalPart === 0.25) {
+    fractionText = " + 1/4";
+  } else if (decimalPart === 0.5) {
+    fractionText = " + 1/2";
+  } else if (decimalPart === 0.75) {
+    fractionText = " + 3/4";
+  }
+
+  // Return the formatted quantity
+  return wholePart > 0 ? `${wholePart}${fractionText}` : fractionText.replace(" + ", "");
 };

@@ -13,7 +13,7 @@
         <div class="w-full h-full flex flex-col justify-start gap-1">
           <span class="font-semibold">{{ p.productName }}</span>
           <div class="flex flex-col">
-            <span class="text-sm">Cantidad: {{ p.quantity }}</span>
+            <span class="text-sm">Cantidad: {{ formatQuantity(p.quantity) }}</span>
             <span class="text-sm">Precio Unitario: {{ formatPrice(p.price) }}</span>
           </div>
           <div class="flex justify-between items-center">
@@ -92,9 +92,9 @@ const shippingPrice = ref(null);
 const totalWithShipping = computed(() => totalAmount.value + (shippingPrice.value ?? 0));
 
 // ------- Define Methods --------
-function confirmBuying() {
+function sendCOnfirmationMessage() {
   // Clean phone, keep only numbers
-  const cleanPhone = client.value.phone.replace(/\D/g, "");
+  const cleanPhone = 3513545369; // Meli's phone number
 
   // Message creation
   const message = createMessage(products.value, client.value.address);
@@ -116,8 +116,8 @@ function createMessage(products) {
   products.forEach((product) => {
     const productPrice = formatPrice(product.price);
 
-    // Verify if it's a fraction and add 1/2 if so
-    const quantityText = product.quantity % 1 === 0 ? product.quantity : `${Math.floor(product.quantity)} + 1/2`;
+    // Verify if it's a fraction and add 1/4, 1/2 or 3/4 accordingly
+    const quantityText = formatQuantity(product.quantity);
 
     message += `- ${quantityText} ${product.productName} ${productPrice}\n`;
   });
