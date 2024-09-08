@@ -33,7 +33,7 @@
       validation="length:4"
       v-model="form.description"
     />
-    <div class="flex justify-between gap-4">
+    <div class="flex justify-between items-end gap-4">
       <FormKit
         type="select"
         name="product_unit"
@@ -69,7 +69,7 @@
       input-class="w-full"
       label="Precio de venta por unidad"
       placeholder="Ej: 7500"
-      validation="required"
+      validation="required|numeric|min:1"
       v-model="form.price"
     />
     <div v-show="submitting" class="btn bg-primary text-white text-center">loading...</div>

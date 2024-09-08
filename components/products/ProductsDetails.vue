@@ -43,7 +43,7 @@
           validation="length:4"
           v-model="form.description"
         />
-        <div class="flex justify-between gap-4">
+        <div class="flex justify-between items-end gap-4">
           <FormKit
             type="select"
             name="product_unit"
