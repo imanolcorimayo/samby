@@ -5,28 +5,21 @@ import {
   getDocs,
   getDoc,
   addDoc,
-  serverTimestamp,
   doc,
   updateDoc,
   deleteDoc,
-  orderBy,
+  orderBy
 } from "firebase/firestore";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   // If going to /welcome or blocked just continue
   // process.server should never be activated since ssr was set to false
-  if (
-    to.path.includes("/welcome") ||
-    to.path.includes("/blocked") ||
-    process.server
-  )
-    return;
+  if (to.path.includes("/welcome") || to.path.includes("/blocked") || process.server) return;
 
   const user = await getCurrentUser();
 
   // If user exist then they can navigate to any page
   if (user) {
-
     // TODO: Implement roles in the future
 
     /* // Connect with firebase and get payments structure
@@ -58,7 +51,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   return navigateTo({
     path: "/welcome",
     query: {
-      redirect: to.fullPath,
-    },
+      redirect: to.fullPath
+    }
   });
 });

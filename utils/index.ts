@@ -41,3 +41,34 @@ export const validateSell = (sell: any) => {
 
   return true;
 };
+
+export const validateProduct = (product: any) => {
+  if (!product) return false;
+
+  // Validate it has product name
+  if (!product.productName) {
+    return false;
+  }
+
+  // Validate description
+  if (!product.description) {
+    return false;
+  }
+
+  // Validate is has unit and it's a float number
+  if (!product.unit || !["Kg", "Unitario", "Bolsa", "Cajon", "Gramo", "Litro", "Docena"].includes(product.unit)) {
+    return false;
+  }
+
+  // Validate is has step and it's a float number
+  if (!product.step || isNaN(product.step) || ![0.25, 0.5, 1].includes(product.step)) {
+    return false;
+  }
+
+  // Validate is has price and it's a float number
+  if (!product.price || isNaN(product.price)) {
+    return false;
+  }
+
+  return true;
+};

@@ -33,17 +33,44 @@
       validation="length:4"
       v-model="form.description"
     />
+    <div class="flex justify-between gap-4">
+      <FormKit
+        type="select"
+        name="product_unit"
+        :options="['Kg', 'Unitario', 'Bolsa', 'Cajon', 'Gramo', 'Litro', 'Docena']"
+        label-class="font-medium"
+        messages-class="text-red-500 text-[0.75rem]"
+        input-class="w-full"
+        outer-class="w-full flex-1"
+        label="Unidad de medida"
+        placeholder="Ej: Kg"
+        validation="required"
+        v-model="form.unit"
+      />
+      <FormKit
+        type="select"
+        name="unit_step"
+        :options="[0.25, 0.5, 1]"
+        label-class="font-medium"
+        messages-class="text-red-500 text-[0.75rem]"
+        input-class="w-full"
+        outer-class="w-full flex-1"
+        label="Paso de unidad de medida"
+        placeholder="Ej: 0.5"
+        validation="required"
+        v-model="form.step"
+      />
+    </div>
     <FormKit
-      type="select"
-      name="product_quantity"
-      :options="['Kg', 'Unitario', 'Bolsa', 'Cajon', 'Gramo', 'Litro', 'Docena']"
+      type="number"
+      name="price"
       label-class="font-medium"
       messages-class="text-red-500 text-[0.75rem]"
       input-class="w-full"
-      label="Unidad de medida"
-      placeholder="Ej: Kg"
+      label="Precio de venta por unidad"
+      placeholder="Ej: 7500"
       validation="required"
-      v-model="form.unit"
+      v-model="form.price"
     />
     <div v-show="submitting" class="btn bg-primary text-white text-center">loading...</div>
     <FormKit
@@ -78,8 +105,10 @@
 </template>
 
 <script setup>
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
+
+// ----- Define Pinia Vars -----
+const productsStore = useProductsStore();
 
 // ----- Define Vars -------
 const submitted = ref(false);
@@ -87,7 +116,9 @@ const submitting = ref(false);
 const form = ref({
   productName: "",
   description: "",
-  unit: "Kg"
+  unit: "Kg",
+  step: 0.5,
+  price: 0
 });
 
 // ----- Define Methods -------
@@ -98,24 +129,16 @@ async function submitHandler() {
   // Set submitting to avoid having multiple requests
   submitting.value = true;
 
-  // Get Firestore and Current User
-  const db = useFirestore();
-  const user = useCurrentUser();
-
-  // Handle recurrent payments
-  const newProduct = await addDoc(collection(db, "producto"), {
-    ...form.value,
-    createdAt: serverTimestamp(),
-    userUid: user.value.uid
-  });
-
-  // the way to access to the buying id if needed: newProduct.id;
+  // Add the product to the store
+  await productsStore.addProduct({ ...form.value });
 
   // Clean values
   form.value = {
     productName: "",
     description: "",
-    unit: "Kg"
+    unit: "Kg",
+    step: 0.5,
+    price: 0
   };
 
   submitted.value = true;

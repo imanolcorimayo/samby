@@ -144,12 +144,6 @@ function removeFromShopping(product) {
 }
 
 useHead({
-  title: "Completar Compra",
-  meta: [
-    {
-      name: "description",
-      content: "Aplicacion web para la compra de bebidas de todo tipo."
-    }
-  ]
+  title: "Confirmar Pedido"
 });
 </script>
