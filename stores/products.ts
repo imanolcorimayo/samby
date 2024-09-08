@@ -128,7 +128,6 @@ export const useProductsStore = defineStore("products", {
       const productReference = doc(db, "producto", productId);
       const productIndex = this.$state.products.findIndex((el: any) => el.id == productId);
 
-      console.log(product);
       // Validate sell object
       const isProductValid = validateProduct(product);
 

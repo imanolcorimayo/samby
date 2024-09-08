@@ -50,11 +50,6 @@ export const validateProduct = (product: any) => {
     return false;
   }
 
-  // Validate description
-  if (!product.description) {
-    return false;
-  }
-
   // Validate is has unit and it's a float number
   if (!product.unit || !["Kg", "Unitario", "Bolsa", "Cajon", "Gramo", "Litro", "Docena"].includes(product.unit)) {
     return false;

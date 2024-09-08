@@ -173,7 +173,7 @@ async function updateProduct() {
       description: form.value.description,
       unit: form.value.unit,
       step: parseFloat(form.value.step),
-      price: form.value.price
+      price: parseFloat(form.value.price)
     },
     currentProduct.value.id
   );
@@ -192,7 +192,7 @@ async function updateProduct() {
   mainModal.value.closeModal();
 
   // Show success message
-  useToast(ToastEvents.success, "Producto actualizada correctamente.");
+  useToast(ToastEvents.success, "Producto actualizado correctamente.");
 }
 
 async function deleteProduct() {

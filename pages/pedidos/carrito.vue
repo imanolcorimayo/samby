@@ -92,7 +92,7 @@ const shippingPrice = ref(null);
 const totalWithShipping = computed(() => totalAmount.value + (shippingPrice.value ?? 0));
 
 // ------- Define Methods --------
-function sendCOnfirmationMessage() {
+function sendConfirmationMessage() {
   // Clean phone, keep only numbers
   const cleanPhone = 3513545369; // Meli's phone number
 
