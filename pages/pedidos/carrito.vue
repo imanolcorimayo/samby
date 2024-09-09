@@ -50,7 +50,7 @@
     <div class="flex justify-between items-center gap-3">
       <span class="font-bold text-xl">Total: {{ formatPrice(totalWithShipping) }}</span>
       <button
-        @click="confirmBuying"
+        @click="sendConfirmationMessage"
         class="flex-1 btn bg-primary text-white flex items-center gap-2 justify-center text-nowrap text-start"
       >
         <MingcuteWhatsappLine class="text-xl" /> Confirmar Pedido
