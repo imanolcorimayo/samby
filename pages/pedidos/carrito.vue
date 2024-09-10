@@ -35,25 +35,7 @@
     <div class="flex flex-col gap-2">
       <span class="font-semibold">Agrega nuevo cliente o selecciona un existente</span>
       <Autocomplete
-        :items="[
-          ...clients,
-          { clientName: 'Verde Fresco', id: 101 },
-          { clientName: 'Raíces y Hojas', id: 102 },
-          {
-            clientName: 'El Huerto del Barrio',
-            id: 103
-          },
-          { clientName: 'Frutas y Verduras La Estación', id: 104 },
-          { clientName: 'El Rincón Verde', id: 105 },
-          { clientName: 'Cosecha Diaria', id: 106 },
-          { clientName: 'Mercado Orgánico', id: 107 },
-          {
-            clientName: 'Sabor a Campo',
-            id: 108
-          },
-          { clientName: 'La Canasta Natural', id: 109 },
-          { clientName: 'El Jardín Comestible', id: 110 }
-        ]"
+        :items="clients"
         property="clientName"
         placeholder="Busca con el nombre del cliente"
         returnValue="id"
