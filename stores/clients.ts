@@ -67,6 +67,14 @@ export const useClientsStore = defineStore("clients", {
         return null;
       }
 
+      // Validate client object
+      const isClientValid = validateClient(client);
+
+      if (!isClientValid) {
+        useToast(ToastEvents.error, "El cliente no es válido");
+        return null;
+      }
+
       try {
         // Handle recurrent payments
         const newClient = await addDoc(collection(db, "cliente"), {
@@ -90,12 +98,12 @@ export const useClientsStore = defineStore("clients", {
       const db = useFirestore();
 
       try {
-        // Check if the client is used in any sell
+        // Check if the client is used in any order
         const querySnapshot = await getDocs(
           query(collection(db, "pedido"), where("clientId", "==", clientId), limit(1))
         );
 
-        // Only archive the client if the client is used in a sell
+        // Only archive the client if the client is used in a order
         if (!querySnapshot.empty) {
           const clientRef = doc(db, "cliente", clientId);
           await updateDoc(clientRef, {
@@ -125,7 +133,7 @@ export const useClientsStore = defineStore("clients", {
       const clientReference = doc(db, "cliente", clientId);
       const clientIndex = this.$state.clients.findIndex((el: any) => el.id == clientId);
 
-      // Validate sell object
+      // Validate client object
       const isClientValid = validateClient(client);
 
       if (!isClientValid) {

@@ -44,7 +44,7 @@
       />
       <div class="flex flex-col gap-1">
         <span>Nombre</span>
-        <input :disabled="clientSelected" v-model="client.name" type="text" placeholder="Ej: Verduleria Carlos" />
+        <input :disabled="clientSelected" v-model="client.clientName" type="text" placeholder="Ej: Verduleria Carlos" />
       </div>
       <div class="flex flex-col gap-1">
         <span>Telefono</span>
@@ -55,10 +55,27 @@
         <input :disabled="clientSelected" v-model="client.address" type="text" placeholder="Direccion de reparto" />
       </div>
     </div>
+    <button
+      @click="saveClient"
+      :disabled="clientSelected"
+      class="flex items-center gap-2 btn bg-secondary shadow ring-1 ring-primary w-fit hover:bg-primary hover:text-white"
+    >
+      <TablerPlus />
+      Guardar nuevo cliente
+    </button>
+    <div class="flex flex-col text-red-500" v-if="clientError.alreadyExists">
+      <span
+        >Ya existe un cliente con esta informacion (misma dirección o teléfono). El cliente tiene los siguientes
+        datos:</span
+      >
+      <span class="font-semibold">Nombre: {{ clientError.clientName }}</span>
+      <span class="font-semibold">Teléfono: {{ clientError.phone }}</span>
+      <span class="font-semibold">Direccón: {{ clientError.address }}</span>
+    </div>
     <div class="flex justify-between items-center gap-3">
       <span class="font-bold text-xl">Total: {{ formatPrice(totalWithShipping) }}</span>
       <button
-        @click="sendConfirmationMessage"
+        @click="confirmOrder"
         class="flex-1 btn bg-primary text-white flex items-center gap-2 justify-center text-nowrap text-start max-w-[30rem]"
       >
         <MingcuteWhatsappLine class="text-xl" /> Confirmar Pedido
@@ -76,9 +93,11 @@
     </div>
     <p>Carrito vacio.</p>
   </div>
+  <Loader v-if="loading" />
 </template>
 
 <script setup>
+import TablerPlus from "~icons/tabler/plus";
 import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
 import TablerTrash from "~icons/tabler/trash";
 import IonArrowBack from "~icons/ion/arrow-back";
@@ -94,9 +113,16 @@ const { doesOrderExist, getShoppingCart: products, totalAmount } = storeToRefs(o
 
 // ------- Define Vars --------
 const client = ref({
-  name: "",
+  clientName: "",
   phone: "",
   address: ""
+});
+const loading = ref(false);
+const clientError = ref({
+  alreadyExists: false,
+  clientName: false,
+  phone: false,
+  address: false
 });
 const shippingPrice = ref(null);
 const clientSelected = ref(false);
@@ -119,12 +145,65 @@ function sendConfirmationMessage() {
   window.open(url, "_blank");
 }
 
+function saveClient() {
+  // Check if loading
+  if (loading.value) return;
+
+  loading.value = true;
+
+  // Validate client information
+  const isClientValid = validateClient(client.value);
+
+  if (!isClientValid) {
+    useToast(ToastEvents.error, "Por favor, complete la información del cliente.");
+    loading.value = false;
+    return;
+  }
+
+  // If client is valid, check if it exists already
+  let clientToSave = clients.value.find((c) => {
+    return c.address === client.value.address || c.phone === client.value.phone;
+  });
+
+  // Add client if it doesn't exist
+  if (!clientToSave) {
+    clientToSave = clientsStore.addClient(client.value);
+    if (clientToSave) {
+      useToast(ToastEvents.success, "Cliente agregado correctamente.");
+      loading.value = false;
+      clientError.value = {
+        alreadyExists: false,
+        clientName: false,
+        phone: false,
+        address: false
+      };
+      return;
+    } else {
+      useToast(ToastEvents.error, "Error al agregar el cliente. Por favor, intente de nuevo.");
+      loading.value = false;
+      return;
+    }
+  }
+
+  // If client exists, add a warning error
+  useToast(ToastEvents.error, "El cliente ya existe en la base de datos.");
+  // Update client error object
+  clientError.value = {
+    alreadyExists: true,
+    clientName: clientToSave.clientName,
+    phone: clientToSave.phone,
+    address: clientToSave.address
+  };
+
+  loading.value = false;
+}
+
 function createMessage(products) {
   // Verify if the address is empty
   const deliveryAddress = client.value.address ? client.value.address : "N/A";
 
   // Add the introduction name
-  let message = `¡Hola, ${client.value.name}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
+  let message = `¡Hola, ${client.value.clientName}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
 
   products.forEach((product) => {
     const productPrice = formatPrice(product.price);
@@ -164,7 +243,7 @@ function selectClient(clientId) {
 
     // Clean the client object
     client.value = {
-      name: "",
+      clientName: "",
       phone: "",
       address: ""
     };
@@ -175,7 +254,7 @@ function selectClient(clientId) {
   }
 
   client.value = {
-    name: selectedClient.clientName,
+    clientName: selectedClient.clientName,
     phone: selectedClient.phone,
     address: selectedClient.address
   };
@@ -184,7 +263,6 @@ function selectClient(clientId) {
 }
 
 function onUnselect() {
-  console.log("Unselect");
   clientSelected.value = false;
 }
 
