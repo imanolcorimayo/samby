@@ -33,25 +33,51 @@
       </div>
     </div>
     <div class="flex flex-col gap-2">
-      <span class="font-semibold">Datos del cliente</span>
+      <span class="font-semibold">Agrega nuevo cliente o selecciona un existente</span>
+      <Autocomplete
+        :items="[
+          ...clients,
+          { clientName: 'Verde Fresco', id: 101 },
+          { clientName: 'Raíces y Hojas', id: 102 },
+          {
+            clientName: 'El Huerto del Barrio',
+            id: 103
+          },
+          { clientName: 'Frutas y Verduras La Estación', id: 104 },
+          { clientName: 'El Rincón Verde', id: 105 },
+          { clientName: 'Cosecha Diaria', id: 106 },
+          { clientName: 'Mercado Orgánico', id: 107 },
+          {
+            clientName: 'Sabor a Campo',
+            id: 108
+          },
+          { clientName: 'La Canasta Natural', id: 109 },
+          { clientName: 'El Jardín Comestible', id: 110 }
+        ]"
+        property="clientName"
+        placeholder="Busca con el nombre del cliente"
+        returnValue="id"
+        @selected="selectClient"
+        @unselect="onUnselect"
+      />
       <div class="flex flex-col gap-1">
         <span>Nombre</span>
-        <input v-model="client.name" type="text" placeholder="Ej: Verduleria Carlos" />
+        <input :disabled="clientSelected" v-model="client.name" type="text" placeholder="Ej: Verduleria Carlos" />
       </div>
       <div class="flex flex-col gap-1">
         <span>Telefono</span>
-        <input v-model="client.phone" type="text" placeholder="Numero de telefono" />
+        <input :disabled="clientSelected" v-model="client.phone" type="text" placeholder="Numero de telefono" />
       </div>
       <div class="flex flex-col gap-1">
         <span>Direccion</span>
-        <input v-model="client.address" type="text" placeholder="Direccion de reparto" />
+        <input :disabled="clientSelected" v-model="client.address" type="text" placeholder="Direccion de reparto" />
       </div>
     </div>
     <div class="flex justify-between items-center gap-3">
       <span class="font-bold text-xl">Total: {{ formatPrice(totalWithShipping) }}</span>
       <button
         @click="sendConfirmationMessage"
-        class="flex-1 btn bg-primary text-white flex items-center gap-2 justify-center text-nowrap text-start"
+        class="flex-1 btn bg-primary text-white flex items-center gap-2 justify-center text-nowrap text-start max-w-[30rem]"
       >
         <MingcuteWhatsappLine class="text-xl" /> Confirmar Pedido
       </button>
@@ -77,6 +103,10 @@ import IonArrowBack from "~icons/ion/arrow-back";
 import { ToastEvents } from "~/interfaces";
 
 // ------- Define Pinia Vars --------
+const clientsStore = useClientsStore();
+clientsStore.fetchData();
+const { clients } = storeToRefs(clientsStore);
+
 const ordersStore = useOrdersStore();
 const { doesOrderExist, getShoppingCart: products, totalAmount } = storeToRefs(ordersStore);
 
@@ -87,6 +117,7 @@ const client = ref({
   address: ""
 });
 const shippingPrice = ref(null);
+const clientSelected = ref(false);
 
 // ------- Define Computed --------
 const totalWithShipping = computed(() => totalAmount.value + (shippingPrice.value ?? 0));
@@ -141,6 +172,38 @@ function removeFromShopping(product) {
   ordersStore.removeProduct(product);
 
   useToast(ToastEvents.success, "Producto eliminado del carrito.");
+}
+
+function selectClient(clientId) {
+  const selectedClient = clients.value.find((c) => c.id === clientId);
+
+  if (!selectedClient) {
+    useToast(ToastEvents.error, "Cliente no encontrado. Por favor, intente de nuevo.");
+
+    // Clean the client object
+    client.value = {
+      name: "",
+      phone: "",
+      address: ""
+    };
+
+    clientSelected.value = false;
+
+    return;
+  }
+
+  client.value = {
+    name: selectedClient.clientName,
+    phone: selectedClient.phone,
+    address: selectedClient.address
+  };
+
+  clientSelected.value = true;
+}
+
+function onUnselect() {
+  console.log("Unselect");
+  clientSelected.value = false;
 }
 
 useHead({
