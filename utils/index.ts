@@ -85,3 +85,24 @@ export const formatQuantity = (quantity: number) => {
   // Return the formatted quantity
   return wholePart > 0 ? `${wholePart}${fractionText}` : fractionText.replace(" + ", "");
 };
+
+export const validateClient = (client: any) => {
+  if (!client) return false;
+
+  // Validate it has client name
+  if (!client.clientName) {
+    return false;
+  }
+
+  // Validate is has phone number
+  if (!client.phone) {
+    return false;
+  }
+
+  // Validate is has email
+  if (!client.address) {
+    return false;
+  }
+
+  return true;
+};

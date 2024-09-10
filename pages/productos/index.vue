@@ -30,7 +30,6 @@
               <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
             </div>
           </div>
-          <div class="flex justify-between"></div>
         </div>
       </div>
       <div class="flex" v-else-if="!areProductsFetched">Cargando productos...</div>

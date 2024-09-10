@@ -146,6 +146,6 @@ async function submitHandler() {
 }
 
 useHead({
-  title: "Nueva producto"
+  title: "Nuevo producto"
 });
 </script>
