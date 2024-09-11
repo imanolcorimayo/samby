@@ -26,10 +26,23 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <span class="font-semibold">Costo de envio</span>
-      <div class="flex flex-col gap-1">
+    <div class="flex flex-col md:flex-row justify-between gap-4">
+      <div class="flex-1 flex flex-col justify-between w-full">
+        <span class="font-semibold">Costo de envio</span>
         <input v-model="shippingPrice" type="number" placeholder="Ej: 1000" />
+      </div>
+      <div class="flex-1 flex flex-col gap-2 w-full">
+        <FormKit
+          type="date"
+          name="shipping_date"
+          label-class="font-medium"
+          messages-class="text-red-500 text-[0.75rem]"
+          input-class="w-full"
+          label="Fecha de venta"
+          placeholder="yyyy-mm-dd"
+          validation="required"
+          v-model="shippingDate"
+        />
       </div>
     </div>
     <div class="flex flex-col gap-2">
@@ -42,35 +55,49 @@
         @selected="selectClient"
         @unselect="onUnselect"
       />
-      <div class="flex flex-col gap-1">
-        <span>Nombre</span>
-        <input :disabled="clientSelected" v-model="client.clientName" type="text" placeholder="Ej: Verduleria Carlos" />
+      <div class="flex flex-col p-3 gap-3 bg-secondary rounded-lg">
+        <div class="flex flex-col gap-1">
+          <span>Nombre</span>
+          <input
+            :disabled="clientSelected"
+            v-model="client.clientName"
+            type="text"
+            placeholder="Ej: Verduleria Carlos"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <span>Telefono</span>
+          <input
+            :disabled="clientSelected"
+            @input="formatPhoneNumber"
+            maxlength="20"
+            v-model="client.phone"
+            type="text"
+            placeholder="Numero de telefono"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <span>Direccion</span>
+          <input :disabled="clientSelected" v-model="client.address" type="text" placeholder="Direccion de reparto" />
+        </div>
+        <button
+          @click="saveClient"
+          :disabled="clientSelected"
+          class="flex items-center gap-2 btn bg-secondary shadow ring-1 ring-primary w-fit hover:bg-primary hover:text-white"
+        >
+          <TablerPlus />
+          Guardar nuevo cliente
+        </button>
+        <div class="flex flex-col text-red-500" v-if="clientError.alreadyExists">
+          <span
+            >Ya existe un cliente con esta informacion (misma dirección o teléfono). El cliente tiene los siguientes
+            datos:</span
+          >
+          <span class="font-semibold">Nombre: {{ clientError.clientName }}</span>
+          <span class="font-semibold">Teléfono: {{ clientError.phone }}</span>
+          <span class="font-semibold">Direccón: {{ clientError.address }}</span>
+        </div>
       </div>
-      <div class="flex flex-col gap-1">
-        <span>Telefono</span>
-        <input :disabled="clientSelected" v-model="client.phone" type="text" placeholder="Numero de telefono" />
-      </div>
-      <div class="flex flex-col gap-1">
-        <span>Direccion</span>
-        <input :disabled="clientSelected" v-model="client.address" type="text" placeholder="Direccion de reparto" />
-      </div>
-    </div>
-    <button
-      @click="saveClient"
-      :disabled="clientSelected"
-      class="flex items-center gap-2 btn bg-secondary shadow ring-1 ring-primary w-fit hover:bg-primary hover:text-white"
-    >
-      <TablerPlus />
-      Guardar nuevo cliente
-    </button>
-    <div class="flex flex-col text-red-500" v-if="clientError.alreadyExists">
-      <span
-        >Ya existe un cliente con esta informacion (misma dirección o teléfono). El cliente tiene los siguientes
-        datos:</span
-      >
-      <span class="font-semibold">Nombre: {{ clientError.clientName }}</span>
-      <span class="font-semibold">Teléfono: {{ clientError.phone }}</span>
-      <span class="font-semibold">Direccón: {{ clientError.address }}</span>
     </div>
     <div class="flex justify-between items-center gap-3">
       <span class="font-bold text-xl">Total: {{ formatPrice(totalWithShipping) }}</span>
@@ -124,6 +151,7 @@ const clientError = ref({
   address: false
 });
 const shippingPrice = ref(null);
+const shippingDate = ref(null);
 const clientSelected = ref(false);
 const orderCreated = ref(false);
 
@@ -205,6 +233,13 @@ async function confirmOrder() {
     return;
   }
 
+  // Check if shipping date is valid
+  if (!shippingDate.value) {
+    useToast(ToastEvents.error, "Por favor, complete la fecha de envío.");
+    loading.value = false;
+    return;
+  }
+
   // Double check products still exits
   if (!products.value.length) {
     useToast(ToastEvents.error, "No hay productos en el carrito.");
@@ -216,6 +251,7 @@ async function confirmOrder() {
   const orderObject = await ordersStore.placeOrder({
     products: products.value,
     shippingPrice: shippingPrice.value,
+    shippingDate: shippingDate.value,
     client: client.value,
     totalAmount: totalWithShipping.value,
     totalProductsAmount: totalAmount.value,
@@ -231,6 +267,40 @@ async function confirmOrder() {
   }
 
   loading.value = false;
+}
+
+function formatPhoneNumber() {
+  // Check if the client has " 9" in the phone number
+  if (client.value.phone === "+54 9") {
+    client.value.phone = "";
+    return;
+  }
+
+  // Check if the client has " 9 " in the phone number
+  const has9InPhone = client.value.phone.includes(" 9 ");
+
+  // Remove all non-numeric characters except "+"
+  let cleanNumber = client.value.phone.replace(/[^\d+]/g, "");
+
+  let mobPhoneAux = "";
+  if (cleanNumber.startsWith("+54") && !has9InPhone) {
+    mobPhoneAux = "+54 9 ";
+    cleanNumber = cleanNumber.substring(3);
+  } else if (cleanNumber.startsWith("+549") && has9InPhone) {
+    mobPhoneAux = "+54 9 ";
+    cleanNumber = cleanNumber.substring(4);
+  }
+
+  // Format as (351) 346-7739
+  if (cleanNumber.length >= 3 && !cleanNumber.startsWith("+54")) {
+    cleanNumber = cleanNumber.replace(/^(\d{3})(\d)/, "($1) $2");
+  }
+  if (cleanNumber.length >= 9) {
+    cleanNumber = cleanNumber.replace(/^(\(\d{3}\) \d{3})(\d{1,4})/, "$1-$2");
+  }
+
+  // Limit the length to 15 characters (Argentina format)
+  client.value.phone = mobPhoneAux + cleanNumber.substring(0, 14);
 }
 
 function removeFromShopping(product) {

@@ -3,6 +3,7 @@
     <div class="flex flex-col items-center gap-[1rem]">
       <IconParkOutlineCheckOne class="text-[3rem] text-success" />
       <span class="text-[2rem] font-semibold text-center">¡Pedido Confirmado!</span>
+      <span class="text-gray-500 text-center">Fecha de envío: {{ formattedDate }} </span>
     </div>
     <div class="flex flex-col gap-3">
       <span class="font-semibold text-xl">Resumen del pedido</span>
@@ -37,25 +38,41 @@
         </tbody>
       </table>
     </div>
+
+    <div class="flex flex-col gap-3">
+      <span class="font-semibold text-xl">Datos del cliente</span>
+      <div class="flex gap-1">
+        <span class="font-semibold">Nombre:</span>
+        <span>{{ lastInsertedOrder.order.client.clientName }}</span>
+      </div>
+      <div class="flex gap-1">
+        <span class="font-semibold">Teléfono:</span>
+        <span>{{ lastInsertedOrder.order.client.phone }}</span>
+      </div>
+      <div class="flex gap-1">
+        <span class="font-semibold">Dirección:</span>
+        <span>{{ lastInsertedOrder.order.client.address ?? "N/A" }}</span>
+      </div>
+    </div>
     <div class="flex flex-col gap-4">
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col md:flex-row gap-3">
         <NuxtLink
           to="/pedidos/nuevo"
-          class="flex items-center justify-center gap-2 btn bg-primary text-white text-center"
+          class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-primary text-white text-center"
         >
           <TablerPlus class="text-xl" />
           Agregar otro pedido</NuxtLink
         >
         <button
           @click="sendConfirmationMessage"
-          class="flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
+          class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
         >
           <MingcuteWhatsappLine class="text-xl" />
           Enviar mensaje al cliente
         </button>
         <NuxtLink
           to="/pedidos"
-          class="flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
+          class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
         >
           <IconParkOutlineTransactionOrder class="text-xl" />
           Ver pedidos</NuxtLink
@@ -73,11 +90,23 @@ import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
 import IconParkOutlineTransactionOrder from "~icons/icon-park-outline/transaction-order";
 import { ToastEvents } from "~/interfaces";
 
+// ------- Define Useful Properties -------
+const { $dayjs } = useNuxtApp();
 // ------- Define Pinia Vars --------
 const ordersStore = useOrdersStore();
 const { lastInsertedOrder } = storeToRefs(ordersStore);
 
-// ------- Define Vars --------
+// ------- Define Computed --------
+const formattedDate = computed(() => {
+  // List of months in Spanish to use in the date format
+  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+  // Get the spanish month
+  const month = months[$dayjs(lastInsertedOrder.value.order.shippingDate).month()];
+
+  // Return the formatted date
+  return `${month} ${$dayjs(lastInsertedOrder.value.order.shippingDate).format("D, YYYY")}`;
+});
 
 // Check if no order was created
 if (!lastInsertedOrder.value.orderId) {
@@ -88,8 +117,8 @@ if (!lastInsertedOrder.value.orderId) {
 
 // ------- Define Methods --------
 function sendConfirmationMessage() {
-  // Clean phone, keep only numbers
-  const cleanPhone = 3513545369; // Meli's phone number
+  // Clean the client's phone number to contain only numbers
+  const cleanPhone = lastInsertedOrder.value.order.client.phone.replace(/\D/g, "");
 
   // Message creation
   const message = createMessage(

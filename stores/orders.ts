@@ -31,7 +31,8 @@ export const useOrdersStore = defineStore("orders", {
     getShoppingCart: (state) => state.shoppingCart,
     doesOrderExist: (state) => state.shoppingCart.length > 0,
     productsCount: (state) => state.shoppingCart.length,
-    totalAmount: (state: any) => state.shoppingCart.reduce((acc: any, product: any) => acc + product.total, 0)
+    totalAmount: (state: any) => state.shoppingCart.reduce((acc: any, product: any) => acc + product.total, 0),
+    getOrders: (state) => state.orders
   },
   actions: {
     async saveShoppingCart(productsQuantity: any) {
