@@ -63,7 +63,7 @@
       </div>
     </div>
   </div>
-  <div class="v-else">No se ha creado ningún pedido</div>
+  <div v-else>No se ha creado ningún pedido</div>
 </template>
 
 <script setup>
@@ -92,7 +92,12 @@ function sendConfirmationMessage() {
   const cleanPhone = 3513545369; // Meli's phone number
 
   // Message creation
-  const message = createMessage(products.value, client.value.address);
+  const message = createMessage(
+    lastInsertedOrder.value.order.products,
+    lastInsertedOrder.value.order.client,
+    lastInsertedOrder.value.order.shippingPrice,
+    lastInsertedOrder.value.order.totalAmount
+  );
 
   // Send message to wsp
   const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
@@ -101,12 +106,12 @@ function sendConfirmationMessage() {
   window.open(url, "_blank");
 }
 
-function createMessage(products) {
+function createMessage(products, client, shippingPrice, totalWithShipping) {
   // Verify if the address is empty
-  const deliveryAddress = client.value.address ? client.value.address : "N/A";
+  const deliveryAddress = client.address ? client.address : "N/A";
 
   // Add the introduction name
-  let message = `¡Hola, ${client.value.clientName}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
+  let message = `¡Hola, ${client.clientName}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
 
   products.forEach((product) => {
     const productPrice = formatPrice(product.price);
@@ -118,10 +123,10 @@ function createMessage(products) {
   });
 
   // Añade el costo de envío
-  message += `\n🚚 Costo de Envío: ${formatPrice(shippingPrice.value)}\n`;
+  message += `\n🚚 Costo de Envío: ${formatPrice(shippingPrice)}\n`;
 
   // Añade el total
-  message += `💵 Total a Pagar: ${formatPrice(totalWithShipping.value)}\n`;
+  message += `💵 Total a Pagar: ${formatPrice(totalWithShipping)}\n`;
 
   // Añade la dirección de envío
   message += `\n📍 Dirección de Envío: ${deliveryAddress}\n`;
