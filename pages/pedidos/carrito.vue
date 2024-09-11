@@ -93,32 +93,11 @@
     </div>
     <p>Carrito vacio.</p>
   </div>
-  <div v-else class="w-full flex flex-col gap-[2rem] flex-1 min-h-full justify-center">
-    <div class="flex flex-col items-center gap-[1rem]">
-      <IconParkOutlineCheckOne class="text-[3rem] text-success" />
-      <span class="text-[2rem] font-semibold text-center">¡Pedido Creado!</span>
-    </div>
-    <div class="flex flex-col gap-4">
-      <span class="text-[1.143rem] text-gray-600 text-center">Esta listo en la lista de pedidos</span>
-      <div class="flex flex-col gap-3">
-        <NuxtLink to="/pedidos/nuevo" class="btn bg-primary text-white text-center">Agregar otro pedido</NuxtLink>
-        <button
-          @click="sendConfirmationMessage"
-          class="flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
-        >
-          <MingcuteWhatsappLine class="text-xl" />
-          Enviar mensaje al cliente
-        </button>
-        <NuxtLink to="/pedidos" class="btn bg-secondary w-full text-center ring-1 ring-gray-300">Ver pedidos</NuxtLink>
-      </div>
-    </div>
-  </div>
   <Loader v-if="loading" />
 </template>
 
 <script setup>
 import TablerPlus from "~icons/tabler/plus";
-import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
 import TablerTrash from "~icons/tabler/trash";
 import IonArrowBack from "~icons/ion/arrow-back";
 import { ToastEvents } from "~/interfaces";
@@ -152,20 +131,6 @@ const orderCreated = ref(false);
 const totalWithShipping = computed(() => totalAmount.value + (shippingPrice.value ?? 0));
 
 // ------- Define Methods --------
-function sendConfirmationMessage() {
-  // Clean phone, keep only numbers
-  const cleanPhone = 3513545369; // Meli's phone number
-
-  // Message creation
-  const message = createMessage(products.value, client.value.address);
-
-  // Send message to wsp
-  const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-
-  // Open message in a new window
-  window.open(url, "_blank");
-}
-
 function saveClient() {
   // Check if loading
   if (loading.value) return;
@@ -248,48 +213,24 @@ async function confirmOrder() {
   }
 
   // Place the order
-  await ordersStore.placeOrder({
+  const orderObject = await ordersStore.placeOrder({
     products: products.value,
     shippingPrice: shippingPrice.value,
     client: client.value,
+    totalAmount: totalWithShipping.value,
+    totalProductsAmount: totalAmount.value,
     pedidoStatus: "pending"
   });
 
-  // Show success message
-  useToast(ToastEvents.success, "Pedido creado correctamente.");
-  orderCreated.value = true;
+  // Check if it was successful
+  if (orderObject) {
+    // Show success message
+    useToast(ToastEvents.success, "Pedido creado correctamente.");
+    orderCreated.value = true;
+    navigateTo("/pedidos/confirmado");
+  }
+
   loading.value = false;
-}
-
-function createMessage(products) {
-  // Verify if the address is empty
-  const deliveryAddress = client.value.address ? client.value.address : "N/A";
-
-  // Add the introduction name
-  let message = `¡Hola, ${client.value.clientName}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
-
-  products.forEach((product) => {
-    const productPrice = formatPrice(product.price);
-
-    // Verify if it's a fraction and add 1/4, 1/2 or 3/4 accordingly
-    const quantityText = formatQuantity(product.quantity);
-
-    message += `- ${quantityText} ${product.productName} ${productPrice}\n`;
-  });
-
-  // Añade el costo de envío
-  message += `\n🚚 Costo de Envío: ${formatPrice(shippingPrice.value)}\n`;
-
-  // Añade el total
-  message += `💵 Total a Pagar: ${formatPrice(totalWithShipping.value)}\n`;
-
-  // Añade la dirección de envío
-  message += `\n📍 Dirección de Envío: ${deliveryAddress}\n`;
-
-  // Cierra con un mensaje amigable
-  message += `\n¡Gracias por tu compra! Si necesitas algo más, no dudes en avisarnos. 😊`;
-
-  return message;
 }
 
 function removeFromShopping(product) {

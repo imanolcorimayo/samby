@@ -18,7 +18,13 @@ import { ToastEvents } from "~/interfaces";
 export const useOrdersStore = defineStore("orders", {
   state: (): any => {
     return {
-      shoppingCart: []
+      shoppingCart: [],
+      orders: [],
+      lastInsertedOrder: {
+        order: {},
+        orderId: false,
+        createdAt: false
+      }
     };
   },
   getters: {
@@ -70,6 +76,8 @@ export const useOrdersStore = defineStore("orders", {
       const db = useFirestore();
       const user = useCurrentUser();
 
+      const { $dayjs } = useNuxtApp();
+
       if (!user || !user.value) {
         return null;
       }
@@ -79,28 +87,31 @@ export const useOrdersStore = defineStore("orders", {
 
       if (!isClientValid) {
         useToast(ToastEvents.error, "Por favor, complete la información del cliente.");
-        return;
+        return null;
       }
 
       // Double check if shipping price is valid
       if (!order.shippingPrice) {
         useToast(ToastEvents.error, "Por favor, complete el costo de envío.");
-        return;
+        return null;
       }
 
       // Double check products still exits
       if (!order.products.length) {
         useToast(ToastEvents.error, "No hay productos en el carrito.");
-        return;
+        return null;
       }
 
       try {
-        // Handle recurrent payments
-        const newOrder = await addDoc(collection(db, "pedido"), {
+        // Create object to be inserted
+        const orderObject = {
           ...order,
           createdAt: serverTimestamp(),
           userUid: user.value.uid
-        });
+        };
+
+        // Handle recurrent payments
+        const newOrder = await addDoc(collection(db, "pedido"), orderObject);
 
         // Get the new order id
         const orderId = newOrder.id;
@@ -112,12 +123,31 @@ export const useOrdersStore = defineStore("orders", {
           userUid: user.value.uid
         });
 
+        // Add order to orders
+        this.$state.orders.push({ ...orderObject, id: newOrder.id });
+
+        // Update last inserted order
+        this.$state.lastInsertedOrder = {
+          order: { ...orderObject, id: newOrder.id },
+          createdAt: $dayjs(),
+          orderId: newOrder.id
+        };
+
         // Clear the shopping cart
         this.$state.shoppingCart = [];
+
+        return orderObject;
       } catch (error) {
         console.error(error);
         return null;
       }
+    },
+    clearLastInsertedOrder() {
+      this.$state.lastInsertedOrder = {
+        order: {},
+        orderId: false,
+        createdAt: false
+      };
     }
   }
 });
