@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-[2rem] w-full mt-[1.429rem]" v-if="doesOrderExist">
+  <div class="flex flex-col gap-[2rem] w-full mt-[1.429rem]" v-if="doesOrderExist && !orderCreated">
     <div class="flex items-center gap-2">
       <NuxtLink
         to="/pedidos/nuevo"
@@ -78,11 +78,11 @@
         @click="confirmOrder"
         class="flex-1 btn bg-primary text-white flex items-center gap-2 justify-center text-nowrap text-start max-w-[30rem]"
       >
-        <MingcuteWhatsappLine class="text-xl" /> Confirmar Pedido
+        Confirmar Pedido
       </button>
     </div>
   </div>
-  <div class="flex flex-col gap-[2rem] w-full mt-[1.429rem]" v-else>
+  <div class="flex flex-col gap-[2rem] w-full mt-[1.429rem]" v-else-if="!orderCreated">
     <div class="flex items-center gap-2">
       <NuxtLink
         to="/pedidos/nuevo"
@@ -92,6 +92,26 @@
       </NuxtLink>
     </div>
     <p>Carrito vacio.</p>
+  </div>
+  <div v-else class="w-full flex flex-col gap-[2rem] flex-1 min-h-full justify-center">
+    <div class="flex flex-col items-center gap-[1rem]">
+      <IconParkOutlineCheckOne class="text-[3rem] text-success" />
+      <span class="text-[2rem] font-semibold text-center">¡Pedido Creado!</span>
+    </div>
+    <div class="flex flex-col gap-4">
+      <span class="text-[1.143rem] text-gray-600 text-center">Esta listo en la lista de pedidos</span>
+      <div class="flex flex-col gap-3">
+        <NuxtLink to="/pedidos/nuevo" class="btn bg-primary text-white text-center">Agregar otro pedido</NuxtLink>
+        <button
+          @click="sendConfirmationMessage"
+          class="flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
+        >
+          <MingcuteWhatsappLine class="text-xl" />
+          Enviar mensaje al cliente
+        </button>
+        <NuxtLink to="/pedidos" class="btn bg-secondary w-full text-center ring-1 ring-gray-300">Ver pedidos</NuxtLink>
+      </div>
+    </div>
   </div>
   <Loader v-if="loading" />
 </template>
@@ -126,6 +146,7 @@ const clientError = ref({
 });
 const shippingPrice = ref(null);
 const clientSelected = ref(false);
+const orderCreated = ref(false);
 
 // ------- Define Computed --------
 const totalWithShipping = computed(() => totalAmount.value + (shippingPrice.value ?? 0));
@@ -195,6 +216,48 @@ function saveClient() {
     address: clientToSave.address
   };
 
+  loading.value = false;
+}
+
+async function confirmOrder() {
+  // Check if loading
+  if (loading.value) return;
+
+  loading.value = true;
+  // Check client information again
+  const isClientValid = validateClient(client.value);
+
+  if (!isClientValid) {
+    useToast(ToastEvents.error, "Por favor, complete la información del cliente.");
+    loading.value = false;
+    return;
+  }
+
+  // Check if shipping price is valid
+  if (!shippingPrice.value) {
+    useToast(ToastEvents.error, "Por favor, complete el costo de envío.");
+    loading.value = false;
+    return;
+  }
+
+  // Double check products still exits
+  if (!products.value.length) {
+    useToast(ToastEvents.error, "No hay productos en el carrito.");
+    loading.value = false;
+    return;
+  }
+
+  // Place the order
+  await ordersStore.placeOrder({
+    products: products.value,
+    shippingPrice: shippingPrice.value,
+    client: client.value,
+    pedidoStatus: "pending"
+  });
+
+  // Show success message
+  useToast(ToastEvents.success, "Pedido creado correctamente.");
+  orderCreated.value = true;
   loading.value = false;
 }
 

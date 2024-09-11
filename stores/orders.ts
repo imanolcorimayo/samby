@@ -9,9 +9,11 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  orderBy
+  orderBy,
+  serverTimestamp
 } from "firebase/firestore";
 import type { User } from "firebase/auth";
+import { ToastEvents } from "~/interfaces";
 
 export const useOrdersStore = defineStore("orders", {
   state: (): any => {
@@ -63,6 +65,59 @@ export const useOrdersStore = defineStore("orders", {
         (p: any) => JSON.stringify(p) !== JSON.stringify(product)
       );
       // Update Local Storage
+    },
+    async placeOrder(order: any) {
+      const db = useFirestore();
+      const user = useCurrentUser();
+
+      if (!user || !user.value) {
+        return null;
+      }
+
+      // Double check the client
+      const isClientValid = validateClient(order.client);
+
+      if (!isClientValid) {
+        useToast(ToastEvents.error, "Por favor, complete la información del cliente.");
+        return;
+      }
+
+      // Double check if shipping price is valid
+      if (!order.shippingPrice) {
+        useToast(ToastEvents.error, "Por favor, complete el costo de envío.");
+        return;
+      }
+
+      // Double check products still exits
+      if (!order.products.length) {
+        useToast(ToastEvents.error, "No hay productos en el carrito.");
+        return;
+      }
+
+      try {
+        // Handle recurrent payments
+        const newOrder = await addDoc(collection(db, "pedido"), {
+          ...order,
+          createdAt: serverTimestamp(),
+          userUid: user.value.uid
+        });
+
+        // Get the new order id
+        const orderId = newOrder.id;
+
+        // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
+        await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {
+          pedidoStatus: "pending",
+          createdAt: serverTimestamp(),
+          userUid: user.value.uid
+        });
+
+        // Clear the shopping cart
+        this.$state.shoppingCart = [];
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
     }
   }
 });
