@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col gap-[2rem] w-full">
+    <OrdersDetails ref="ordersDetails" />
     <Navigator />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
@@ -22,23 +23,23 @@
             v-for="(order, index) in pendingOrders"
             :key="index"
           >
-            <div class="flex justify-between items-start">
-              <div class="flex flex-col">
+            <button class="flex flex-col items-start w-full" @click="showDetails(order.id)">
+              <div class="flex justify-between w-full">
                 <span class="flex items-center gap-3 font-medium"
                   ><MingcuteUser4Fill class="text-[2rem]" />{{ order.client.clientName }}</span
                 >
-                <span class="text-sm text-gray-500">{{ order.client.address }}</span>
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-sm font-semibold text-yellow-800 ring-1 ring-inset ring-yellow-600/20"
+                  >
+                    {{ order.orderStatus }}</span
+                  >
+                  <EpArrowRightBold />
+                </div>
               </div>
-              <div class="flex items-center gap-2">
-                <span
-                  class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-sm font-semibold text-yellow-800 ring-1 ring-inset ring-yellow-600/20"
-                >
-                  {{ order.orderStatus }}</span
-                >
-                <EpArrowRightBold />
-              </div>
-            </div>
-            <div class="flex flex-col gap-1">
+              <span class="text-sm text-gray-500">{{ order.client.address }}</span>
+            </button>
+            <div class="flex flex-col gap-1 w-full">
               <div class="flex justify-between py-1 px-3 rounded-md bg-gray-50">
                 <span class="font-medium">Fecha de envío</span>
                 <span class="font-medium">{{ formattedDate(order.shippingDate) }}</span>
@@ -53,40 +54,59 @@
               </div>
               <div class="flex justify-between py-1 px-3">
                 <span class=""></span>
-                <button class="btn-sm bg-primary text-white text-sm">Completar pedido</button>
+                <button @click="markAsCompleted" class="flex items-center gap-1 btn-sm bg-primary text-white text-sm">
+                  <IconParkOutlineCheckOne /> Marcar completado
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="flex" v-else-if="!areOrdersFetched">Cargando pedidos...</div>
+      <div class="flex" v-else-if="!arePendingOrdersFetched">Cargando pedidos...</div>
       <div class="flex" v-else>No se encontraron pedidos</div>
     </div>
   </div>
 </template>
 
 <script setup>
+import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import IcRoundPlus from "~icons/ic/round-plus";
 import MingcuteUser4Fill from "~icons/mingcute/user-4-fill";
 import EpArrowRightBold from "~icons/ep/arrow-right-bold";
+import { ToastEvents } from "~/interfaces";
 
 // ----- Define Useful Properties -------
 const { $dayjs } = useNuxtApp();
 
 // ----- Define Pinia Vars --------
 const ordersStore = useOrdersStore();
-const { getPendingOrders: pendingOrders, areOrdersFetched } = storeToRefs(ordersStore);
+const { getPendingOrders: pendingOrders, arePendingOrdersFetched } = storeToRefs(ordersStore);
 
 // Function will manage if the data is already fetched
 ordersStore.fetchPendingOrders();
 
-// ----- Define Computed -------
-
 // ----- Define Vars -------
 
-// ----- Define Hooks -------
+// Refs
+const ordersDetails = ref(null);
+
+// ----- Define Computed -------
 
 // ----- Define Methods -------
+const showDetails = (orderId) => {
+  // Check sellsDetails is defined
+  if (!ordersDetails.value) return;
+
+  ordersDetails.value.showModal(orderId);
+};
+
+function markAsCompleted() {
+  console.log("Mark as completed");
+
+  useToast(ToastEvents.info, "No implementado todavía");
+}
+
+// ----- Define Hooks -------
 
 // ----- Define Watchers -------
 

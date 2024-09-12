@@ -35,7 +35,8 @@ export const useOrdersStore = defineStore("orders", {
     productsCount: (state) => state.shoppingCart.length,
     totalAmount: (state: any) => state.shoppingCart.reduce((acc: any, product: any) => acc + product.total, 0),
     getOrders: (state) => state.orders,
-    getPendingOrders: (state) => state.pendingOrders
+    getPendingOrders: (state) => state.pendingOrders,
+    arePendingOrdersFetched: (state) => state.pendingOrdersFetched
   },
   actions: {
     async saveShoppingCart(productsQuantity: any) {
