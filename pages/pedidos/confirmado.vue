@@ -135,37 +135,6 @@ function sendConfirmationMessage() {
   window.open(url, "_blank");
 }
 
-function createMessage(products, client, shippingPrice, totalWithShipping) {
-  // Verify if the address is empty
-  const deliveryAddress = client.address ? client.address : "N/A";
-
-  // Add the introduction name
-  let message = `¡Hola, ${client.clientName}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
-
-  products.forEach((product) => {
-    const productPrice = formatPrice(product.price);
-
-    // Verify if it's a fraction and add 1/4, 1/2 or 3/4 accordingly
-    const quantityText = formatQuantity(product.quantity);
-
-    message += `- ${quantityText} ${product.productName} ${productPrice}\n`;
-  });
-
-  // Añade el costo de envío
-  message += `\n🚚 Costo de Envío: ${formatPrice(shippingPrice)}\n`;
-
-  // Añade el total
-  message += `💵 Total a Pagar: ${formatPrice(totalWithShipping)}\n`;
-
-  // Añade la dirección de envío
-  message += `\n📍 Dirección de Envío: ${deliveryAddress}\n`;
-
-  // Cierra con un mensaje amigable
-  message += `\n¡Gracias por tu compra! Si necesitas algo más, no dudes en avisarnos. 😊`;
-
-  return message;
-}
-
 useHead({
   title: "Pedido Confirmado"
 });
