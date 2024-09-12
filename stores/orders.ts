@@ -24,7 +24,9 @@ export const useOrdersStore = defineStore("orders", {
         order: {},
         orderId: false,
         createdAt: false
-      }
+      },
+      pendingOrders: [],
+      pendingOrdersFetched: false
     };
   },
   getters: {
@@ -32,7 +34,8 @@ export const useOrdersStore = defineStore("orders", {
     doesOrderExist: (state) => state.shoppingCart.length > 0,
     productsCount: (state) => state.shoppingCart.length,
     totalAmount: (state: any) => state.shoppingCart.reduce((acc: any, product: any) => acc + product.total, 0),
-    getOrders: (state) => state.orders
+    getOrders: (state) => state.orders,
+    getPendingOrders: (state) => state.pendingOrders
   },
   actions: {
     async saveShoppingCart(productsQuantity: any) {
@@ -119,13 +122,13 @@ export const useOrdersStore = defineStore("orders", {
 
         // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
         await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {
-          pedidoStatus: "pending",
+          orderStatus: "pendiente",
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
 
         // Add order to orders
-        this.$state.orders.push({ ...orderObject, id: newOrder.id });
+        this.$state.pendingOrders.push({ ...orderObject, id: newOrder.id });
 
         // Update last inserted order
         this.$state.lastInsertedOrder = {
@@ -149,6 +152,37 @@ export const useOrdersStore = defineStore("orders", {
         orderId: false,
         createdAt: false
       };
+    },
+    async fetchPendingOrders() {
+      const db = useFirestore();
+      const user = useCurrentUser();
+
+      // If data is already fetched, return
+      if (this.$state.pendingOrdersFetched) {
+        return;
+      }
+
+      if (!user || !user.value) {
+        return null;
+      }
+      try {
+        const querySnapshot = await getDocs(
+          query(collection(db, "pedido"), where("orderStatus", "==", "pendiente"), orderBy("createdAt", "desc"))
+        );
+
+        console.log(querySnapshot);
+        const orders = querySnapshot.docs.map((doc) => {
+          return { ...doc.data(), id: doc.id };
+        });
+
+        console.log(orders);
+
+        this.$state.pendingOrders = orders;
+        this.$state.pendingOrdersFetched = true;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
     }
   }
 });

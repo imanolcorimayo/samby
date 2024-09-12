@@ -129,6 +129,9 @@ import TablerTrash from "~icons/tabler/trash";
 import IonArrowBack from "~icons/ion/arrow-back";
 import { ToastEvents } from "~/interfaces";
 
+// ------- Define Useful Properties --------
+const { $dayjs } = useNuxtApp();
+
 // ------- Define Pinia Vars --------
 const clientsStore = useClientsStore();
 clientsStore.fetchData();
@@ -151,7 +154,8 @@ const clientError = ref({
   address: false
 });
 const shippingPrice = ref(null);
-const shippingDate = ref(null);
+// Set for today
+const shippingDate = ref($dayjs().format("YYYY-MM-DD"));
 const clientSelected = ref(false);
 const orderCreated = ref(false);
 
@@ -255,7 +259,7 @@ async function confirmOrder() {
     client: client.value,
     totalAmount: totalWithShipping.value,
     totalProductsAmount: totalAmount.value,
-    pedidoStatus: "pending"
+    orderStatus: "pendiente"
   });
 
   // Check if it was successful

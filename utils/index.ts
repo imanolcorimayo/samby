@@ -106,3 +106,15 @@ export const validateClient = (client: any) => {
 
   return true;
 };
+
+export const formattedDate = (date: string) => {
+  const { $dayjs } = useNuxtApp();
+  // List of months in Spanish to use in the date format
+  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+  // Get the spanish month
+  const month = months[$dayjs(date).month()];
+
+  // Return the formatted date
+  return `${month} ${$dayjs(date).format("D, YYYY")}`;
+};
