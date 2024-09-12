@@ -127,7 +127,7 @@ export const createMessage = (products: any, client: any, shippingPrice: any, to
   let message = `¡Hola, ${client.clientName}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
 
   products.forEach((product: any) => {
-    const productPrice = formatPrice(product.price);
+    const productPrice = formatPrice(product.total);
 
     // Verify if it's a fraction and add 1/4, 1/2 or 3/4 accordingly
     const quantityText = formatQuantity(product.quantity);
