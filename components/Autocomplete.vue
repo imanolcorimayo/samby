@@ -6,6 +6,7 @@
       v-model="searchItem"
       :placeholder="placeholder"
       @focus="markUnselected"
+      autocomplete="off"
     />
     <div class="relative">
       <TransitionGroup
@@ -48,6 +49,11 @@ const props = defineProps({
     type: String,
     required: true,
     default: "id"
+  },
+  clearOnSelect: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 });
 
@@ -85,7 +91,7 @@ function selectItem(item) {
   itemSelected.value = true;
 
   // Update the v-model of the parent component
-  searchItem.value = item[props.property];
+  searchItem.value = !props.clearOnSelect ? item[props.property] : "";
 
   // Emit the selected item to the parent component
   emit("selected", item[props.returnValue]);

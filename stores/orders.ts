@@ -168,7 +168,11 @@ export const useOrdersStore = defineStore("orders", {
       }
       try {
         const querySnapshot = await getDocs(
-          query(collection(db, "pedido"), where("orderStatus", "==", "pendiente"), orderBy("createdAt", "desc"))
+          query(
+            collection(db, "pedido"),
+            where("orderStatus", "in", ["pendiente", "pendiente-modificado"]),
+            orderBy("createdAt", "desc")
+          )
         );
 
         console.log(querySnapshot);
@@ -183,6 +187,54 @@ export const useOrdersStore = defineStore("orders", {
       } catch (error) {
         console.error(error);
         return null;
+      }
+    },
+    async updatePendingOrder(order: any) {
+      const db = useFirestore();
+      const user = useCurrentUser();
+
+      if (!user || !user.value) {
+        return false;
+      }
+
+      // Get id and remove it from the object
+      const orderId = order.id;
+      delete order.id;
+
+      // Get order from orders
+      const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
+
+      if (orderIndex === -1) {
+        useToast(ToastEvents.error, "No se encontró la orden.");
+        return false;
+      }
+
+      // Double check the new order is not identical to the old one
+      if (JSON.stringify(this.$state.pendingOrders[orderIndex]) === JSON.stringify(order)) {
+        useToast(ToastEvents.error, "La orden no ha sido modificada.");
+        return false;
+      }
+
+      try {
+        await updateDoc(doc(db, "pedido", orderId), {
+          ...order,
+          orderStatus: "pendiente-modificado"
+        });
+
+        // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
+        await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {
+          orderStatus: "pendiente-modificado",
+          message: "Orden modificada por el usuario " + user.value.displayName,
+          createdAt: serverTimestamp(),
+          userUid: user.value.uid
+        });
+
+        this.$state.pendingOrders[orderIndex] = { ...order, id: orderId, orderStatus: "pendiente-modificado" };
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
       }
     }
   }

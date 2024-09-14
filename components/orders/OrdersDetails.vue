@@ -1,125 +1,23 @@
 <template>
   <ModalStructure ref="mainModal">
     <template #header>
-      <div class="flex flex-col gap-2 w-full">
-        <div class="flex flex-col cursor-pointer w-full">
-          <span class="font-bold text-xl">Detalles del pedido</span>
+      <div class="flex justify-between items-center w-full">
+        <div class="flex flex-col gap-2 w-full">
+          <div class="flex flex-col cursor-pointer w-full">
+            <span class="font-bold text-xl">Detalles del pedido</span>
+          </div>
+          <div class="flex flex-col cursor-pointer w-full">
+            <span class="text-xs text-gray-500">Pedido id: {{ currentOrder.id }}</span>
+          </div>
         </div>
-        <div class="flex flex-col cursor-pointer w-full">
-          <span class="text-xs text-gray-500">Pedido id: {{ currentOrder.id }}</span>
-        </div>
+        <span
+          class="h-fit inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 font-semibold text-yellow-800 ring-1 ring-inset ring-yellow-600/20"
+        >
+          {{ formatStatus(currentOrder.orderStatus) }}</span
+        >
       </div>
     </template>
     <template #default>
-      <!-- 
-        <FormKit
-          type="form"
-          id="ventas-nuevo"
-          :form-class="'flex flex-col gap-4 w-full'"
-          submit-label="Nueva Venta"
-          @submit="updateSell"
-          :actions="false"
-        >
-          <FormKit
-            type="number"
-            name="quantity"
-            label-class="font-medium"
-            messages-class="text-red-500 text-[0.75rem]"
-            input-class="w-full"
-            label="Cantidad"
-            placeholder="Cantidad por unidad de venta"
-            validation="required"
-            v-model="form.quantity"
-          />
-          <FormKit
-            type="number"
-            name="buying_price"
-            label-class="font-medium"
-            messages-class="text-red-500 text-[0.75rem]"
-            input-class="w-full"
-            label="Precio de compra por unidad"
-            placeholder="$$$"
-            validation="required"
-            v-model="form.buyingPrice"
-          />
-          <FormKit
-            type="number"
-            name="selling_price"
-            label-class="font-medium"
-            messages-class="text-red-500 text-[0.75rem]"
-            input-class="w-full"
-            label="Precio de venta por unidad"
-            placeholder="$$$"
-            validation="required"
-            v-model="form.sellingPrice"
-          />
-          <FormKit
-            type="date"
-            name="sell_date"
-            label-class="font-medium"
-            messages-class="text-red-500 text-[0.75rem]"
-            input-class="w-full"
-            label="Fecha de venta"
-            placeholder="yyyy-mm-dd"
-            validation="required"
-            v-model="form.date"
-          />
-          <div class="flex flex-col gap-[0.143rem]">
-            <span class="font-medium">Calidad del producto</span>
-            <span class="font-medium text-xs text-danger" v-if="!form.quality">(no seleccionado)</span>
-            <div class="flex gap-2 justify-between m-1">
-              <div class="flex-1 w-full">
-                <input v-model="form.quality" class="hidden" type="radio" id="baja" name="quality" value="baja" checked />
-                <label
-                  :class="{
-                    'ring-2 ring-primary': form.quality === 'baja'
-                  }"
-                  class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
-                  for="baja"
-                >
-                  <AkarIconsCircleXFill class="text-[1.285rem] text-danger" />
-                  <span>Baja</span>
-                </label>
-              </div>
-
-              <div class="flex-1 w-full">
-                <input
-                  v-model="form.quality"
-                  class="hidden"
-                  type="radio"
-                  id="intermedia"
-                  name="quality"
-                  value="intermedia"
-                />
-                <label
-                  :class="{
-                    'ring-2 ring-primary': form.quality === 'intermedia'
-                  }"
-                  class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
-                  for="intermedia"
-                >
-                  <FluentStarHalf12Regular class="text-[1.428rem] text-[#fcd53f]" />
-                  <span>Intermedia</span>
-                </label>
-              </div>
-
-              <div class="flex-1 w-full">
-                <input v-model="form.quality" class="hidden" type="radio" id="buena" name="quality" value="buena" />
-                <label
-                  :class="{
-                    'ring-2 ring-primary': form.quality === 'buena'
-                  }"
-                  class="flex items-center gap-2 btn bg-secondary text-nowrap inline-block w-full text-center"
-                  for="buena"
-                >
-                  <IconoirStarSolid class="text-[1.285rem] text-[#fcd53f]" />
-                  <span>Buena</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </FormKit> 
-      -->
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <span class="font-semibold text-lg">Resumen del pedido</span>
@@ -127,29 +25,73 @@
             <thead>
               <tr class="text-gray-400 border-b">
                 <th class="font-medium text-start">Producto</th>
-                <th class="font-medium">Precio</th>
+                <th class="font-medium hidden sm:block">Precio</th>
                 <th class="font-medium">Cantidad</th>
-                <th class="font-medium">Subtotal</th>
+                <th class="font-medium flex flex-col items-center justify-center">
+                  <span>Subtotal</span>
+                  <span class="text-xs block sm:hidden">(p/ unidad)</span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr class="text-center border-b" v-for="product in currentOrder.products" :key="product.id">
-                <td class="py-3 text-start">{{ product.productName }}</td>
-                <td class="py-3">{{ formatPrice(product.price) }}</td>
-                <td class="py-3">{{ product.quantity }}</td>
-                <td class="py-3">{{ formatPrice(product.total) }}</td>
+              <tr class="text-center border-b" v-for="product in editableOrder.products" :key="product.id">
+                <td class="py-3 text-start">{{ `${product.productName} (${product.unit})` }}</td>
+                <td class="py-3 hidden sm:block">{{ formatPrice(product.price) }}</td>
+                <td class="py-3">
+                  <div class="flex justify-between items-center gap-2 w-full">
+                    <button
+                      @click="manageProduct(product.productId, 'remove')"
+                      class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
+                    >
+                      <MiRemove v-if="product.quantity > 1" class="text-black text-xs" />
+                      <TablerTrash v-else class="text-black text-xs" />
+                    </button>
+                    <span
+                      class="w-full bg-secondary text-sm py-[0.214rem] px-[0.428rem] rounded-[0.214rem] ring-1 ring-gray-500 text-center text-nowrap max-h-[2.143rem]"
+                      >{{ product.quantity }}</span
+                    >
+                    <button
+                      @click="manageProduct(product.productId, 'add')"
+                      class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
+                    >
+                      <TablerPlus class="text-black text-xs" />
+                    </button>
+                  </div>
+                </td>
+                <td class="py-3">
+                  <div class="flex flex-col items-center justify-center">
+                    <span>{{ formatPrice(product.total) }}</span>
+                    <span class="text-xs block sm:hidden">({{ formatPrice(product.price) }})</span>
+                  </div>
+                </td>
+              </tr>
+              <tr class="text-center border-b">
+                <td class="py-3 text-start">
+                  <Autocomplete
+                    :items="autocompleteProducts"
+                    property="productNameWithUnit"
+                    placeholder="+ Nuevo Producto"
+                    returnValue="id"
+                    clearOnSelect
+                    @selected="addProduct"
+                    @unselect="onUnselect"
+                  />
+                </td>
+                <td class="py-3 hidden sm:block"></td>
+                <td class="py-3"></td>
+                <td class="py-3"></td>
               </tr>
               <tr class="text-center border-b">
                 <td class="py-3 text-start">Envío</td>
-                <td class="py-3"></td>
+                <td class="py-3 hidden sm:block"></td>
                 <td class="py-3"></td>
                 <td class="py-3">{{ formatPrice(currentOrder.shippingPrice) }}</td>
               </tr>
               <tr class="text-center border-b font-bold">
                 <td class="py-3 text-start">Total</td>
+                <td class="py-3 hidden sm:block"></td>
                 <td class="py-3"></td>
-                <td class="py-3"></td>
-                <td class="py-3">{{ formatPrice(currentOrder.totalAmount ?? 0) }}</td>
+                <td class="py-3">{{ formatPrice(editableOrder.totalAmount ?? 0) }}</td>
               </tr>
             </tbody>
           </table>
@@ -178,23 +120,24 @@
       </div>
     </template>
     <template #footer>
-      <div v-if="submitting" class="btn bg-secondary border text-center">loading...</div>
+      <div v-if="submitting && isOrderModified" class="btn bg-secondary border text-center">loading...</div>
       <button
-        v-else
-        @click="showModalUpdate()"
-        class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
+        v-else-if="isOrderModified"
+        @click="modifyOrder()"
+        class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-primary text-white w-full text-center"
       >
         <LucideEdit /> Modificar
       </button>
-      <div v-if="submitting" class="btn bg-danger text-white text-nowrap">loading...</div>
+      <div v-if="submitting && !isOrderModified" class="btn bg-danger text-white text-nowrap">loading...</div>
       <button
-        v-else
+        v-else-if="!isOrderModified"
         @click="markAsCancelled()"
         class="flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
       >
         <IcRoundArchive /> Cancelar venta
       </button>
       <button
+        v-if="!isOrderModified"
         @click="sendConfirmationMessage"
         class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
       >
@@ -208,30 +151,46 @@
 </template>
 
 <script setup>
+import TablerPlus from "~icons/tabler/plus";
+import MiRemove from "~icons/mi/remove";
+import TablerTrash from "~icons/tabler/trash";
 import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
 import LucideEdit from "~icons/lucide/edit";
 import IcRoundArchive from "~icons/ic/round-archive";
 import { ToastEvents } from "~/interfaces";
 
 // ----- Define Pinia Vars -----
+const productsStore = useProductsStore();
+const { products } = storeToRefs(productsStore);
+
 const ordersStore = useOrdersStore();
 const { getPendingOrders: pendingOrders, arePendingOrdersFetched } = storeToRefs(ordersStore);
+
+productsStore.fetchData();
 
 // ----- Define Vars -----
 const submitting = ref(false);
 const currentOrder = ref(null);
-const currentProduct = ref(null);
-const form = ref({
-  quantity: 0,
-  quality: false,
-  buyingPrice: 0,
-  sellingPrice: 0,
-  date: ""
-});
+const editableOrder = ref([]);
+const isOrderModified = ref(false);
 
 // Refs
 const mainModal = ref(null);
 const confirmDialogue = ref(null);
+
+// ----- Define Computed -----
+const autocompleteProducts = computed(() => {
+  // Filter out the product that are in the modifiedOrder
+  const productsIds = editableOrder.value.products.map((p) => p.productId);
+  const filteredProducts = products.value.filter((p) => !productsIds.includes(p.id));
+
+  return filteredProducts.map((p) => {
+    return {
+      ...p,
+      productNameWithUnit: `${p.productName} (${p.unit})`
+    };
+  });
+});
 
 // ----- Define Methods -----
 async function showModalUpdate() {
@@ -261,6 +220,80 @@ function sendConfirmationMessage() {
   window.open(url, "_blank");
 }
 
+// ----- Define Methods -------
+function manageProduct(productId, action) {
+  // Find index of the product
+  const productIndex = editableOrder.value.products.findIndex((p) => p.productId === productId);
+
+  // Find product in products
+  const productFullInfo = products.value.find((p) => p.id === productId);
+  const productStep = productFullInfo.step ?? 0.5;
+
+  // Edit product by reference
+  const product = editableOrder.value.products[productIndex];
+
+  if (action === "add") {
+    // Add quantity
+    product.quantity = product.quantity + productStep;
+    product.total = product.price * product.quantity;
+
+    // Update total
+    updateOrderFinancial();
+    return;
+  }
+
+  // If it's the last product, remove it and unselect it
+  if (product.quantity <= productStep) {
+    // Remove product from the list using the index
+    editableOrder.value.products.splice(productIndex, 1);
+  }
+
+  // Manage remove action
+  product.quantity = product.quantity - productStep;
+  product.total = product.price * product.quantity;
+  updateOrderFinancial();
+}
+
+function addProduct(productId) {
+  // Get product properties
+  const product = products.value.find((p) => p.id === productId);
+
+  // Check if product exists
+  if (!product) {
+    useToast("error", "El producto no existe, por favor intenta nuevamente.");
+    return;
+  }
+
+  // Check if product is already in the list
+  if (editableOrder.value.products.find((p) => p.productId === product.id)) {
+    useToast("error", "El producto ya ha sido agregado, por favor intenta nuevamente.");
+    return;
+  }
+
+  // Add product to the list
+  editableOrder.value.products.push({
+    productId: product.id,
+    productName: product.productName,
+    price: product.price,
+    quantity: product.step ?? 0.5,
+    total: product.price * (product.step ?? 0.5),
+    unit: product.unit
+  });
+
+  // Update the total amount
+  updateOrderFinancial();
+}
+
+function updateOrderFinancial() {
+  // Update the total products amount
+  editableOrder.value.totalProductsAmount = editableOrder.value.products.reduce((acc, product) => {
+    return acc + product.total;
+  }, 0);
+
+  // Update the total amount
+  editableOrder.value.totalAmount = editableOrder.value.totalProductsAmount + editableOrder.value.shippingPrice;
+}
+
 const showModal = (orderId) => {
   // Check sells are fetched
   if (!arePendingOrdersFetched.value) {
@@ -285,13 +318,51 @@ const showModal = (orderId) => {
   // Set current order
   currentOrder.value = order;
 
-  // Fill form
+  // This is the only way to make it work, otherwise it will be a reference since there are many nested objects
+  editableOrder.value = JSON.parse(JSON.stringify(order));
 
   // Show modal
   mainModal.value.showModal();
 };
 
+async function modifyOrder() {
+  // If submitting, do nothing
+  if (submitting.value) return;
+
+  // Start the loader
+  submitting.value = true;
+
+  // Confirm dialogue
+  const confirmed = await confirmDialogue.value.openDialog({ edit: true });
+
+  if (!confirmed) {
+    submitting.value = false;
+    return;
+  }
+
+  // Update the order
+  const orderUpdated = await ordersStore.updatePendingOrder(editableOrder.value);
+
+  if (orderUpdated) {
+    useToast(ToastEvents.success, "Pedido modificado correctamente");
+    mainModal.value.closeModal();
+    submitting.value = false;
+  } else {
+    useToast(ToastEvents.error, "Hubo un error al modificar el pedido, por favor intenta nuevamente");
+    submitting.value = false;
+  }
+}
+
 // ----- Define Hooks -----
+
+// ----- Define Watchers -----
+watch(
+  [currentOrder, editableOrder],
+  (newValues) => {
+    isOrderModified.value = JSON.stringify(newValues[0]) !== JSON.stringify(newValues[1]);
+  },
+  { deep: true }
+);
 
 // ----- Define Expose -----
 defineExpose({ showModal });

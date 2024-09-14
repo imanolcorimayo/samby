@@ -13,8 +13,6 @@ import {
   orderBy,
   limit
 } from "firebase/firestore";
-import type { User } from "firebase/auth";
-import { update } from "firebase/database";
 import { ToastEvents } from "~/interfaces";
 
 const defaultObject = {

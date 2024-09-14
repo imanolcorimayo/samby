@@ -16,9 +16,7 @@
           <div class="overflow-auto pt-2 scrollbar-none no-scrollbar">
             <slot></slot>
           </div>
-          <div
-            class="flex flex-col lg:flex-row justify-end gap-[0.571rem] footer mb-6 lg:mb-[unset] w-full lg:max-w-[15rem] m-auto"
-          >
+          <div class="flex flex-col justify-center gap-[0.571rem] footer mb-6 w-full lg:flex-row lg:mb-[unset]">
             <slot name="footer"> </slot>
           </div>
         </div>
@@ -86,10 +84,4 @@ function closeModal() {
 defineExpose({ showModal, closeModal });
 </script>
 
-<style scoped>
-.footer :deep(button),
-.footer :deep(input) {
-  margin: 0px;
-  width: 100%;
-}
-</style>
+<style scoped></style>
