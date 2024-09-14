@@ -12,7 +12,6 @@ import {
   orderBy,
   serverTimestamp
 } from "firebase/firestore";
-import type { User } from "firebase/auth";
 import { ToastEvents } from "~/interfaces";
 
 export const useOrdersStore = defineStore("orders", {
@@ -42,6 +41,7 @@ export const useOrdersStore = defineStore("orders", {
     async saveShoppingCart(productsQuantity: any) {
       // Get the products from the store
       const productsStore = useProductsStore();
+      // @ts-ignore
       const { getProducts: products } = storeToRefs(productsStore);
 
       // Create the order object
@@ -174,13 +174,9 @@ export const useOrdersStore = defineStore("orders", {
             orderBy("createdAt", "desc")
           )
         );
-
-        console.log(querySnapshot);
         const orders = querySnapshot.docs.map((doc) => {
           return { ...doc.data(), id: doc.id };
         });
-
-        console.log(orders);
 
         this.$state.pendingOrders = orders;
         this.$state.pendingOrdersFetched = true;
