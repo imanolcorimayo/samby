@@ -11,7 +11,14 @@
           </div>
         </div>
         <span
-          class="h-fit inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 font-semibold text-yellow-800 ring-1 ring-inset ring-yellow-600/20"
+          class="h-fit inline-flex items-center rounded-md px-2 py-1 font-semibold ring-1 ring-inset"
+          :class="{
+            'bg-green-50 text-green-800 ring-green-600/20': currentOrder.orderStatus == 'entregado',
+            'bg-red-50 text-red-800 ring-red-600/20': currentOrder.orderStatus == 'cancelado',
+            'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ['pendiente', 'pendiente-modificado'].includes(
+              currentOrder.orderStatus
+            )
+          }"
         >
           {{ formatStatus(currentOrder.orderStatus) }}</span
         >
@@ -120,24 +127,34 @@
       </div>
     </template>
     <template #footer>
-      <div v-if="submitting && isOrderModified" class="btn bg-secondary border text-center">loading...</div>
+      <div
+        v-if="submitting && isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
+        class="btn bg-secondary border text-center"
+      >
+        loading...
+      </div>
       <button
-        v-else-if="isOrderModified"
+        v-else-if="isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
         @click="modifyOrder()"
         class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-primary text-white w-full text-center"
       >
         <LucideEdit /> Modificar
       </button>
-      <div v-if="submitting && !isOrderModified" class="btn bg-danger text-white text-nowrap">loading...</div>
+      <div
+        v-if="submitting && !isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
+        class="btn bg-danger text-white text-nowrap"
+      >
+        loading...
+      </div>
       <button
-        v-else-if="!isOrderModified"
+        v-else-if="!isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
         @click="markAsCancelled()"
         class="flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
       >
         <IcRoundArchive /> Cancelar venta
       </button>
       <button
-        v-if="!isOrderModified"
+        v-if="!isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
         @click="sendConfirmationMessage"
         class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
       >
@@ -164,7 +181,7 @@ const productsStore = useProductsStore();
 const { products } = storeToRefs(productsStore);
 
 const ordersStore = useOrdersStore();
-const { getPendingOrders: pendingOrders, arePendingOrdersFetched } = storeToRefs(ordersStore);
+const { getPendingOrders: pendingOrders, getOrders: orders, arePendingOrdersFetched } = storeToRefs(ordersStore);
 
 productsStore.fetchData();
 
@@ -193,12 +210,32 @@ const autocompleteProducts = computed(() => {
 });
 
 // ----- Define Methods -----
-async function showModalUpdate() {
-  useToast(ToastEvents.info, "No implementado todavía");
-}
-
 async function markAsCancelled() {
-  useToast(ToastEvents.info, "No implementado todavía");
+  // If submitting, do nothing
+  if (submitting.value) return;
+
+  // Start the loader
+  submitting.value = true;
+
+  // Confirm dialogue
+  const confirmed = await confirmDialogue.value.openDialog({ edit: true });
+
+  if (!confirmed) {
+    submitting.value = false;
+    return;
+  }
+
+  // Update the order
+  const orderUpdated = await ordersStore.updateStatusOrder(currentOrder.value.id, "cancelado");
+
+  if (orderUpdated) {
+    useToast(ToastEvents.success, "Pedido cancelado correctamente");
+    mainModal.value.closeModal();
+    submitting.value = false;
+  } else {
+    useToast(ToastEvents.error, "Hubo un error al cancelar el pedido, por favor intenta nuevamente");
+    submitting.value = false;
+  }
 }
 
 function sendConfirmationMessage() {
@@ -307,7 +344,7 @@ const showModal = (orderId) => {
   }
 
   // Based on the orderId, we will get the sell data and fill the form
-  const order = pendingOrders.value.find((o) => o.id === orderId);
+  const order = [...pendingOrders.value, ...orders.value].find((o) => o.id === orderId);
 
   // Check if order exists
   if (!order) {

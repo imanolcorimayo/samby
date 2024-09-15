@@ -25,7 +25,8 @@ export const useOrdersStore = defineStore("orders", {
         createdAt: false
       },
       pendingOrders: [],
-      pendingOrdersFetched: false
+      pendingOrdersFetched: false,
+      ordersFetched: false
     };
   },
   getters: {
@@ -185,6 +186,37 @@ export const useOrdersStore = defineStore("orders", {
         return null;
       }
     },
+    async fetchOrders() {
+      const db = useFirestore();
+      const user = useCurrentUser();
+
+      // If data is already fetched, return
+      if (this.$state.ordersFetched) {
+        return;
+      }
+
+      if (!user || !user.value) {
+        return null;
+      }
+      try {
+        const querySnapshot = await getDocs(
+          query(
+            collection(db, "pedido"),
+            where("orderStatus", "in", ["entregado", "cancelado"]),
+            orderBy("createdAt", "desc")
+          )
+        );
+        const orders = querySnapshot.docs.map((doc) => {
+          return { ...doc.data(), id: doc.id };
+        });
+
+        this.$state.orders = orders;
+        this.$state.ordersFetched = true;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    },
     async updatePendingOrder(order: any) {
       const db = useFirestore();
       const user = useCurrentUser();
@@ -226,6 +258,48 @@ export const useOrdersStore = defineStore("orders", {
         });
 
         this.$state.pendingOrders[orderIndex] = { ...order, id: orderId, orderStatus: "pendiente-modificado" };
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    },
+    async updateStatusOrder(orderId: string, status: string) {
+      const db = useFirestore();
+      const user = useCurrentUser();
+
+      if (!user || !user.value) {
+        return false;
+      }
+
+      try {
+        await updateDoc(doc(db, "pedido", orderId), {
+          orderStatus: status
+        });
+
+        // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
+        await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {
+          orderStatus: status,
+          message: `Cambio de estado hecho por ${user.value.displayName}`,
+          createdAt: serverTimestamp(),
+          userUid: user.value.uid
+        });
+
+        // Check if it's in the pending orders
+        const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
+
+        // Move from pending orders to the corresponding status
+        let order = false;
+        if (orderIndex > -1) {
+          order = this.$state.pendingOrders[orderIndex];
+          this.$state.pendingOrders.splice(orderIndex, 1);
+        }
+
+        if (order && typeof order === "object") {
+          // @ts-ignore
+          this.$state.orders.push({ ...order, orderStatus: status });
+        }
 
         return true;
       } catch (error) {

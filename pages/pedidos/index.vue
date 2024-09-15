@@ -12,15 +12,27 @@
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo
         </NuxtLink>
       </div>
-      <div class="flex flex-col gap-[0.571rem]" v-if="pendingOrders.length">
-        <div class="flex gap-1">
-          <span class="btn drop-shadow-md" :class="{ ['bg-primary text-white font-medium']: true }">Pendientes</span>
-          <span class="btn bg-secondary drop-shadow-md">Completados</span>
+      <div class="flex flex-col gap-[0.571rem]" v-if="filteredOrders.length">
+        <div class="flex gap-1 bg-gray-200 rounded-[.714rem] p-1 w-fit">
+          <button
+            @click="showOrders('pending')"
+            class="py-1 px-2 rounded-[.428rem]"
+            :class="{ 'bg-secondary shadow': orderType == 'pending' }"
+          >
+            Pendientes
+          </button>
+          <button
+            @click="showOrders('completed')"
+            class="py-1 px-2 rounded-[.428rem]"
+            :class="{ 'bg-secondary shadow': orderType == 'completed' }"
+          >
+            Completados
+          </button>
         </div>
         <div class="flex flex-col">
           <div
             class="flex flex-col gap-3 p-2 py-4 bg-secondary border-b"
-            v-for="(order, index) in pendingOrders"
+            v-for="(order, index) in filteredOrders"
             :key="index"
           >
             <button class="flex flex-col items-start w-full" @click="showDetails(order.id)">
@@ -30,14 +42,21 @@
                 >
                 <div class="flex items-center gap-2">
                   <span
-                    class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-sm font-semibold text-yellow-800 ring-1 ring-inset ring-yellow-600/20"
+                    class="inline-flex items-center rounded-md px-2 py-1 text-sm font-semibold ring-1 ring-inset"
+                    :class="{
+                      'bg-green-50 text-green-800 ring-green-600/20': order.orderStatus == 'entregado',
+                      'bg-red-50 text-red-800 ring-red-600/20': order.orderStatus == 'cancelado',
+                      'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ['pendiente', 'pendiente-modificado'].includes(
+                        order.orderStatus
+                      )
+                    }"
                   >
                     {{ formatStatus(order.orderStatus) }}</span
                   >
                   <EpArrowRightBold />
                 </div>
               </div>
-              <span class="text-sm text-gray-500">{{ order.client.address }}</span>
+              <span class="text-sm text-gray-500 text-start">{{ order.client.address }}</span>
             </button>
             <div class="flex flex-col gap-1 w-full">
               <div class="flex justify-between py-1 px-3 rounded-md bg-gray-50">
@@ -52,10 +71,13 @@
                 <span class="font-medium">Total</span>
                 <span class="font-semibold">{{ formatPrice(order.totalAmount) }}</span>
               </div>
-              <div class="flex justify-between py-1 px-3">
+              <div class="flex justify-between py-1 px-3" v-if="orderType == 'pending'">
                 <span class=""></span>
-                <button @click="markAsCompleted" class="flex items-center gap-1 btn-sm bg-primary text-white text-sm">
-                  <IconParkOutlineCheckOne /> Marcar completado
+                <button
+                  @click="markAsDelivered(order.id)"
+                  class="flex items-center gap-1 btn-sm bg-primary text-white text-sm"
+                >
+                  <IconParkOutlineCheckOne /> Marcar entregado
                 </button>
               </div>
             </div>
@@ -65,6 +87,8 @@
       <div class="flex" v-else-if="!arePendingOrdersFetched">Cargando pedidos...</div>
       <div class="flex" v-else>No se encontraron pedidos</div>
     </div>
+    <ConfirmDialogue ref="confirmDialogue" />
+    <Loader v-if="submitting" />
   </div>
 </template>
 
@@ -76,19 +100,22 @@ import EpArrowRightBold from "~icons/ep/arrow-right-bold";
 import { ToastEvents } from "~/interfaces";
 
 // ----- Define Useful Properties -------
-const { $dayjs } = useNuxtApp();
 
 // ----- Define Pinia Vars --------
 const ordersStore = useOrdersStore();
-const { getPendingOrders: pendingOrders, arePendingOrdersFetched } = storeToRefs(ordersStore);
+const { getPendingOrders: pendingOrders, getOrders: orders, arePendingOrdersFetched } = storeToRefs(ordersStore);
 
 // Function will manage if the data is already fetched
 ordersStore.fetchPendingOrders();
 
 // ----- Define Vars -------
+const submitting = ref(null);
+const filteredOrders = ref(pendingOrders.value);
+const orderType = ref("pending");
 
 // Refs
 const ordersDetails = ref(null);
+const confirmDialogue = ref(null);
 
 // ----- Define Computed -------
 
@@ -100,13 +127,52 @@ const showDetails = (orderId) => {
   ordersDetails.value.showModal(orderId);
 };
 
-function markAsCompleted() {
-  useToast(ToastEvents.info, "No implementado todavía");
+async function showOrders(status) {
+  submitting.value = true;
+  orderType.value = status;
+  if (status === "pending") {
+    filteredOrders.value = pendingOrders.value;
+  } else {
+    // Fetch all orders
+    await ordersStore.fetchOrders();
+    filteredOrders.value = orders.value;
+  }
+  submitting.value = false;
+}
+
+async function markAsDelivered(orderId) {
+  // If submitting, do nothing
+  if (submitting.value) return;
+
+  // Start the loader
+  submitting.value = true;
+
+  // Confirm dialogue
+  const confirmed = await confirmDialogue.value.openDialog({ edit: true });
+
+  if (!confirmed) {
+    submitting.value = false;
+    return;
+  }
+
+  // Update the order
+  const orderUpdated = await ordersStore.updateStatusOrder(orderId, "entregado");
+
+  if (orderUpdated) {
+    useToast(ToastEvents.success, "Pedido marcado como entregado correctamente");
+    submitting.value = false;
+  } else {
+    useToast(ToastEvents.error, "Hubo un error al completar el pedido, por favor intenta nuevamente");
+    submitting.value = false;
+  }
 }
 
 // ----- Define Hooks -------
 
 // ----- Define Watchers -------
+watch(pendingOrders, () => {
+  filteredOrders.value = pendingOrders.value;
+});
 
 useHead({
   title: "Lista de ventas"
