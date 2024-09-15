@@ -7,7 +7,7 @@
         <h1 class="text-start font-semibold">Lista de pedidos</h1>
       </div>
       <div class="flex gap-2">
-        <input type="text" class="" placeholder="Buscar..." />
+        <input v-model="search" type="text" class="" placeholder="Buscar..." />
         <NuxtLink to="/pedidos/nuevo" class="btn bg-primary text-white flex items-center text-nowrap"
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo
         </NuxtLink>
@@ -112,6 +112,7 @@ ordersStore.fetchPendingOrders();
 const submitting = ref(null);
 const filteredOrders = ref(pendingOrders.value);
 const orderType = ref("pending");
+const search = ref("");
 
 // Refs
 const ordersDetails = ref(null);
@@ -172,6 +173,27 @@ async function markAsDelivered(orderId) {
 // ----- Define Watchers -------
 watch(pendingOrders, () => {
   filteredOrders.value = pendingOrders.value;
+});
+
+watch(search, () => {
+  const ordersToUse = orderType.value === "pending" ? pendingOrders.value : orders.value;
+
+  if (search.value) {
+    filteredOrders.value = ordersToUse.filter((order) => {
+      // Check if the client name includes the search value
+      const includesClientName = order.client.clientName.toLowerCase().includes(search.value.toLowerCase());
+
+      // Check if the status includes the search value
+      const includesStatus = order.orderStatus.toLowerCase().includes(search.value.toLowerCase());
+
+      // Check if the address includes the search value
+      const includesAddress = order.client.address.toLowerCase().includes(search.value.toLowerCase());
+
+      return includesClientName || includesStatus || includesAddress;
+    });
+  } else {
+    filteredOrders.value = ordersToUse;
+  }
 });
 
 useHead({

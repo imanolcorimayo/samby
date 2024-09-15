@@ -45,7 +45,7 @@
                 <td class="py-3 text-start">{{ `${product.productName} (${product.unit})` }}</td>
                 <td class="py-3 hidden sm:block">{{ formatPrice(product.price) }}</td>
                 <td class="py-3">
-                  <div class="flex justify-between items-center gap-2 w-full">
+                  <div class="flex justify-between items-center gap-2 w-full" v-if="isEditable">
                     <button
                       @click="manageProduct(product.productId, 'remove')"
                       class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
@@ -64,6 +64,7 @@
                       <TablerPlus class="text-black text-xs" />
                     </button>
                   </div>
+                  <span v-else>{{ product.quantity }}</span>
                 </td>
                 <td class="py-3">
                   <div class="flex flex-col items-center justify-center">
@@ -72,7 +73,7 @@
                   </div>
                 </td>
               </tr>
-              <tr class="text-center border-b">
+              <tr class="text-center border-b" v-if="isEditable">
                 <td class="py-3 text-start">
                   <Autocomplete
                     :items="autocompleteProducts"
@@ -127,34 +128,28 @@
       </div>
     </template>
     <template #footer>
-      <div
-        v-if="submitting && isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
-        class="btn bg-secondary border text-center"
-      >
+      <div v-if="submitting && isOrderModified && isEditable" class="btn bg-secondary border text-center">
         loading...
       </div>
       <button
-        v-else-if="isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
+        v-else-if="isOrderModified && isEditable"
         @click="modifyOrder()"
         class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-primary text-white w-full text-center"
       >
         <LucideEdit /> Modificar
       </button>
-      <div
-        v-if="submitting && !isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
-        class="btn bg-danger text-white text-nowrap"
-      >
+      <div v-if="submitting && !isOrderModified && isEditable" class="btn bg-danger text-white text-nowrap">
         loading...
       </div>
       <button
-        v-else-if="!isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
+        v-else-if="!isOrderModified && isEditable"
         @click="markAsCancelled()"
         class="flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
       >
         <IcRoundArchive /> Cancelar venta
       </button>
       <button
-        v-if="!isOrderModified && !['entregado', 'cancelado'].includes(currentOrder.orderStatus)"
+        v-if="!isOrderModified && isEditable"
         @click="sendConfirmationMessage"
         class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
       >
@@ -207,6 +202,9 @@ const autocompleteProducts = computed(() => {
       productNameWithUnit: `${p.productName} (${p.unit})`
     };
   });
+});
+const isEditable = computed(() => {
+  return !["entregado", "cancelado"].includes(currentOrder.value.orderStatus);
 });
 
 // ----- Define Methods -----
