@@ -367,6 +367,13 @@ async function modifyOrder() {
   // Start the loader
   submitting.value = true;
 
+  // Validate the editableOrder has products
+  if (editableOrder.value.products.length === 0) {
+    useToast(ToastEvents.error, "El pedido debe tener al menos un producto, por favor intenta nuevamente");
+    submitting.value = false;
+    return;
+  }
+
   // Confirm dialogue
   const confirmed = await confirmDialogue.value.openDialog({ edit: true });
 
