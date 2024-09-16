@@ -13,84 +13,82 @@
           ><IcRoundPlus pendingOrders.value pendingOrders.valueclass="text-[1.143rem]" /> Nuevo
         </NuxtLink>
       </div>
-      <div class="flex flex-col gap-[0.571rem]" v-if="filteredOrders.length">
-        <div class="flex gap-2 items-center">
-          <div class="flex gap-1 bg-gray-200 rounded-[.714rem] p-1 w-fit">
-            <button
-              @click="showOrders('pending')"
-              class="py-1 px-2 rounded-[.428rem]"
-              :class="{ 'bg-secondary shadow': orderType == 'pending' }"
-            >
-              Pendientes
-            </button>
-            <button
-              @click="showOrders('completed')"
-              class="py-1 px-2 rounded-[.428rem]"
-              :class="{ 'bg-secondary shadow': orderType == 'completed' }"
-            >
-              Completados
-            </button>
-          </div>
+      <div class="flex gap-2 items-center">
+        <div class="flex gap-1 bg-gray-200 rounded-[.714rem] p-1 w-fit">
           <button
-            v-if="isPendingShown"
-            class="flex gap-1 items-center btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
-            @click="stockList"
+            @click="showOrders('pending')"
+            class="py-1 px-2 rounded-[.428rem]"
+            :class="{ 'bg-secondary shadow': orderType == 'pending' }"
           >
-            <IconParkOutlineTransactionOrder />
-            Calcular lista de compra
+            Pendientes
+          </button>
+          <button
+            @click="showOrders('completed')"
+            class="py-1 px-2 rounded-[.428rem]"
+            :class="{ 'bg-secondary shadow': orderType == 'completed' }"
+          >
+            Completados
           </button>
         </div>
-        <div class="flex flex-col">
-          <div
-            class="flex flex-col gap-3 p-2 py-4 bg-secondary border-b"
-            v-for="(order, index) in filteredOrders"
-            :key="index"
-          >
-            <button class="flex flex-col items-start w-full" @click="showDetails(order.id)">
-              <div class="flex justify-between w-full">
-                <span class="flex items-center gap-3 font-medium"
-                  ><MingcuteUser4Fill class="text-[2rem]" />{{ order.client.clientName }}</span
+        <button
+          v-if="isPendingShown"
+          class="flex gap-1 items-center btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
+          @click="stockList"
+        >
+          <IconParkOutlineTransactionOrder />
+          Calcular lista de compra
+        </button>
+      </div>
+      <div class="flex flex-col" v-if="filteredOrders.length">
+        <div
+          class="flex flex-col gap-3 p-2 py-4 bg-secondary border-b"
+          v-for="(order, index) in filteredOrders"
+          :key="index"
+        >
+          <button class="flex flex-col items-start w-full" @click="showDetails(order.id)">
+            <div class="flex justify-between w-full">
+              <span class="flex items-center gap-3 font-medium"
+                ><MingcuteUser4Fill class="text-[2rem]" />{{ order.client.clientName }}</span
+              >
+              <div class="flex items-center gap-2">
+                <span
+                  class="inline-flex items-center rounded-md px-2 py-1 text-sm font-semibold ring-1 ring-inset"
+                  :class="{
+                    'bg-green-50 text-green-800 ring-green-600/20': order.orderStatus == 'entregado',
+                    'bg-red-50 text-red-800 ring-red-600/20': order.orderStatus == 'cancelado',
+                    'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ['pendiente', 'pendiente-modificado'].includes(
+                      order.orderStatus
+                    )
+                  }"
                 >
-                <div class="flex items-center gap-2">
-                  <span
-                    class="inline-flex items-center rounded-md px-2 py-1 text-sm font-semibold ring-1 ring-inset"
-                    :class="{
-                      'bg-green-50 text-green-800 ring-green-600/20': order.orderStatus == 'entregado',
-                      'bg-red-50 text-red-800 ring-red-600/20': order.orderStatus == 'cancelado',
-                      'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ['pendiente', 'pendiente-modificado'].includes(
-                        order.orderStatus
-                      )
-                    }"
-                  >
-                    {{ formatStatus(order.orderStatus) }}</span
-                  >
-                  <EpArrowRightBold />
-                </div>
-              </div>
-              <span class="text-sm text-gray-500 text-start">{{ order.client.address }}</span>
-            </button>
-            <div class="flex flex-col gap-1 w-full">
-              <div class="flex justify-between py-1 px-3 rounded-md bg-gray-50">
-                <span class="font-medium">Fecha de envío</span>
-                <span class="font-medium">{{ formattedDate(order.shippingDate) }}</span>
-              </div>
-              <div class="flex justify-between py-1 px-3 rounded-md">
-                <span class="font-medium">Envío</span>
-                <span class="font-medium">{{ formatPrice(order.shippingPrice) }}</span>
-              </div>
-              <div class="flex justify-between py-1 px-3 rounded-md bg-gray-50">
-                <span class="font-medium">Total</span>
-                <span class="font-semibold">{{ formatPrice(order.totalAmount) }}</span>
-              </div>
-              <div class="flex justify-between py-1 px-3" v-if="orderType == 'pending'">
-                <span class=""></span>
-                <button
-                  @click="markAsDelivered(order.id)"
-                  class="flex items-center gap-1 btn-sm bg-primary text-white text-sm"
+                  {{ formatStatus(order.orderStatus) }}</span
                 >
-                  <IconParkOutlineCheckOne /> Marcar entregado
-                </button>
+                <EpArrowRightBold />
               </div>
+            </div>
+            <span class="text-sm text-gray-500 text-start">{{ order.client.address }}</span>
+          </button>
+          <div class="flex flex-col gap-1 w-full">
+            <div class="flex justify-between py-1 px-3 rounded-md bg-gray-50">
+              <span class="font-medium">Fecha de envío</span>
+              <span class="font-medium">{{ formattedDate(order.shippingDate) }}</span>
+            </div>
+            <div class="flex justify-between py-1 px-3 rounded-md">
+              <span class="font-medium">Envío</span>
+              <span class="font-medium">{{ formatPrice(order.shippingPrice) }}</span>
+            </div>
+            <div class="flex justify-between py-1 px-3 rounded-md bg-gray-50">
+              <span class="font-medium">Total</span>
+              <span class="font-semibold">{{ formatPrice(order.totalAmount) }}</span>
+            </div>
+            <div class="flex justify-between py-1 px-3" v-if="orderType == 'pending'">
+              <span class=""></span>
+              <button
+                @click="markAsDelivered(order.id)"
+                class="flex items-center gap-1 btn-sm bg-primary text-white text-sm"
+              >
+                <IconParkOutlineCheckOne /> Marcar entregado
+              </button>
             </div>
           </div>
         </div>
