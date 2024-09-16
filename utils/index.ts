@@ -129,7 +129,7 @@ export const createMessage = (products: any, client: any, shippingPrice: any, to
   const deliveryAddress = client.address ? client.address : "N/A";
 
   // Add the introduction name
-  let message = `¡Hola, ${client.clientName}! 👋\nTu pedido está completo, estos son los detalles:\n\n`;
+  let message = `Detalles de tu pedido:\n\n`;
 
   products.forEach((product: any) => {
     const productPrice = formatPrice(product.total);
