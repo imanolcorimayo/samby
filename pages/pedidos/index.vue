@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-col gap-[2rem] w-full">
     <OrdersDetails ref="ordersDetails" />
+    <OrdersStockDetails ref="ordersStockDetails" />
     <Navigator />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
@@ -9,24 +10,34 @@
       <div class="flex gap-2">
         <input v-model="search" type="text" class="" placeholder="Buscar..." />
         <NuxtLink to="/pedidos/nuevo" class="btn bg-primary text-white flex items-center text-nowrap"
-          ><IcRoundPlus class="text-[1.143rem]" /> Nuevo
+          ><IcRoundPlus pendingOrders.value pendingOrders.valueclass="text-[1.143rem]" /> Nuevo
         </NuxtLink>
       </div>
       <div class="flex flex-col gap-[0.571rem]" v-if="filteredOrders.length">
-        <div class="flex gap-1 bg-gray-200 rounded-[.714rem] p-1 w-fit">
+        <div class="flex gap-2 items-center">
+          <div class="flex gap-1 bg-gray-200 rounded-[.714rem] p-1 w-fit">
+            <button
+              @click="showOrders('pending')"
+              class="py-1 px-2 rounded-[.428rem]"
+              :class="{ 'bg-secondary shadow': orderType == 'pending' }"
+            >
+              Pendientes
+            </button>
+            <button
+              @click="showOrders('completed')"
+              class="py-1 px-2 rounded-[.428rem]"
+              :class="{ 'bg-secondary shadow': orderType == 'completed' }"
+            >
+              Completados
+            </button>
+          </div>
           <button
-            @click="showOrders('pending')"
-            class="py-1 px-2 rounded-[.428rem]"
-            :class="{ 'bg-secondary shadow': orderType == 'pending' }"
+            v-if="isPendingShown"
+            class="flex gap-1 items-center btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
+            @click="stockList"
           >
-            Pendientes
-          </button>
-          <button
-            @click="showOrders('completed')"
-            class="py-1 px-2 rounded-[.428rem]"
-            :class="{ 'bg-secondary shadow': orderType == 'completed' }"
-          >
-            Completados
+            <IconParkOutlineTransactionOrder />
+            Calcular lista de compra
           </button>
         </div>
         <div class="flex flex-col">
@@ -98,6 +109,7 @@ import IcRoundPlus from "~icons/ic/round-plus";
 import MingcuteUser4Fill from "~icons/mingcute/user-4-fill";
 import EpArrowRightBold from "~icons/ep/arrow-right-bold";
 import { ToastEvents } from "~/interfaces";
+import IconParkOutlineTransactionOrder from "~icons/icon-park-outline/transaction-order";
 
 // ----- Define Useful Properties -------
 
@@ -113,16 +125,18 @@ const submitting = ref(null);
 const filteredOrders = ref(pendingOrders.value);
 const orderType = ref("pending");
 const search = ref("");
+const isPendingShown = ref(true);
 
 // Refs
 const ordersDetails = ref(null);
+const ordersStockDetails = ref(null);
 const confirmDialogue = ref(null);
 
 // ----- Define Computed -------
 
 // ----- Define Methods -------
 const showDetails = (orderId) => {
-  // Check sellsDetails is defined
+  // Check orderDetails is defined
   if (!ordersDetails.value) return;
 
   ordersDetails.value.showModal(orderId);
@@ -133,10 +147,12 @@ async function showOrders(status) {
   orderType.value = status;
   if (status === "pending") {
     filteredOrders.value = pendingOrders.value;
+    isPendingShown.value = true;
   } else {
     // Fetch all orders
     await ordersStore.fetchOrders();
     filteredOrders.value = orders.value;
+    isPendingShown.value = false;
   }
   submitting.value = false;
 }
@@ -166,6 +182,13 @@ async function markAsDelivered(orderId) {
     useToast(ToastEvents.error, "Hubo un error al completar el pedido, por favor intenta nuevamente");
     submitting.value = false;
   }
+}
+
+function stockList() {
+  // Check sellsDetails is defined
+  if (!ordersStockDetails.value) return;
+
+  ordersStockDetails.value.showStockList(pendingOrders.value);
 }
 
 // ----- Define Hooks -------
