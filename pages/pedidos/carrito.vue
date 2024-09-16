@@ -50,6 +50,7 @@
       <Autocomplete
         :items="clients"
         property="clientName"
+        subItemProperty="address"
         placeholder="Busca con el nombre del cliente"
         returnValue="id"
         @selected="selectClient"

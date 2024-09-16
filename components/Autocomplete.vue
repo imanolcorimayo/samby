@@ -22,7 +22,10 @@
           :key="index"
           class="hover:bg-gray-200 hover:font-semibold p-3"
         >
-          {{ item[property] }}
+          <div class="flex flex-col">
+            <span>{{ item[property] }}</span>
+            <span v-if="subItemProperty" class="text-xs">{{ item[subItemProperty] }}</span>
+          </div>
         </li>
       </TransitionGroup>
     </div>
@@ -35,6 +38,11 @@ const props = defineProps({
     type: Array,
     required: true,
     default: () => []
+  },
+  subItemProperty: {
+    type: Array,
+    required: false,
+    default: false
   },
   property: {
     type: String,
