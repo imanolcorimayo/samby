@@ -9,12 +9,15 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  orderBy
+  orderBy,
+  limit,
+  startAfter
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
 const defaultObject = {
   fetched: false,
+  lastVisible: false,
   sells: []
 };
 export const useSellsStore = defineStore("sells", {
@@ -27,11 +30,16 @@ export const useSellsStore = defineStore("sells", {
     areSellsFetched: (state) => state.fetched
   },
   actions: {
-    async fetchData() {
-      if (this.areSellsFetched) {
+    async fetchData(startAfterLastVisible: boolean = false) {
+      // If startDate and endDate are the same as the current state, and fetched return
+      if (this.$state.fetched && !startAfterLastVisible) {
         return;
       }
-      const sells: Array<any> = [];
+
+      if (this.$state.lastVisible === null && startAfterLastVisible) {
+        useToast(ToastEvents.error, "No hay más ventas");
+        return;
+      }
 
       // Index store will manage all logic needed in the app to run
       // First check if there is a user
@@ -44,9 +52,7 @@ export const useSellsStore = defineStore("sells", {
         return;
       }
 
-      // Get one month back
-      const previousMonthStart = $dayjs().subtract(1, "month").startOf("month");
-      const currentMonthEnd = $dayjs().endOf("month");
+      const sells: Array<any> = [];
 
       // collection based on user
       let collectionName = "venta";
@@ -56,26 +62,41 @@ export const useSellsStore = defineStore("sells", {
 
       // Connect with firebase and get payments structure
       const db = useFirestore();
-      const querySnapshot = await getDocs(
-        query(
-          collection(db, collectionName),
-          where("createdAt", ">=", previousMonthStart.toDate()),
-          where("createdAt", "<=", currentMonthEnd.toDate())
-        )
-      );
+
+      let reference = null;
+      if (startAfterLastVisible) {
+        const lastVisible = this.$state.lastVisible;
+        reference = query(collection(db, collectionName), orderBy("date", "desc"), limit(40), startAfter(lastVisible));
+      } else {
+        reference = query(collection(db, collectionName), orderBy("date", "desc"), limit(40));
+      }
+
+      const querySnapshot = await getDocs(reference);
+
+      // Save last visible
+      const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+      if (lastVisible && querySnapshot.docs.length === 40) {
+        this.$state.lastVisible = lastVisible;
+      } else {
+        this.$state.lastVisible = null;
+      }
 
       querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
         sells.push({
           id: doc.id,
-          ...doc.data()
+          ...data,
+          formattedDate: $dayjs(data.date.toDate()).format("DD/MM/YYYY")
         });
       });
 
       this.$state.fetched = true;
-      this.$state.sells = sells;
+      this.$state.sells = startAfterLastVisible ? [...this.$state.sells, ...sells] : sells;
     },
     async addSell(sell: any) {
-      this.$state.sells.push(sell);
+      // Add sell to be in the first position
+      this.$state.sells.unshift(sell);
     },
     async updateSell(sell: any, sellId: string) {
       const db = useFirestore();

@@ -4,20 +4,29 @@
     <div class="flex flex-col gap-4">
       <div class="flex justify-between items-center">
         <h1 class="font-semibold text-start">Resumen Financiero</h1>
-        <button
-          v-if="!showFilters"
-          @click="showFilters = true"
-          class="btn bg-secondary shadow flex items-center gap-2 text-nowrap"
-        >
-          <PepiconsPopEye /> Ver filtros
-        </button>
-        <button
-          v-if="showFilters"
-          @click="showFilters = false"
-          class="btn bg-secondary shadow flex items-center gap-2 h-fit"
-        >
-          <PhEyeClosedBold /> Esconder
-        </button>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <button
+            v-if="!showFilters"
+            @click="showFilters = true"
+            class="btn-sm text-sm bg-secondary shadow flex justify-center items-center gap-2 text-nowrap"
+          >
+            <PepiconsPopEye /> Ver filtros
+          </button>
+          <button
+            v-if="showFilters"
+            @click="showFilters = false"
+            class="btn-sm text-sm bg-secondary shadow flex justify-center items-center gap-2 h-fit"
+          >
+            <PhEyeClosedBold /> Esconder
+          </button>
+          <button
+            @click="updateData"
+            class="btn-sm text-sm bg-secondary shadow flex items-center gap-2 h-fit ring-1 ring-primary text-nowrap hover:bg-primary hover:text-white"
+          >
+            <MdiUpdate />
+            Actualizar Datos
+          </button>
+        </div>
       </div>
       <Transition>
         <div class="flex gap-2" v-if="showFilters">
@@ -50,67 +59,82 @@
         <div class="flex-1 ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
           <div class="flex flex-col justify-between h-full gap-3">
             <div class="flex justify-between">
-              <span class="font-medium">Ganancia total</span>
+              <div class="flex flex-col gap-1 justify-start items-start md:flex-row md:items-center">
+                <span class="font-medium">Ganancia total</span>
+                <span class="font-medium text-gray-500 text-sm">(este mes)</span>
+              </div>
               <FlowbiteDollarOutline class="text-gray-500 text-xl" />
             </div>
-            <span class="font-semibold text-[1.143rem]">{{ formatPrice(totalEarnings) }}</span>
+            <div class="flex flex-col">
+              <div class="flex gap-1 items-center">
+                <span class="font-semibold text-[1.143rem]">{{ formatPrice(totalEarningsThisMonth) }}</span>
+
+                <span class="text-sm text-success font-semibold"
+                  >({{ calculateRatio(totalSellingThisMonth, totalEarningsThisMonth).toFixed(1) }}%)</span
+                >
+              </div>
+
+              <span class="text-sm font-medium text-gray-400">Facturado: {{ formatPrice(totalSellingThisMonth) }}</span>
+            </div>
           </div>
         </div>
         <div class="flex-1 ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
           <div class="flex flex-col justify-between h-full gap-3">
             <div class="flex justify-between">
-              <span class="font-medium">Mejor Producto</span>
+              <div class="flex flex-col gap-1 justify-start items-start md:flex-row md:items-center">
+                <span class="font-medium">Futuro Indicador</span>
+                <span class="font-medium text-sm text-danger">(No disponible)</span>
+              </div>
               <PhTrendUpBold class="text-gray-500 text-xl" />
             </div>
             <div class="flex flex-col">
               <span class="font-semibold text-[1.143rem]">{{ bestProduct?.name }}</span>
-              <span class="text-sm font-medium text-gray-400"
-                >Ganancia: {{ bestProduct ? formatPrice(bestProduct?.totalEarnings) : 0 }}</span
-              >
+              <span class="text-sm font-medium text-gray-400">---</span>
             </div>
           </div>
         </div>
       </div>
       <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
         <div class="flex flex-col">
-          <span class="font-semibold text-[1.143rem]">Ranking dias de venta</span>
-          <span class="text-gray-500">Comparacion de dias de venta</span>
+          <span class="font-semibold text-[1.143rem]">Días de venta</span>
+          <span class="text-gray-500">Comparación de días de venta</span>
         </div>
         <div class="w-full overflow-auto">
           <table class="w-full">
             <thead>
               <tr class="text-left border-b text-gray-400 font-normal">
-                <th class="text-sm text-center"></th>
                 <th class="text-sm text-left">Fecha</th>
                 <th class="text-sm text-center">Tot. Facturado</th>
-                <th class="text-sm text-center">G. Total</th>
-                <th class="text-sm text-center">% Gan</th>
+                <th class="text-sm text-center">G. Total (%)</th>
+                <th class="text-sm text-center">Mej. Prod.</th>
+                <th class="text-sm text-center">G. Mej. Prod. (%)</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="border-b" v-for="(d, index) in dayOfSellsTable" :key="`sell-${index}`">
-                <td class="py-2 font-medium">{{ index + 1 }}</td>
-                <td class="py-2 font-medium">{{ d.dateFormatted }}</td>
-                <td class="py-2 text-center">{{ formatPrice(d.totalSelling) }}</td>
-                <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(d.totalEarnings) }}</td>
-                <td class="py-2 text-center">{{ d.earningP.toFixed(1) }}%</td>
+              <tr class="border-b" v-for="(d, index) in dailySells" :key="`sell-${index}`">
+                <td class="py-1 font-medium">{{ d.formattedDate }}</td>
+                <td class="py-1 text-center">{{ formatPrice(d.totalSelling) }}</td>
+                <td class="py-1 text-center">
+                  <div class="flex flex-col">
+                    <span>{{ formatPrice(d.totalEarnings) }}</span>
+                    <span class="text-sm text-success">({{ d.percentageEarnings.toFixed(1) }}%)</span>
+                  </div>
+                </td>
+                <td class="py-1 text-center">{{ d.bestProduct.name }}</td>
+                <td class="py-1 text-center">
+                  <div class="flex flex-col">
+                    <span>{{ formatPrice(d.bestProduct.earnings) }}</span>
+                    <span class="text-sm text-success"
+                      >({{ calculateRatio(d.totalEarnings, d.bestProduct.earnings).toFixed(1) }}%)</span
+                    >
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
       <div class="flex flex-col gap-[2rem]">
-        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
-          <div class="flex flex-col">
-            <span class="font-semibold text-[1.143rem]">Costo vs Ganancia</span>
-            <span class="text-gray-500"
-              >Análisis comparativo para identificar la rentabilidad entre costos y ganancias</span
-            >
-          </div>
-          <div>
-            <canvas id="costVsProfit" width="400" height="200"></canvas>
-          </div>
-        </div>
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
           <div class="flex flex-col">
             <span class="font-semibold text-[1.143rem]">% de Ganancia</span>
@@ -121,9 +145,22 @@
           </div>
         </div>
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
-          <div class="flex flex-col">
-            <span class="font-semibold text-[1.143rem]">Ranking de productos</span>
-            <span class="text-gray-500">Comparacion de todos los productos durante los 2 meses</span>
+          <div class="flex justify-between">
+            <div class="flex flex-col">
+              <span class="font-semibold text-[1.143rem]"
+                >Ranking de productos ({{ productsRanking.formattedDate }})</span
+              >
+              <span class="text-gray-500">Comparacion de todos los productos durante los 2 meses</span>
+            </div>
+            <select
+              @change="getRankingDate"
+              v-model="rankingDateAux"
+              name="rankingDate"
+              id="rankingDate"
+              class="w-fit h-fit"
+            >
+              <option v-for="date in datesForRanking" :value="date">{{ date }}</option>
+            </select>
           </div>
           <table class="w-full">
             <thead>
@@ -136,12 +173,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="border-b" v-for="(p, index) in productsTable" :key="index">
+              <tr class="border-b" v-for="(p, index) in productsRanking.products" :key="index">
                 <td class="py-2 font-medium">{{ index + 1 }}</td>
                 <td class="py-2 font-medium">{{ p.name }}</td>
                 <td class="py-2 text-center">{{ p.totalQuantity }}</td>
                 <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(p.totalEarnings) }}</td>
-                <td class="py-2 text-center">{{ p.earningP.toFixed(1) }}%</td>
+                <td class="py-2 text-center">{{ p.earningPercentage.toFixed(1) }}%</td>
               </tr>
             </tbody>
           </table>
@@ -161,7 +198,7 @@
       </div>
     </div>
   </div>
-  <Loader v-if="!areSellsFetched" />
+  <Loader v-if="!areStatsFetched" />
 </template>
 
 <script setup>
@@ -171,6 +208,7 @@ import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
 import PhTrendUpBold from "~icons/ph/trend-up-bold";
 import PhEyeClosedBold from "~icons/ph/eye-closed-bold";
 import PepiconsPopEye from "~icons/pepicons-pop/eye";
+import MdiUpdate from "~icons/mdi/update";
 
 // ----- Define Useful Properties --------
 const { $dayjs } = useNuxtApp();
@@ -180,36 +218,55 @@ $dayjs.extend(isBetween);
 const { width } = useWindowSize();
 
 // ----- Define Pinia Vars --------
-const sellsStore = useSellsStore();
-const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
-const productsStore = useProductsStore();
-const { getProducts: products } = storeToRefs(productsStore);
+const dashboardStore = useDashboardStore();
+const {
+  getDailySells: dailySells,
+  getWeeklyProductPriceComparison: weeklyProductPriceComparison,
+  getProductsRanking: productsRanking,
+  areStatsFetched
+} = storeToRefs(dashboardStore);
 
 // Function will manage if the data is already fetched
-productsStore.fetchData();
-sellsStore.fetchData();
+dashboardStore.fetchData();
 
 // ----- Define Vars --------
 const minDate = ref($dayjs().subtract(1, "month").startOf("week").format("YYYY-MM-DD"));
 const maxDate = ref($dayjs().endOf("week").format("YYYY-MM-DD"));
 const showFilters = ref(false);
 const profitChart = ref({});
-const productsTable = ref([]);
-const productPrices = ref([]);
-const dayOfSellsTable = ref([]);
 const bestProduct = ref({});
+const rankingDateAux = ref("");
 
 // Define Computed
-const totalEarnings = computed(() => {
-  // Create new variable to store sells of this week
-  const sellsThisWeek = sells.value.filter((sell) => {
-    const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
-    const localStartDate = $dayjs(minDate.value, { format: "YYYY-MM-DD" });
-    const localEndDate = $dayjs(maxDate.value, { format: "YYYY-MM-DD" });
+const totalEarningsThisMonth = computed(() => {
+  // Create new variable to store daily sells of this month
+  const daySellsThisMonth = dailySells.value.filter((sell) => {
+    const daySell = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+    const localStartDate = $dayjs().startOf("month");
+    const localEndDate = $dayjs().endOf("month");
 
-    return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
+    return daySell && daySell.isBetween(localStartDate, localEndDate, null, "[]");
   });
-  return sellsThisWeek.reduce((acc, sell) => acc + (sell.sellingPrice - sell.buyingPrice) * sell.quantity, 0);
+
+  // Return total earnings of this month
+  return daySellsThisMonth.reduce((acc, daySell) => acc + daySell.totalEarnings, 0);
+});
+
+const totalSellingThisMonth = computed(() => {
+  // Create new variable to store daily sells of this month
+  const daySellsThisMonth = dailySells.value.filter((sell) => {
+    const daySell = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+    const localStartDate = $dayjs().startOf("month");
+    const localEndDate = $dayjs().endOf("month");
+
+    return daySell && daySell.isBetween(localStartDate, localEndDate, null, "[]");
+  });
+
+  // Return total earnings of this month
+  return daySellsThisMonth.reduce((acc, daySell) => acc + daySell.totalSelling, 0);
+});
+const datesForRanking = computed(() => {
+  return dailySells.value.map((sellDay) => sellDay.formattedDate);
 });
 
 // ----- Define Methods ------------
@@ -232,19 +289,19 @@ function createEarningsP() {
     // Add labels
     labels.push(localStartDate.format("DD/MM"));
 
-    // Filter sells in week
-    const sellsInWeek = sells.value.filter((sell) => {
-      const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+    // Filter dailySells in week
+    const dailySellsInWeek = dailySells.value.filter((sell) => {
+      const daySellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
 
-      return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
+      return daySellDate && daySellDate.isBetween(localStartDate, localEndDate, null, "[]");
     });
 
     let costsInWeek = 0;
     let sellsAmountInWeek = 0;
-    sellsInWeek.forEach((sell) => {
+    dailySellsInWeek.forEach((daySell) => {
       // Update costs and sells
-      costsInWeek += sell.buyingPrice * sell.quantity;
-      sellsAmountInWeek += sell.sellingPrice * sell.quantity;
+      costsInWeek += daySell.totalBuying;
+      sellsAmountInWeek += daySell.totalSelling;
     });
 
     const totalProfitInWeek = costsInWeek ? ((sellsAmountInWeek - costsInWeek) * 100) / costsInWeek : 0;
@@ -263,26 +320,24 @@ function createEarningsP() {
         data: totalProfit,
         fill: false,
         borderColor: "rgb(75, 192, 192)",
-        tension: 0.1
-      }
-    ]
-  };
-
-  // Data Costs vs Earnings
-  const dataCostsVsEarnings = {
-    labels: labels,
-    datasets: [
+        tension: 0.1,
+        yAxisID: "percentage"
+      },
       {
         label: "Total Costos",
         data: totalCosts,
         fill: false,
-        tension: 0.1
+        tension: 0.1,
+        yAxisID: "y",
+        borderColor: "rgb(255, 99, 132)"
       },
       {
         label: "Total en Ventas",
         data: totalSells,
         fill: false,
-        tension: 0.1
+        tension: 0.1,
+        yAxisID: "y",
+        borderColor: "rgb(54, 162, 235)"
       }
     ]
   };
@@ -294,45 +349,8 @@ function createEarningsP() {
       responsive: true,
       scales: {
         y: {
-          ticks: {
-            // Include a dollar sign in the ticks
-            callback: function (value, index, ticks) {
-              return value.toFixed(1) + "%";
-            }
-          }
-        }
-      },
-      // Add % to the tooltip
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              let label = context.dataset.label || "";
-
-              if (label) {
-                label += ": ";
-              }
-
-              if (context.parsed.y !== null) {
-                label += context.parsed.y.toFixed(1) + "%";
-              }
-
-              return label;
-            }
-          }
-        }
-      }
-    }
-  };
-
-  // Config Costs vs Earnings
-  const configCostsVsEarnings = {
-    type: "line",
-    data: dataCostsVsEarnings,
-    options: {
-      responsive: true,
-      scales: {
-        y: {
+          type: "linear",
+          position: "left",
           ticks: {
             // Include a dollar sign in the ticks
             callback: function (value, index, ticks) {
@@ -341,6 +359,18 @@ function createEarningsP() {
               return million;
             }
           }
+        },
+        percentage: {
+          ticks: {
+            // Include a dollar sign in the ticks
+            callback: function (value, index, ticks) {
+              return value.toFixed(1) + "%";
+            }
+          },
+          type: "linear",
+          position: "right",
+          min: 0,
+          max: 100
         }
       },
       // Add % to the tooltip
@@ -348,17 +378,12 @@ function createEarningsP() {
         tooltip: {
           callbacks: {
             label: function (context) {
-              let label = context.dataset.label || "";
-
-              if (label) {
-                label += ": ";
+              // Check if label belongs to percentage or y axis
+              if (context.datasetIndex == 0) {
+                return context.dataset.label + ": " + context.parsed.y.toFixed(1) + "%";
+              } else {
+                return context.dataset.label + ": " + formatPrice(context.parsed.y);
               }
-
-              if (context.parsed.y !== null) {
-                label += formatPrice(context.parsed.y);
-              }
-
-              return label;
             }
           }
         }
@@ -366,113 +391,8 @@ function createEarningsP() {
     }
   };
 
-  // Create costsVs Profit chart
-  createChart("costVsProfit", configCostsVsEarnings);
   // Create earnings chart
   createChart("earningsP", config);
-}
-
-function createProductsRanking() {
-  // Clean products table
-  productsTable.value = [];
-  // Iterate weekly
-  for (let i = 8; i >= 0; i--) {
-    // Create date
-    const dates = getStartAndEndPerWeek(maxDate.value, minDate.value, i);
-
-    // If dates are not valid, continue
-    if (!dates) continue;
-
-    const { localStartDate, localEndDate } = dates;
-
-    // Filter sells in week
-    const sellsInWeek = sells.value.filter((sell) => {
-      const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
-
-      return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
-    });
-
-    sellsInWeek.forEach((sell) => {
-      // The problem is here: Add to products table
-      const productsTableAux = productsTable.value.map((product) => product.id);
-      const productIndex = productsTableAux.indexOf(sell.product.id);
-
-      const totalSelling = sell.sellingPrice * sell.quantity;
-      const totalBuying = sell.buyingPrice * sell.quantity;
-      const earningsPerProduct = totalSelling - totalBuying;
-      const earningP = (earningsPerProduct * 100) / (sell.buyingPrice * sell.quantity);
-
-      // If product does not exist, add it
-      if (productIndex == -1) {
-        productsTable.value.push({
-          id: sell.product.id,
-          name: sell.product.name,
-          totalEarnings: earningsPerProduct,
-          totalSelling,
-          totalBuying,
-          totalQuantity: parseFloat(sell.quantity),
-          earningP: earningP
-        });
-      } else {
-        productsTable.value[productIndex].totalEarnings += earningsPerProduct;
-        productsTable.value[productIndex].totalSelling += totalSelling;
-        productsTable.value[productIndex].totalBuying += totalBuying;
-        productsTable.value[productIndex].totalQuantity += parseFloat(sell.quantity);
-        productsTable.value[productIndex].earningP =
-          (productsTable.value[productIndex].totalEarnings * 100) / productsTable.value[productIndex].totalBuying;
-      }
-    });
-  }
-  // Sort products table
-  productsTable.value.sort((a, b) => b.totalEarnings - a.totalEarnings);
-
-  // Get best product
-  bestProduct.value = productsTable.value[0];
-}
-
-function createBestDayOfSellsRanking() {
-  // Clean day of sells table
-  dayOfSellsTable.value = [];
-  // Filter sells in week
-  sells.value.forEach((sell) => {
-    const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
-
-    // Check if day exist in the dayOfSellsTable variable
-    const dayIndex = dayOfSellsTable.value.findIndex((day) => day.date.isSame(sellDate, "day"));
-
-    // Get total selling price and buying price
-    const totalSellingPrice = sell.sellingPrice * sell.quantity;
-    const totalBuyingPrice = sell.buyingPrice * sell.quantity;
-
-    // Earnings per selling
-    const earningsPerSelling = totalSellingPrice - totalBuyingPrice;
-
-    // If day does not exist, add it
-    if (dayIndex == -1) {
-      dayOfSellsTable.value.push({
-        date: sellDate,
-        dateFormatted: sellDate.format("DD/MM/YYYY"),
-        totalEarnings: earningsPerSelling,
-        totalSelling: totalSellingPrice,
-        totalBuying: totalBuyingPrice,
-        totalQuantity: parseFloat(sell.quantity),
-        earningP: (earningsPerSelling * 100) / totalBuyingPrice
-      });
-    } else {
-      dayOfSellsTable.value[dayIndex].totalEarnings += earningsPerSelling;
-      dayOfSellsTable.value[dayIndex].totalSelling += totalSellingPrice;
-      dayOfSellsTable.value[dayIndex].totalBuying += totalBuyingPrice;
-      dayOfSellsTable.value[dayIndex].totalQuantity += parseFloat(sell.quantity);
-      dayOfSellsTable.value[dayIndex].earningP =
-        (dayOfSellsTable.value[dayIndex].totalEarnings * 100) / dayOfSellsTable.value[dayIndex].totalBuying;
-    }
-  });
-
-  // Sort products table
-  dayOfSellsTable.value.sort((a, b) => b.totalEarnings - a.totalEarnings);
-
-  // Keep only 10 first days
-  dayOfSellsTable.value = dayOfSellsTable.value.slice(0, 10);
 }
 
 function createChart(chartId, configData) {
@@ -514,93 +434,44 @@ function getStartAndEndPerWeek(maxDate, minDate, nWeeksBack) {
 }
 
 function createWeeklyPricePerProduct() {
-  // Clean products table
-  productPrices.value = [];
+  // Get labels
+  const labels = weeklyProductPriceComparison.value.map((comparison) => {
+    return comparison.formattedDate;
+  });
 
-  // First create all default products
-  if (products.value) {
-    products.value.forEach((product) => {
-      productPrices.value.push({
-        id: product.id,
-        name: product.productName,
-        sumBuyingPrice: 0,
-        timesAdded: 0
-      });
-    });
-  }
+  // Create a full list of products, there will be repeated
+  let products = [];
+  weeklyProductPriceComparison.value.forEach((comparison) => {
+    // Week products
+    const weekProducts = comparison.productPrices.map((prod) => prod.name);
 
-  // Iterate weekly
-  const labels = [];
-  for (let i = 8; i >= 0; i--) {
-    // Create date
-    const dates = getStartAndEndPerWeek(maxDate.value, minDate.value, i);
+    // Add products to the list
+    products = [...products, ...weekProducts];
+  });
 
-    // If dates are not valid, continue
-    if (!dates) continue;
+  // Remove duplicates
+  products = [...new Set(products)];
 
-    const { localStartDate, localEndDate } = dates;
+  // Create datasets
+  const datasets = products.map((product) => {
+    return {
+      label: product,
+      data: weeklyProductPriceComparison.value.map((comparison) => {
+        const productPrice = comparison.productPrices.find((prod) => prod.name == product);
 
-    // Add labels
-    labels.push(localStartDate.format("DD/MM"));
-
-    // Filter sells in week. Here, each sell contains the price of the product
-    const sellsInWeek = sells.value.filter((sell) => {
-      const sellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
-
-      return sellDate && sellDate.isBetween(localStartDate, localEndDate, null, "[]");
-    });
-
-    sellsInWeek.forEach((sell) => {
-      // The problem is here: Add to products table
-      const productsTableAux = productPrices.value.map((product) => product.id);
-      const productIndex = productsTableAux.indexOf(sell.product.id);
-
-      // If product does not exist, add it
-      if (productIndex == -1) {
-        productPrices.value.push({
-          id: sell.product.id,
-          name: sell.product.name,
-          sumBuyingPrice: parseInt(sell.buyingPrice), // Avg is calculated at the end
-          timesAdded: 1
-        });
-      } else {
-        // If it already exists, update the values
-        productPrices.value[productIndex].sumBuyingPrice += parseInt(sell.buyingPrice);
-        productPrices.value[productIndex].timesAdded += 1;
-      }
-    });
-
-    // Calculate average price per product, and push them into a prices array
-    productPrices.value.forEach((product) => {
-      product.avgBuyingPrice = product.timesAdded ? product.sumBuyingPrice / product.timesAdded : 0;
-
-      // Check it key prices exits in product
-      if (!product.prices) {
-        product.prices = [];
-      }
-
-      // Add price to product
-      product.prices.push(product.avgBuyingPrice);
-
-      // Clean sumBuyingPrice and timesAdded so it iterates again and calculates the new average
-      product.sumBuyingPrice = 0;
-      product.timesAdded = 0;
-    });
-  }
+        return productPrice ? productPrice.price : 0;
+      }),
+      fill: false,
+      tension: 0.1,
+      // Increase point
+      pointRadius: 5
+    };
+  });
 
   // Create data object to create a chart with each product
   const data = {
     labels,
-    datasets: productPrices.value.map((product) => {
-      return {
-        label: product.name,
-        data: product.prices,
-        fill: false,
-        tension: 0.1,
-        // Increase point
-        pointRadius: 5
-      };
-    })
+    datasets
   };
 
   // Create config object to create a chart with each product
@@ -650,21 +521,41 @@ function createWeeklyPricePerProduct() {
   // Create weekly price per product chart
   createChart("weeklyPricePerProduct", config);
 }
+function getRankingDate() {
+  // Use js and send time to search in store
+  dashboardStore.getRankingBasedOnDate(rankingDateAux.value);
+}
+async function updateData() {
+  // Show confirm message
+  if (
+    !confirm(
+      "¿Estás seguro de actualizar los datos? Esta acción actualizará las ventas más recientes en los datos de resumen. \nATENCIÓN: Úsalo solo cuando hayas terminado de cargar las ventas del día."
+    )
+  ) {
+    return;
+  }
+
+  await dashboardStore.updateFullData();
+}
 
 // ----- Define Hooks ------------
 onMounted(() => {
   createEarningsP();
-  createProductsRanking();
-  createBestDayOfSellsRanking();
   createWeeklyPricePerProduct();
 });
 
 // ----- Define Watcher ------------
-watch(sells, () => {
+
+watch(dailySells, () => {
   createEarningsP();
-  createProductsRanking();
-  createBestDayOfSellsRanking();
+});
+
+watch(weeklyProductPriceComparison, () => {
   createWeeklyPricePerProduct();
+});
+
+watch(productsRanking, () => {
+  rankingDateAux.value = productsRanking.value.formattedDate;
 });
 
 watch([minDate, maxDate], (newValues) => {
@@ -674,7 +565,6 @@ watch([minDate, maxDate], (newValues) => {
   }
 
   createEarningsP();
-  createProductsRanking();
   createWeeklyPricePerProduct();
 });
 

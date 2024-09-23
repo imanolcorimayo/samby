@@ -52,7 +52,75 @@
       </div>
       <!-- This element only avoids elements reordering  -->
       <div v-if="!buttonIsVisible" class="h-[3.071rem]"></div>
-      <div class="flex flex-col gap-[0.571rem]" v-if="sellsCleaned.length">
+
+      <!-- Sells List -->
+      <div class="overflow-auto no-scrollbar scrollbar-none" v-if="sellsCleaned.length">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-secondary border-b text-gray-500">
+              <th class="px-1 text-start py-2">Producto</th>
+              <th class="px-1 py-2">Ganancia (%)</th>
+              <th class="px-1 py-2">Cantidad</th>
+              <th class="px-1 py-2">Total Fact.</th>
+              <th class="px-1 py-2">Fecha</th>
+              <th class="px-1 py-2">Calidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              @click="showSellsDetails(sell.id)"
+              class="bg-secondary border-b"
+              v-for="(sell, index) in sellsCleaned"
+              :key="index"
+            >
+              <td class="ps-1 py-2 text-start">{{ sell.product?.productName }}</td>
+              <td class="text-center py-2">
+                <div class="flex flex-col flex-center gap-[0.285rem]">
+                  <span>{{ formatPrice((sell.sellingPrice - sell.buyingPrice) * sell.quantity) }}</span>
+                  <span
+                    class="font-semibold"
+                    :class="{
+                      'text-success': parseInt(sell.sellingPrice) > parseInt(sell.buyingPrice),
+                      'text-danger': parseInt(sell.sellingPrice) <= parseInt(sell.buyingPrice)
+                    }"
+                    >({{ (((sell.sellingPrice - sell.buyingPrice) * 100) / sell.buyingPrice).toFixed(1) }}%)</span
+                  >
+                </div>
+              </td>
+              <td class="text-center py-2">{{ sell.quantity }}</td>
+              <td class="text-center py-2">{{ formatPrice(sell.sellingPrice * sell.quantity) }}</td>
+              <td class="text-center py-2 text-nowrap">{{ sell.formattedDate }}</td>
+              <td class="text-center py-2">
+                <div class="flex items-center justify-center">
+                  <div class="flex items-center gap-2" v-if="sell.quality == 'baja'">
+                    <AkarIconsCircleXFill class="text-[1.285rem] text-danger" />
+                  </div>
+                  <div class="flex items -center gap-2" v-else-if="sell.quality == 'intermedia'">
+                    <FluentStarHalf12Regular class="text-[1.428rem] text-[#fcd53f]" />
+                  </div>
+                  <div class="flex items -center gap-2" v-else-if="sell.quality == 'buena'">
+                    <IconoirStarSolid class="text-[1.285rem] text-[#fcd53f]" />
+                  </div>
+                  <div class="flex items -center gap-2" v-else><span class="font-medium">N/A</span></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-2">
+                <button
+                  @click="loadMoreSells"
+                  class="flex justify-center items-center gap-1 btn bg-secondary ring-1 ring-primary text-nowrap"
+                >
+                  <IcRoundPlus class="text-[1.143rem]" />
+                  Mas ventas
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- <div class="flex flex-col gap-[0.571rem]">
         <div
           class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow cursor-pointer"
           v-for="(sell, index) in sellsCleaned"
@@ -107,10 +175,11 @@
             <div class="flex items-center gap-2" v-else><span>Calidad:</span> <span class="font-medium">N/A</span></div>
           </div>
         </div>
-      </div>
+      </div> -->
       <div class="flex" v-else-if="!areSellsFetched">Cargando ventas...</div>
       <div class="flex" v-else>No se encontraron ventas</div>
     </div>
+    <Loader v-if="submitting" />
   </div>
 </template>
 
@@ -138,6 +207,7 @@ sellsStore.fetchData();
 
 // ----- Define Vars -------
 const search = ref("");
+const submitting = ref(false);
 const filterDate = ref("");
 
 // Refs
@@ -184,22 +254,12 @@ const sellsCleaned = computed(() => {
 });
 
 // ----- Define Hooks -------
-onMounted(() => {
-  // Find last sell date and assign to filterDate
-  getLastSellDate();
-});
 
 // ----- Define Methods -------
-function getLastSellDate() {
-  // Find last sell date and assign to filterDate
-  if (sells.value) {
-    // Loop through sells to find the last date
-    sells.value.forEach((sell) => {
-      if (!filterDate.value || $dayjs(sell.date).isAfter($dayjs(filterDate.value))) {
-        filterDate.value = $dayjs(sell.date).format("YYYY-MM-DD");
-      }
-    });
-  }
+async function loadMoreSells() {
+  submitting.value = true;
+  await sellsStore.fetchData(true);
+  submitting.value = false;
 }
 
 function showSellsDetails(id) {
@@ -210,11 +270,6 @@ function showSellsDetails(id) {
 }
 
 // ----- Define Watchers -------
-watch(sells, (newValue) => {
-  // Find last sell date and assign to filterDate
-  getLastSellDate();
-});
-
 useHead({
   title: "Lista de ventas"
 });

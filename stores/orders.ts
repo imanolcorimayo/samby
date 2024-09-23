@@ -10,7 +10,8 @@ import {
   updateDoc,
   deleteDoc,
   orderBy,
-  serverTimestamp
+  serverTimestamp,
+  limit
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
@@ -203,7 +204,8 @@ export const useOrdersStore = defineStore("orders", {
           query(
             collection(db, "pedido"),
             where("orderStatus", "in", ["entregado", "cancelado"]),
-            orderBy("createdAt", "desc")
+            orderBy("createdAt", "desc"),
+            limit(40)
           )
         );
         const orders = querySnapshot.docs.map((doc) => {
@@ -245,7 +247,6 @@ export const useOrdersStore = defineStore("orders", {
 
       try {
         await updateDoc(doc(db, "pedido", orderId), {
-          ...order,
           orderStatus: "pendiente-modificado"
         });
 

@@ -154,3 +154,7 @@ export const createMessage = (products: any, client: any, shippingPrice: any, to
 
   return message;
 };
+
+export const calculateRatio = (total: number, part: number) => {
+  return (part * 100) / total;
+};
