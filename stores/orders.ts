@@ -159,6 +159,7 @@ export const useOrdersStore = defineStore("orders", {
     async fetchPendingOrders() {
       const db = useFirestore();
       const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
 
       // If data is already fetched, return
       if (this.$state.pendingOrdersFetched) {
@@ -173,11 +174,12 @@ export const useOrdersStore = defineStore("orders", {
           query(
             collection(db, "pedido"),
             where("orderStatus", "in", ["pendiente", "pendiente-modificado"]),
-            orderBy("createdAt", "desc")
+            orderBy("shippingDate", "desc")
           )
         );
         const orders = querySnapshot.docs.map((doc) => {
-          return { ...doc.data(), id: doc.id };
+          const data = doc.data();
+          return { ...data, id: doc.id, shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD") };
         });
 
         this.$state.pendingOrders = orders;
@@ -190,6 +192,7 @@ export const useOrdersStore = defineStore("orders", {
     async fetchOrders() {
       const db = useFirestore();
       const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
 
       // If data is already fetched, return
       if (this.$state.ordersFetched) {
@@ -204,12 +207,13 @@ export const useOrdersStore = defineStore("orders", {
           query(
             collection(db, "pedido"),
             where("orderStatus", "in", ["entregado", "cancelado"]),
-            orderBy("createdAt", "desc"),
+            orderBy("shippingDate", "desc"),
             limit(40)
           )
         );
         const orders = querySnapshot.docs.map((doc) => {
-          return { ...doc.data(), id: doc.id };
+          const data = doc.data();
+          return { ...data, id: doc.id, shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD") };
         });
 
         this.$state.orders = orders;

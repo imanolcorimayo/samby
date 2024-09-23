@@ -13,34 +13,34 @@ admin.initializeApp({
 const db = admin.firestore();
 
 // Get all sales
-let allSells = [];
+let allOrders = [];
 try {
-  // Get all sells
-  const sells = []; // await db.collection("venta").get();
+  // Get all orders
+  const orders = await db.collection("pedido").get();
 
-  allSells = []; /* sells.docs.map((sell) => {
-    return { ...sell.data(), id: sell.id };
-  }); */
+  allOrders = orders.docs.map((order) => {
+    return { ...order.data(), id: order.id };
+  });
 } catch (error) {
   console.error("Error getting documents: ", error);
 }
 
-// Do for each on sell and fix date
-allSells.forEach(async (sell, index) => {
-  // console: Updating sale id ${sell.id}
-  console.log(`Updating sale id ${sell.id}`);
+// Do for each on order and fix date
+allOrders.forEach(async (order, index) => {
+  // console: Updating sale id ${order.id}
+  console.log(`Updating sale id ${order.id}`);
   // Console de date
-  console.log("Date: ", sell.date);
+  console.log("Date: ", order.shippingDate);
 
   const objectToUpdate = {
-    date: admin.firestore.Timestamp.fromDate(dayjs(sell.date).toDate())
+    shippingDate: admin.firestore.Timestamp.fromDate(dayjs(order.shippingDate).toDate())
   };
 
   console.log("objectToUpdate: ", objectToUpdate);
 
   // Console the new date in a legible way (toDate)
-  console.log("New date: ", objectToUpdate.date.toDate());
+  console.log("New date: ", objectToUpdate.shippingDate.toDate());
 
   // Update doc
-  // await db.collection("venta").doc(sell.id).update(objectToUpdate);
+  await db.collection("pedido").doc(order.id).update(objectToUpdate);
 });

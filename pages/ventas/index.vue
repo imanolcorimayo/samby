@@ -57,13 +57,13 @@
       <div class="overflow-auto no-scrollbar scrollbar-none" v-if="sellsCleaned.length">
         <table class="w-full">
           <thead>
-            <tr class="bg-secondary border-b text-gray-500">
-              <th class="px-1 text-start py-2">Producto</th>
-              <th class="px-1 py-2">Ganancia (%)</th>
-              <th class="px-1 py-2">Cantidad</th>
-              <th class="px-1 py-2">Total Fact.</th>
-              <th class="px-1 py-2">Fecha</th>
-              <th class="px-1 py-2">Calidad</th>
+            <tr class="bg-secondary border-b text-gray-500 text-sm">
+              <th class="px-2 text-start py-2">Producto</th>
+              <th class="px-2 py-2">Ganancia (%)</th>
+              <th class="px-2 py-2">Cantidad</th>
+              <th class="px-2 py-2">Total Fact.</th>
+              <th class="px-2 py-2">Fecha</th>
+              <th class="px-2 py-2">Calidad</th>
             </tr>
           </thead>
           <tbody>
@@ -73,7 +73,7 @@
               v-for="(sell, index) in sellsCleaned"
               :key="index"
             >
-              <td class="ps-1 py-2 text-start">{{ sell.product?.productName }}</td>
+              <td class="ps-2 py-2 text-start">{{ sell.product?.productName }}</td>
               <td class="text-center py-2">
                 <div class="flex flex-col flex-center gap-[0.285rem]">
                   <span>{{ formatPrice((sell.sellingPrice - sell.buyingPrice) * sell.quantity) }}</span>
