@@ -119,63 +119,6 @@
           </tbody>
         </table>
       </div>
-
-      <!-- <div class="flex flex-col gap-[0.571rem]">
-        <div
-          class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow cursor-pointer"
-          v-for="(sell, index) in sellsCleaned"
-          :key="index"
-          @click="showSellsDetails(sell.id)"
-        >
-          <div class="flex justify-between">
-            <div class="flex flex-col">
-              <span class="font-semibold text-[1.143rem]">{{ sell.product?.productName }}</span>
-            </div>
-            <span class="font-medium text-[1.143rem]">{{ formatPrice(sell.sellingPrice * sell.quantity) }}</span>
-          </div>
-          <div class="flex flex-col gap-0">
-            <div class="flex justify-between">
-              <span class="font-semibold">Precio de venta: </span>
-              <span>{{ formatPrice(sell.sellingPrice) }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-semibold">Precio de compra: </span>
-              <span>{{ formatPrice(sell.buyingPrice) }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-semibold">Cantidad ({{ sell.product?.unit }}): </span>
-              <span>{{ sell.quantity }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-semibold">Ganancia: </span>
-              <div class="flex gap-[0.285rem]">
-                <span>{{ formatPrice((sell.sellingPrice - sell.buyingPrice) * sell.quantity) }}</span>
-                <span
-                  class="font-semibold"
-                  :class="{
-                    'text-success': parseInt(sell.sellingPrice) > parseInt(sell.buyingPrice),
-                    'text-danger': parseInt(sell.sellingPrice) <= parseInt(sell.buyingPrice)
-                  }"
-                  >({{ (((sell.sellingPrice - sell.buyingPrice) * 100) / sell.buyingPrice).toFixed(1) }}%)</span
-                >
-              </div>
-            </div>
-          </div>
-          <div class="flex justify-between">
-            <span class="">Fecha: {{ sell.date }}</span>
-            <div class="flex items-center gap-2" v-if="sell.quality == 'baja'">
-              <span>Calidad:</span> <AkarIconsCircleXFill class="text-[1.285rem] text-danger" />
-            </div>
-            <div class="flex items-center gap-2" v-else-if="sell.quality == 'intermedia'">
-              <span>Calidad:</span> <FluentStarHalf12Regular class="text-[1.428rem] text-[#fcd53f]" />
-            </div>
-            <div class="flex items-center gap-2" v-else-if="sell.quality == 'buena'">
-              <span>Calidad:</span> <IconoirStarSolid class="text-[1.285rem] text-[#fcd53f]" />
-            </div>
-            <div class="flex items-center gap-2" v-else><span>Calidad:</span> <span class="font-medium">N/A</span></div>
-          </div>
-        </div>
-      </div> -->
       <div class="flex" v-else-if="!areSellsFetched">Cargando ventas...</div>
       <div class="flex" v-else>No se encontraron ventas</div>
     </div>

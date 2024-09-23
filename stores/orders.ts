@@ -11,7 +11,8 @@ import {
   deleteDoc,
   orderBy,
   serverTimestamp,
-  limit
+  limit,
+  startAfter
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
@@ -27,7 +28,8 @@ export const useOrdersStore = defineStore("orders", {
       },
       pendingOrders: [],
       pendingOrdersFetched: false,
-      ordersFetched: false
+      ordersFetched: false,
+      lastVisible: false
     };
   },
   getters: {
@@ -189,13 +191,18 @@ export const useOrdersStore = defineStore("orders", {
         return null;
       }
     },
-    async fetchOrders() {
+    async fetchOrders(startAfterLastVisible: boolean = false) {
       const db = useFirestore();
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
 
       // If data is already fetched, return
-      if (this.$state.ordersFetched) {
+      if (this.$state.ordersFetched && !startAfterLastVisible) {
+        return;
+      }
+
+      if (this.$state.lastVisible === null && startAfterLastVisible) {
+        useToast(ToastEvents.error, "No hay más pedidos");
         return;
       }
 
@@ -203,20 +210,43 @@ export const useOrdersStore = defineStore("orders", {
         return null;
       }
       try {
-        const querySnapshot = await getDocs(
-          query(
+        let reference = null;
+        if (startAfterLastVisible) {
+          const lastVisible = this.$state.lastVisible;
+
+          console.log(lastVisible);
+          reference = query(
             collection(db, "pedido"),
             where("orderStatus", "in", ["entregado", "cancelado"]),
             orderBy("shippingDate", "desc"),
-            limit(40)
-          )
-        );
+            limit(20),
+            startAfter(lastVisible)
+          );
+        } else {
+          reference = query(
+            collection(db, "pedido"),
+            where("orderStatus", "in", ["entregado", "cancelado"]),
+            orderBy("shippingDate", "desc"),
+            limit(20)
+          );
+        }
+
+        const querySnapshot = await getDocs(reference);
+
+        // Save last visible
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+        if (lastVisible && querySnapshot.docs.length === 20) {
+          this.$state.lastVisible = lastVisible;
+        } else {
+          this.$state.lastVisible = null;
+        }
+
         const orders = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           return { ...data, id: doc.id, shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD") };
         });
 
-        this.$state.orders = orders;
+        this.$state.orders = [...this.$state.orders, ...orders];
         this.$state.ordersFetched = true;
       } catch (error) {
         console.error(error);

@@ -39,7 +39,7 @@
           Calcular lista de compra
         </button>
       </div>
-      <div class="flex flex-col" v-if="filteredOrders.length">
+      <div class="flex flex-col mb-3" v-if="filteredOrders.length">
         <div class="flex flex-col gap-3" v-for="(order, index) in filteredOrders" :key="index">
           <div
             class="text-md font-bold"
@@ -96,6 +96,11 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="mt-3" v-if="orderType !== 'pending'">
+          <button @click="loadMoreOrders" class="btn bg-secondary ring-1 ring-primary flex gap-1 items-center">
+            <IcRoundPlus /> Ver mas pedidos
+          </button>
         </div>
       </div>
       <div class="flex" v-else-if="!arePendingOrdersFetched">Cargando pedidos...</div>
@@ -195,6 +200,26 @@ function stockList() {
   if (!ordersStockDetails.value) return;
 
   ordersStockDetails.value.showStockList(pendingOrders.value);
+}
+
+async function loadMoreOrders() {
+  // If submitting, do nothing
+  if (submitting.value) return;
+
+  // Start the loader
+  submitting.value = true;
+
+  // Fetch more orders
+  await ordersStore.fetchOrders(true);
+
+  // Update filtered orders
+  filteredOrders.value = orders.value;
+
+  // Clear search in case it was used
+  search.value = "";
+
+  // Stop the loader
+  submitting.value = false;
 }
 
 // ----- Define Hooks -------
