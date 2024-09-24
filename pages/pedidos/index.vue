@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-[2rem] w-full">
     <OrdersDetails ref="ordersDetails" />
     <OrdersStockDetails ref="ordersStockDetails" />
-    <Navigator />
+    <Navigator v-if="userRole === 'admin'" />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de pedidos</h1>
@@ -13,7 +13,7 @@
           v-if="userRole === 'admin'"
           to="/pedidos/nuevo"
           class="btn bg-primary text-white flex items-center text-nowrap"
-          ><IcRoundPlus pendingOrders.value pendingOrders.valueclass="text-[1.143rem]" /> Nuevo
+          ><IcRoundPlus class="text-[1.143rem]" /> Nuevo
         </NuxtLink>
       </div>
       <div class="flex gap-2 items-center">
