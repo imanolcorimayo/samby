@@ -12,7 +12,8 @@ import {
   orderBy,
   serverTimestamp,
   limit,
-  startAfter
+  startAfter,
+  Timestamp
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
@@ -111,10 +112,13 @@ export const useOrdersStore = defineStore("orders", {
         return null;
       }
 
+      const shippingTime = $dayjs(order.shippingDate).toDate();
+
       try {
         // Create object to be inserted
         const orderObject = {
           ...order,
+          shippingDate: Timestamp.fromDate(shippingTime),
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         };
@@ -246,7 +250,11 @@ export const useOrdersStore = defineStore("orders", {
           return { ...data, id: doc.id, shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD") };
         });
 
-        this.$state.orders = [...this.$state.orders, ...orders];
+        if (!startAfterLastVisible) {
+          this.$state.orders = orders;
+        } else {
+          this.$state.orders = [...this.$state.orders, ...orders];
+        }
         this.$state.ordersFetched = true;
       } catch (error) {
         console.error(error);

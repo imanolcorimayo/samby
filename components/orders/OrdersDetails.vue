@@ -138,24 +138,51 @@
       >
         <LucideEdit /> Modificar
       </button>
-      <div v-if="submitting && !isOrderModified && isEditable" class="btn bg-danger text-white text-nowrap">
-        loading...
+      <div class="flex justify-between gap-1">
+        <div
+          v-if="submitting && !isOrderModified && isEditable"
+          class="flex-1 flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap"
+        >
+          loading...
+        </div>
+        <button
+          v-else-if="!isOrderModified && isEditable"
+          @click="markAsCancelled()"
+          class="flex-1 flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
+        >
+          <IcRoundArchive /> Cancelar venta
+        </button>
+        <div
+          v-if="submitting && !isOrderModified && isEditable"
+          class="flex-1 flex items-center justify-center gap-1 btn bg-primary text-white text-nowrap"
+        >
+          loading...
+        </div>
+        <button
+          v-else-if="!isOrderModified && isEditable"
+          @click="markAsDelivered(currentOrder.id)"
+          class="flex-1 flex items-center justify-center gap-1 btn bg-primary text-white text-nowrap"
+        >
+          <IconParkOutlineCheckOne /> Marcar entregado
+        </button>
       </div>
-      <button
-        v-else-if="!isOrderModified && isEditable"
-        @click="markAsCancelled()"
-        class="flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
-      >
-        <IcRoundArchive /> Cancelar venta
-      </button>
-      <button
-        v-if="!isOrderModified && isEditable"
-        @click="sendConfirmationMessage"
-        class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
-      >
-        <MingcuteWhatsappLine class="text-xl" />
-        Enviar mensaje al cliente
-      </button>
+      <div class="flex justify-between gap-1">
+        <button
+          v-if="!isOrderModified && isEditable"
+          @click="sendConfirmationMessage"
+          class="flex-1 w-full text-nowrap flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
+        >
+          <MingcuteWhatsappLine class="text-xl" />
+          Resumen
+        </button>
+        <button
+          v-if="!isOrderModified && isEditable"
+          @click="sendEmptyMessage"
+          class="flex-1 w-full flex items-center justify-center gap-2 btn bg-secondary w-full text-center ring-1 ring-gray-300"
+        >
+          <MingcuteWhatsappLine class="text-xl" /> Vacío
+        </button>
+      </div>
     </template>
   </ModalStructure>
   <Loader v-if="submitting" />
@@ -164,6 +191,7 @@
 
 <script setup>
 import TablerPlus from "~icons/tabler/plus";
+import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import MiRemove from "~icons/mi/remove";
 import TablerTrash from "~icons/tabler/trash";
 import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
@@ -247,6 +275,20 @@ function sendConfirmationMessage() {
     currentOrder.value.shippingPrice,
     currentOrder.value.totalAmount
   );
+
+  // Send message to wsp
+  const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+
+  // Open message in a new window
+  window.open(url, "_blank");
+}
+
+function sendEmptyMessage() {
+  // Clean the client's phone number to contain only numbers
+  const cleanPhone = currentOrder.value.client.phone.replace(/\D/g, "");
+
+  // Message creation
+  const message = "";
 
   // Send message to wsp
   const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
@@ -391,6 +433,33 @@ async function modifyOrder() {
     submitting.value = false;
   } else {
     useToast(ToastEvents.error, "Hubo un error al modificar el pedido, por favor intenta nuevamente");
+    submitting.value = false;
+  }
+}
+
+async function markAsDelivered(orderId) {
+  // If submitting, do nothing
+  if (submitting.value) return;
+
+  // Start the loader
+  submitting.value = true;
+
+  // Confirm dialogue
+  const confirmed = await confirmDialogue.value.openDialog({ edit: true });
+
+  if (!confirmed) {
+    submitting.value = false;
+    return;
+  }
+
+  // Update the order
+  const orderUpdated = await ordersStore.updateStatusOrder(orderId, "entregado");
+
+  if (orderUpdated) {
+    useToast(ToastEvents.success, "Pedido marcado como entregado correctamente");
+    submitting.value = false;
+  } else {
+    useToast(ToastEvents.error, "Hubo un error al completar el pedido, por favor intenta nuevamente");
     submitting.value = false;
   }
 }

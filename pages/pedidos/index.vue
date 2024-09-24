@@ -147,6 +147,10 @@ const confirmDialogue = ref(null);
 
 // ----- Define Computed -------
 const orderDates = computed(() => {
+  if (orderType.value === "pending") {
+    return pendingOrders.value.map((order) => order.shippingDate);
+  }
+
   return orders.value.map((order) => order.shippingDate);
 });
 

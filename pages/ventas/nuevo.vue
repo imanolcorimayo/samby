@@ -198,7 +198,7 @@ import FluentStarHalf12Regular from "~icons/fluent/star-half-12-regular";
 import IconoirStarSolid from "~icons/iconoir/star-solid";
 import AkarIconsCircleXFill from "~icons/akar-icons/circle-x-fill";
 
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 
 // ----- Define Useful Properties -------
 const { $dayjs } = useNuxtApp();
@@ -260,6 +260,7 @@ async function submitHandler(productId, productName) {
 
   const sellObject = {
     ...form.value,
+    date: TimeStamp.fromDate($dayjs(form.value.date).toDate()),
     product: {
       id: productId,
       name: productName
