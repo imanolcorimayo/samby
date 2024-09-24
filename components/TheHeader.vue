@@ -35,7 +35,7 @@
                   >Pedidos</NuxtLink
                 >
               </li>
-              <li @click="switchMenu">
+              <li @click="switchMenu" v-if="userRole === 'admin'">
                 <NuxtLink
                   to="/ventas"
                   class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
@@ -43,7 +43,7 @@
                   >Ventas</NuxtLink
                 >
               </li>
-              <li @click="switchMenu">
+              <li @click="switchMenu" v-if="userRole === 'admin'">
                 <NuxtLink
                   to="/productos"
                   class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
@@ -51,7 +51,7 @@
                   >Productos</NuxtLink
                 >
               </li>
-              <li @click="switchMenu">
+              <li @click="switchMenu" v-if="userRole === 'admin'">
                 <NuxtLink
                   to="/clientes"
                   class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
@@ -59,7 +59,7 @@
                   >Clientes</NuxtLink
                 >
               </li>
-              <li @click="switchMenu">
+              <li @click="switchMenu" v-if="userRole === 'admin'">
                 <NuxtLink
                   to="/dashboard"
                   class="w-full block px-4 py-2 text-start text-sm hover:bg-primary-transparent hover:text-black"
@@ -93,6 +93,8 @@ const user = await getCurrentUser();
 const route = useRoute();
 
 // ----- Define Pinia Vars ----------
+const indexStore = useIndexStore();
+const { getUserRole: userRole } = storeToRefs(indexStore);
 
 // ---- Define Vars --------
 const showMenu = ref(false);

@@ -10,6 +10,7 @@
       >Pedidos</NuxtLink
     >
     <NuxtLink
+      v-if="getUserRole === 'admin'"
       :class="{
         ['bg-primary text-white']: route.fullPath.includes('ventas'),
         ['bg-secondary']: !route.fullPath.includes('ventas')
@@ -19,6 +20,7 @@
       >Ventas</NuxtLink
     >
     <NuxtLink
+      v-if="getUserRole === 'admin'"
       :class="{
         ['bg-primary text-white']: route.fullPath.includes('dashboard'),
         ['bg-secondary']: !route.fullPath.includes('dashboard')
@@ -31,6 +33,9 @@
 </template>
 
 <script setup>
+// ----- Define Pinia Vars ----------
+const indexStore = useIndexStore();
+const { getUserRole } = storeToRefs(indexStore);
 // ----- Define Useful Properties ----------
 const route = useRoute();
 </script>

@@ -26,3 +26,4 @@ logs
 
 # Firebase service account
 /scripts/*.json
+/scripts/update-privileges-to-users.js

@@ -9,7 +9,10 @@
       </div>
       <div class="flex gap-2">
         <input v-model="search" type="text" class="" placeholder="Buscar..." />
-        <NuxtLink to="/pedidos/nuevo" class="btn bg-primary text-white flex items-center text-nowrap"
+        <NuxtLink
+          v-if="userRole === 'admin'"
+          to="/pedidos/nuevo"
+          class="btn bg-primary text-white flex items-center text-nowrap"
           ><IcRoundPlus pendingOrders.value pendingOrders.valueclass="text-[1.143rem]" /> Nuevo
         </NuxtLink>
       </div>
@@ -122,6 +125,8 @@ import IconParkOutlineTransactionOrder from "~icons/icon-park-outline/transactio
 // ----- Define Useful Properties -------
 
 // ----- Define Pinia Vars --------
+const indexStore = useIndexStore();
+const { getUserRole: userRole } = storeToRefs(indexStore);
 const ordersStore = useOrdersStore();
 const { getPendingOrders: pendingOrders, getOrders: orders, arePendingOrdersFetched } = storeToRefs(ordersStore);
 

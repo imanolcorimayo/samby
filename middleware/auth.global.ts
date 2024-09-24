@@ -1,3 +1,4 @@
+import { getIdTokenResult } from "firebase/auth";
 import {
   collection,
   query,
@@ -17,34 +18,24 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (to.path.includes("/welcome") || to.path.includes("/blocked") || process.server) return;
 
   const user = await getCurrentUser();
+  const indexStore = useIndexStore();
 
   // If user exist then they can navigate to any page
   if (user) {
-    // TODO: Implement roles in the future
+    // Get id token results
+    const idTokenResult = await getIdTokenResult(user);
 
-    /* // Connect with firebase and get payments structure
-    const db = useFirestore();
+    // Update user role
+    indexStore.updateUserRole(idTokenResult.claims.role ?? "employee");
 
-    // Get full list of allowed emails from fireStore
-    const querySnapshot = await getDocs(query(collection(db, "allowedEmails"))); */
+    // Allowed routed to navigate for non admin users
+    const allowedRoutes = ["/pedidos", "/blocked", "/404"];
 
-    /* let isSafeAccount = false;
-    querySnapshot.forEach((doc) => {
-      const safeUser = doc.data();
+    if ((idTokenResult.claims.role && idTokenResult.claims.role === "admin") || allowedRoutes.includes(to.path)) {
+      return;
+    }
 
-      // Check if current account belongs to safe accounts
-      isSafeAccount = isSafeAccount || safeUser.email == user.email;
-    });
-
-    // Save role in order to avoid calling "allowedEmails again"
-    authStore.saveRole(isSafeAccount ? "admin" : "forbidden");
-
-    // If it's not safe account, redirect to blocked page
-    if (!isSafeAccount) {
-      return navigateTo("blocked");
-    } */
-
-    return;
+    return navigateTo("/pedidos");
   }
 
   // Redirect to sign-in page
