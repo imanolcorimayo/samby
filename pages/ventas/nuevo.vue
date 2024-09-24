@@ -260,7 +260,7 @@ async function submitHandler(productId, productName) {
 
   const sellObject = {
     ...form.value,
-    date: TimeStamp.fromDate($dayjs(form.value.date).toDate()),
+    date: Timestamp.fromDate($dayjs(form.value.date).toDate()),
     product: {
       id: productId,
       name: productName
@@ -299,7 +299,9 @@ async function submitHandler(productId, productName) {
   // Add sell to the store
   sellsStore.addSell({
     id: newSell.id,
-    ...sellObject
+    ...sellObject,
+    // Format date again
+    formattedDate: $dayjs(sellObject.date.toDate()).format("DD/MM/YYYY")
   });
 
   useToast("success", "Venta agregada correctamente");
@@ -322,7 +324,7 @@ function selectProduct(id) {
 function setProductSold(sellsValue) {
   // Find sells made today
   const sellsToday = sellsValue.filter((sell) => {
-    return $dayjs(sell.date).format("YYYY-MM-DD") === $dayjs().format("YYYY-MM-DD");
+    return $dayjs(sell.date.toDate()).format("YYYY-MM-DD") === $dayjs().format("YYYY-MM-DD");
   });
 
   // Set productSold to true
