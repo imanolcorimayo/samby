@@ -291,6 +291,7 @@ export const useOrdersStore = defineStore("orders", {
       try {
         await updateDoc(doc(db, "pedido", orderId), {
           ...order,
+          shippingDate: Timestamp.fromDate($dayjs(order.shippingDate).toDate()),
           orderStatus: "pendiente-modificado"
         });
 
