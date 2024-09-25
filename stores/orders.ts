@@ -264,6 +264,7 @@ export const useOrdersStore = defineStore("orders", {
     async updatePendingOrder(order: any) {
       const db = useFirestore();
       const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
 
       if (!user || !user.value) {
         return false;
@@ -289,6 +290,7 @@ export const useOrdersStore = defineStore("orders", {
 
       try {
         await updateDoc(doc(db, "pedido", orderId), {
+          ...order,
           orderStatus: "pendiente-modificado"
         });
 
