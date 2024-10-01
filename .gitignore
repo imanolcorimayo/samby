@@ -24,6 +24,10 @@ logs
 !.env.example
 .firebase
 
+# VSCode
+.vscode
+
 # Firebase service account
 /scripts/*.json
 /scripts/update-privileges-to-users.js
+/scripts/export-prod-to-develop.js

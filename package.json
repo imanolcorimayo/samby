@@ -6,7 +6,8 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "deploy": "nuxt generate && firebase deploy",
+    "prodDeploy": "cp .env.samby-prod .env && nuxt generate && firebase use samby-prod && firebase deploy",
+    "devDeploy": "cp .env.samby-prod .env && nuxt generate && firebase use samby-dev && firebase deploy",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },

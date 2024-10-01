@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "samby-repo"
-  }
+    "samby-dev": "samby-dev",
+    "samby-prod": "samby-repo"
+  },
+  "targets": {},
+  "etags": {}
 }

@@ -52,11 +52,11 @@ export default defineNuxtConfig({
     },
     config: {
       apiKey: process.env.FIREBASE_API_KEY,
-      authDomain: "samby-repo.firebaseapp.com",
+      authDomain: `${process.env.FIREBASE_PROJECT_ID}.firebaseapp.com`,
       projectId: process.env.FIREBASE_PROJECT_ID,
-      storageBucket: "samby-repo.appspot.com",
-      messagingSenderId: "338722770644",
-      appId: "1:338722770644:web:4a025823961353e768f541"
+      storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.FIREBASE_APP_ID
     }
   }
 });
