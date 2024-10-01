@@ -211,6 +211,7 @@ productsStore.fetchData();
 // ----- Define Vars -----
 const submitting = ref(false);
 const currentOrder = ref(null);
+const currentOrderId = ref(null);
 const editableOrder = ref([]);
 const isOrderModified = ref(false);
 
@@ -394,6 +395,7 @@ const showModal = (orderId) => {
 
   // Set current order
   currentOrder.value = order;
+  currentOrderId.value = orderId;
 
   // This is the only way to make it work, otherwise it will be a reference since there are many nested objects
   editableOrder.value = JSON.parse(JSON.stringify(order));
@@ -430,6 +432,8 @@ async function modifyOrder() {
   if (orderUpdated) {
     useToast(ToastEvents.success, "Pedido modificado correctamente");
     mainModal.value.closeModal();
+    // Show the updated order
+    showModal(currentOrderId.value);
     submitting.value = false;
   } else {
     useToast(ToastEvents.error, "Hubo un error al modificar el pedido, por favor intenta nuevamente");

@@ -225,10 +225,12 @@ async function uploadAllSales() {
           ToastEvents.error,
           `Error, recarga la página y trata de nuevo. Contactate con el desarrollador si el error persiste`
         );
+        submitting.value = false; // Stop the loader
         return;
       }
 
       useToast(ToastEvents.error, `La venta para el producto "${prod.productName}" no es valida`);
+      submitting.value = false; // Stop the loader
       return;
     }
   }
@@ -243,6 +245,7 @@ async function uploadAllSales() {
         ToastEvents.error,
         `Error, recarga la página y trata de nuevo. Contactate con el desarrollador si el error persiste`
       );
+      submitting.value = false; // Stop the loader
       return;
     }
 
