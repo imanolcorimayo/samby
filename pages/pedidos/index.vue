@@ -44,7 +44,7 @@
             <span class="">Pedidos del: {{ $dayjs(orderDates[index]).format("DD/MM/YYYY") }}</span>
             <NuxtLink
               class="flex justify-center items-center gap-1 btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
-              v-if="!isPendingShown"
+              v-if="!isPendingShown && userRole === 'admin'"
               :to="`/ventas/desde-pedido/${$dayjs(orderDates[index]).format('YYYY-MM-DD')}`"
             >
               <CarbonSalesOps />

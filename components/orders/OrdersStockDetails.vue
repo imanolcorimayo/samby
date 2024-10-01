@@ -48,6 +48,8 @@
 <script setup>
 import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
 
+// ----- Define Useful Properties -----
+const { $dayjs } = useNuxtApp();
 // ----- Define Pinia Vars -----
 
 // ----- Define Vars -----
@@ -85,7 +87,9 @@ function sendListMessage() {
   const cleanPhone = 3513545369; // Meli's number
 
   // Message creation
-  let message = "Lista de productos que necesitamos comprar:\n\n";
+  let message = `Lista de productos que necesitamos comprar para el ${$dayjs(dateToFilter.value).format(
+    "DD/MM/YYYY"
+  )}:\n\n`;
 
   finalList.value.forEach((product) => {
     message += `- ${product.productName} (${product.unit}) - ${product.finalQuantity}\n`;
