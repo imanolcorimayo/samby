@@ -29,5 +29,5 @@ logs
 
 # Firebase service account
 /scripts/*.json
-/scripts/update-privileges-to-users.js
+/scripts/update-privileges-to-users*.js
 /scripts/export-prod-to-develop.js

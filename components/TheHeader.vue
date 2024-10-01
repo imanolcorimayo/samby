@@ -1,5 +1,10 @@
 <template>
-  <header class="w-full max-w-[80rem] p-[1.429rem] mx-auto">
+  <div v-if="config.public.env === 'dev'" class="fixed top-0 right-0 w-full z-50">
+    <div class="m-auto max-w-[80rem] flex justify-end">
+      <div class="bg-red-600 text-white font-bold py-2 px-4 rounded-bl-lg shadow-lg z-50 w-fit">Test Environment</div>
+    </div>
+  </div>
+  <header class="w-full max-w-[80rem] p-[1.429rem] mx-auto relative">
     <nav>
       <div class="w-full max-w-screen flex justify-between items-center mx-auto py-[1.429rem] pt-0">
         <NuxtLink to="/" class="flex items-center space-x-3 rtl:space-x-reverse hover:bg-transparent no-hover">
@@ -91,6 +96,7 @@ import PhXLogoDuotone from "~icons/ph/x-logo-duotone";
 const auth = useFirebaseAuth();
 const user = await getCurrentUser();
 const route = useRoute();
+const config = useRuntimeConfig();
 
 // ----- Define Pinia Vars ----------
 const indexStore = useIndexStore();
