@@ -39,6 +39,7 @@ export const useOrdersStore = defineStore("orders", {
     productsCount: (state) => state.shoppingCart.length,
     totalAmount: (state: any) => state.shoppingCart.reduce((acc: any, product: any) => acc + product.total, 0),
     getOrders: (state) => state.orders,
+    areOrdersFetched: (state) => state.ordersFetched,
     getPendingOrders: (state) => state.pendingOrders,
     arePendingOrdersFetched: (state) => state.pendingOrdersFetched
   },
@@ -137,7 +138,11 @@ export const useOrdersStore = defineStore("orders", {
         });
 
         // Add order to orders
-        this.$state.pendingOrders.push({ ...orderObject, id: newOrder.id });
+        this.$state.pendingOrders.push({
+          ...orderObject,
+          id: newOrder.id,
+          shippingDate: $dayjs(orderObject.shippingDate.toDate()).format("YYYY-MM-DD")
+        });
 
         // Update last inserted order
         this.$state.lastInsertedOrder = {

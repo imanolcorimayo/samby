@@ -199,6 +199,7 @@ import IconoirStarSolid from "~icons/iconoir/star-solid";
 import AkarIconsCircleXFill from "~icons/akar-icons/circle-x-fill";
 
 import { collection, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
+import { ToastEvents } from "~/interfaces";
 
 // ----- Define Useful Properties -------
 const { $dayjs } = useNuxtApp();
@@ -252,62 +253,34 @@ async function submitHandler(productId, productName) {
   // Set submitting to avoid having multiple requests
   submitting.value = true;
 
-  // Validate form
-  validateSell(form.value);
-  // Get Firestore and Current User
-  const db = useFirestore();
-  const user = useCurrentUser();
+  // Add sell to the store
+  const saleAdded = await sellsStore.addSell(form.value, { id: productId, name: productName });
 
-  const sellObject = {
-    ...form.value,
-    date: Timestamp.fromDate($dayjs(form.value.date).toDate()),
-    product: {
-      id: productId,
-      name: productName
-    },
-    createdAt: serverTimestamp(),
-    userUid: user.value.uid
-  };
+  if (saleAdded) {
+    useToast(ToastEvents.success, "Venta agregada correctamente");
 
-  // collection based on user
-  let collectionName = "venta";
-  if (user.value.email === "imanolcorimayotest@gmail.com") {
-    collectionName = "ventaTest";
+    // Clean values
+    form.value = {
+      quantity: "",
+      quality: "buena",
+      buyingPrice: "",
+      sellingPrice: "",
+      date: $dayjs().format("YYYY-MM-DD")
+    };
+
+    // Hide all forms
+    Object.keys(selectedProduct.value).forEach((key) => {
+      selectedProduct.value[key] = false;
+    });
+    // set productSold to true
+    setProductSold(sells.value);
+
+    submitting.value = false; // Hide loader
+    return;
   }
 
-  // Handle recurrent payments
-  const newSell = await addDoc(collection(db, collectionName), sellObject);
-
-  // the way to access to the sell id if needed: newSell.id;
-
-  // Clean values
-  form.value = {
-    quantity: "",
-    quality: "buena",
-    buyingPrice: "",
-    sellingPrice: "",
-    date: $dayjs().format("YYYY-MM-DD")
-  };
-
-  submitting.value = false;
-
-  // Hide all forms
-  Object.keys(selectedProduct.value).forEach((key) => {
-    selectedProduct.value[key] = false;
-  });
-
-  // Add sell to the store
-  sellsStore.addSell({
-    id: newSell.id,
-    ...sellObject,
-    // Format date again
-    formattedDate: $dayjs(sellObject.date.toDate()).format("DD/MM/YYYY")
-  });
-
-  useToast("success", "Venta agregada correctamente");
-
-  // set productSold to true
-  setProductSold(sells.value);
+  submitting.value = false; // Hide loader
+  useToast(ToastEvents.error, "Ocurrió un error al agregar la venta");
 }
 
 function selectProduct(id) {

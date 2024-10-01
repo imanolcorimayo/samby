@@ -100,8 +100,6 @@ const showStockList = (orders) => {
     return;
   }
 
-  console.log(orders);
-
   // This is the only way to make it work, otherwise it will be a reference since there are many nested objects
   pendingOrders.value = JSON.parse(JSON.stringify(orders));
 

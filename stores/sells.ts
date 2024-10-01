@@ -11,9 +11,11 @@ import {
   deleteDoc,
   orderBy,
   limit,
-  startAfter
+  startAfter,
+  Timestamp
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
+import { serverTimestamp } from "firebase/database";
 
 const defaultObject = {
   fetched: false,
@@ -94,9 +96,48 @@ export const useSellsStore = defineStore("sells", {
       this.$state.fetched = true;
       this.$state.sells = startAfterLastVisible ? [...this.$state.sells, ...sells] : sells;
     },
-    async addSell(sell: any) {
-      // Add sell to be in the first position
-      this.$state.sells.unshift(sell);
+    async addSell(sell: any, product = { id: "", name: "" }) {
+      // Get Firestore and Current User
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
+
+      if (!user.value) {
+        return false;
+      }
+
+      // Validate form
+      const isValid = validateSell(sell);
+      if (!isValid) {
+        useToast(ToastEvents.error, "La venta no es válida");
+        return false;
+      }
+
+      try {
+        const sellObject = {
+          ...sell,
+          date: Timestamp.fromDate($dayjs(sell.date).toDate()),
+          product,
+          createdAt: serverTimestamp(),
+          userUid: user.value.uid
+        };
+
+        // Handle recurrent payments
+        const newSell = await addDoc(collection(db, "venta"), sellObject);
+
+        // Add sell to be in the first position
+        this.$state.sells.unshift({
+          id: newSell.id,
+          ...sellObject,
+          // Format date again
+          formattedDate: $dayjs(sellObject.date.toDate()).format("DD/MM/YYYY")
+        });
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
     },
     async updateSell(sell: any, sellId: string) {
       const db = useFirestore();

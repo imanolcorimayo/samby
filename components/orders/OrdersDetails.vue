@@ -458,6 +458,9 @@ async function markAsDelivered(orderId) {
   if (orderUpdated) {
     useToast(ToastEvents.success, "Pedido marcado como entregado correctamente");
     submitting.value = false;
+
+    // Close the modal
+    mainModal.value.closeModal();
   } else {
     useToast(ToastEvents.error, "Hubo un error al completar el pedido, por favor intenta nuevamente");
     submitting.value = false;

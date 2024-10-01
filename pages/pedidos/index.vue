@@ -45,11 +45,19 @@
       <div class="flex flex-col mb-3" v-if="filteredOrders.length">
         <div class="flex flex-col gap-3" v-for="(order, index) in filteredOrders" :key="index">
           <div
-            class="text-md font-bold"
+            class="flex justify-between text-md font-bold"
             :class="{ ['mt-4']: index > 0 }"
             v-if="orderDates[index] !== orderDates[index - 1]"
           >
             <span class="">Pedidos del: {{ $dayjs(orderDates[index]).format("DD/MM/YYYY") }}</span>
+            <NuxtLink
+              class="flex justify-center items-center gap-1 btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
+              v-if="!isPendingShown"
+              :to="`/ventas/desde-pedido/${$dayjs(orderDates[index]).format('YYYY-MM-DD')}`"
+            >
+              <CarbonSalesOps />
+              Cargar ventas
+            </NuxtLink>
           </div>
           <div class="flex flex-col gap-3 p-2 py-4 bg-secondary border-b">
             <button class="flex flex-col items-start w-full" @click="showDetails(order.id)">
@@ -115,6 +123,7 @@
 </template>
 
 <script setup>
+import CarbonSalesOps from "~icons/carbon/sales-ops";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import IcRoundPlus from "~icons/ic/round-plus";
 import MingcuteUser4Fill from "~icons/mingcute/user-4-fill";

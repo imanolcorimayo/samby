@@ -1,7 +1,7 @@
 <template>
   <div v-if="config.public.env === 'dev'" class="fixed top-0 right-0 w-full z-50">
     <div class="m-auto max-w-[80rem] flex justify-end">
-      <div class="bg-red-600 text-white font-bold py-2 px-4 rounded-bl-lg shadow-lg z-50 w-fit">Test Environment</div>
+      <div class="bg-red-600 text-white font-bold py-2 px-4 rounded-bl-lg shadow-lg w-fit">Test Environment</div>
     </div>
   </div>
   <header class="w-full max-w-[80rem] p-[1.429rem] mx-auto relative">
