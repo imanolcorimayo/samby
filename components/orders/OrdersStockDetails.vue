@@ -3,7 +3,8 @@
     <template #header>
       <div class="flex flex-col gap-2 w-full">
         <div class="flex flex-col cursor-pointer w-full">
-          <span class="font-bold text-xl">Detalle de lista de compra</span>
+          <span class="font-bold text-xl">Lista de compra</span>
+          <span class="text-gray-500">Fecha: {{ $dayjs(dateToFilter).format("DD/MM/YYYY") }}</span>
         </div>
       </div>
     </template>
@@ -51,15 +52,19 @@ import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
 
 // ----- Define Vars -----
 const pendingOrders = ref([]);
+const dateToFilter = ref("");
 
 // Refs
 const mainModal = ref(null);
 
 // ----- Define Computed -----
 const finalList = computed(() => {
+  // Filter orders based on the date selected
+  const datesBasedOrders = pendingOrders.value.filter((order) => order.shippingDate === dateToFilter.value);
+
   const list = [];
 
-  pendingOrders.value.forEach((order) => {
+  datesBasedOrders.forEach((order) => {
     order.products.forEach((product) => {
       const index = list.findIndex((item) => item.productId === product.productId);
 
@@ -94,7 +99,7 @@ function sendListMessage() {
 }
 
 // ----- Define Methods -------
-const showStockList = (orders) => {
+const showStockList = (orders, date) => {
   if (!mainModal.value) {
     useToast("error", "Parece que hay un error en el sistema, por favor intenta nuevamente.");
     return;
@@ -102,6 +107,7 @@ const showStockList = (orders) => {
 
   // This is the only way to make it work, otherwise it will be a reference since there are many nested objects
   pendingOrders.value = JSON.parse(JSON.stringify(orders));
+  dateToFilter.value = date;
 
   // Show modal
   mainModal.value.showModal();

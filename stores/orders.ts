@@ -144,6 +144,12 @@ export const useOrdersStore = defineStore("orders", {
           shippingDate: $dayjs(orderObject.shippingDate.toDate()).format("YYYY-MM-DD")
         });
 
+        // Sort orders by shipping date (ascending order)
+        this.$state.pendingOrders = this.$state.pendingOrders.sort(
+          // @ts-ignore
+          (a: any, b: any) => $dayjs(a.shippingDate).toDate() - $dayjs(b.shippingDate).toDate()
+        );
+
         // Update last inserted order
         this.$state.lastInsertedOrder = {
           order: { ...orderObject, id: newOrder.id },
@@ -185,7 +191,7 @@ export const useOrdersStore = defineStore("orders", {
           query(
             collection(db, "pedido"),
             where("orderStatus", "in", ["pendiente", "pendiente-modificado"]),
-            orderBy("shippingDate", "desc")
+            orderBy("shippingDate", "asc")
           )
         );
         const orders = querySnapshot.docs.map((doc) => {

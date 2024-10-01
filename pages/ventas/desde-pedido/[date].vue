@@ -176,8 +176,6 @@ const productsSold = computed(() => {
     (order) => order.orderStatus === "entregado" && order.shippingDate === route.params.date
   );
 
-  console.log(deliveredOrders);
-
   const list = [];
 
   deliveredOrders.forEach((order) => {

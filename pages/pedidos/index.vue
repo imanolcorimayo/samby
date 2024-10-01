@@ -33,14 +33,6 @@
             Completados
           </button>
         </div>
-        <button
-          v-if="isPendingShown"
-          class="flex gap-1 items-center btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
-          @click="stockList"
-        >
-          <IconParkOutlineTransactionOrder />
-          Calcular lista de compra
-        </button>
       </div>
       <div class="flex flex-col mb-3" v-if="filteredOrders.length">
         <div class="flex flex-col gap-3" v-for="(order, index) in filteredOrders" :key="index">
@@ -58,6 +50,14 @@
               <CarbonSalesOps />
               Cargar ventas
             </NuxtLink>
+            <button
+              v-if="isPendingShown"
+              class="flex gap-1 items-center btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
+              @click="stockList($dayjs(orderDates[index]).format('YYYY-MM-DD'))"
+            >
+              <IconParkOutlineTransactionOrder />
+              Calcular lista de compra
+            </button>
           </div>
           <div class="flex flex-col gap-3 p-2 py-4 bg-secondary border-b">
             <button class="flex flex-col items-start w-full" @click="showDetails(order.id)">
@@ -213,11 +213,11 @@ async function markAsDelivered(orderId) {
   }
 }
 
-function stockList() {
+function stockList(date) {
   // Check sellsDetails is defined
   if (!ordersStockDetails.value) return;
 
-  ordersStockDetails.value.showStockList(pendingOrders.value);
+  ordersStockDetails.value.showStockList(pendingOrders.value, date);
 }
 
 async function loadMoreOrders() {
