@@ -359,7 +359,6 @@ function createBestDayOfSellsRanking(sells: any, dayjs: any) {
   const dayOfSellsTable: any = [];
   // Filter sells in week
   sells.forEach((sell: any) => {
-    console.log("sell: ", sell.date.toDate());
     const sellDate = dayjs(sell.date.toDate(), { format: "YYYY-MM-DD" });
 
     // Check if day exist in the dayOfSellsTable variable
@@ -417,7 +416,6 @@ async function addDailySell(totals: any, db: any) {
     // Create a ref to the new collection "dailySells"
     // Handle recurrent payments
     const newProduct = await addDoc(collection(db, `dailySellTotals`), totals);
-
     console.log("newProduct.id: ", newProduct.id);
   } catch (error) {
     useToast(
@@ -437,8 +435,6 @@ function createProductsRanking(sells: any, dayjs: any) {
 
   // Create unique list of days
   const days = [...new Set(sells.map((sell: any) => dayjs(sell.date.toDate()).format("YYYY-MM-DD")))];
-
-  console.log(days);
 
   // Sort days
   days.sort((a, b) => dayjs(a).unix() - dayjs(b).unix());
@@ -564,7 +560,7 @@ function createWeeklyProductCostAndEarnings(sells: any, products: any, minDate: 
 
     // If dates are not valid, continue
     if (!dates) {
-      console.log("Dates are not valid");
+      console.error("Dates are not valid");
       continue;
     }
 
@@ -644,7 +640,6 @@ async function addProductPriceComparison(totals: any, db: any) {
     // Create a ref to the new collection "dailySells"
     // Handle recurrent payments
     const weeklyComparison = await addDoc(collection(db, "weeklyProductPriceComparison"), totals);
-
     console.log("weeklyComparison.id: ", weeklyComparison.id);
   } catch (error) {
     console.error("Error adding document: ", error);

@@ -13,7 +13,8 @@ import {
   serverTimestamp,
   limit,
   startAfter,
-  Timestamp
+  Timestamp,
+  onSnapshot
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
@@ -187,20 +188,21 @@ export const useOrdersStore = defineStore("orders", {
         return null;
       }
       try {
-        const querySnapshot = await getDocs(
-          query(
-            collection(db, "pedido"),
-            where("orderStatus", "in", ["pendiente", "pendiente-modificado"]),
-            orderBy("shippingDate", "asc")
-          )
+        const q = query(
+          collection(db, "pedido"),
+          where("orderStatus", "in", ["pendiente", "pendiente-modificado"]),
+          orderBy("shippingDate", "asc")
         );
-        const orders = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return { ...data, id: doc.id, shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD") };
-        });
 
-        this.$state.pendingOrders = orders;
-        this.$state.pendingOrdersFetched = true;
+        onSnapshot(q, (querySnapshot) => {
+          const orders = querySnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return { ...data, id: doc.id, shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD") };
+          });
+
+          this.$state.pendingOrders = orders;
+          this.$state.pendingOrdersFetched = true;
+        });
       } catch (error) {
         console.error(error);
         return null;
@@ -229,7 +231,6 @@ export const useOrdersStore = defineStore("orders", {
         if (startAfterLastVisible) {
           const lastVisible = this.$state.lastVisible;
 
-          console.log(lastVisible);
           reference = query(
             collection(db, "pedido"),
             where("orderStatus", "in", ["entregado", "cancelado"]),
