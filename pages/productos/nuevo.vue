@@ -72,6 +72,40 @@
       validation="required|numeric|min:1"
       v-model="form.price"
     />
+    <FormKit
+      type="select"
+      name="category"
+      :options="['frutas', 'verduras', 'otro']"
+      label-class="font-medium"
+      messages-class="text-red-500 text-[0.75rem]"
+      input-class="w-full capitalize"
+      outer-class="w-full"
+      label="Categoría"
+      placeholder="Selecciona la categoría del producto"
+      validation="required"
+      v-model="form.category"
+    />
+    <div class="flex flex-col gap-1">
+      <span class="font-medium">¿Disponible?</span>
+      <div class="flex gap-2">
+        <button
+          @click="form.isAvailable = true"
+          type="button"
+          class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+          :class="{ ['bg-primary text-white']: form.isAvailable, ['bg-secondary']: !form.isAvailable }"
+        >
+          Sí
+        </button>
+        <button
+          @click="form.isAvailable = false"
+          type="button"
+          class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+          :class="{ ['bg-primary text-white']: !form.isAvailable, ['bg-secondary']: form.isAvailable }"
+        >
+          No
+        </button>
+      </div>
+    </div>
     <div v-show="submitting" class="btn bg-primary text-white text-center">loading...</div>
     <FormKit
       v-show="!submitting"
@@ -118,7 +152,9 @@ const form = ref({
   description: "",
   unit: "Kg",
   step: 0.5,
-  price: 0
+  price: 0,
+  category: "otro",
+  isAvailable: true
 });
 
 // ----- Define Methods -------
@@ -138,7 +174,9 @@ async function submitHandler() {
     description: "",
     unit: "Kg",
     step: 0.5,
-    price: 0
+    price: 0,
+    category: "otro",
+    isAvailable: true
   };
 
   submitted.value = true;

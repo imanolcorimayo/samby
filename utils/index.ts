@@ -30,14 +30,20 @@ export const validateSell = (sell: any) => {
   // Validate quality
   if (!sell.quality) return false;
 
-  // Validate is has buyingPrice and it's a float number
+  // Validate if has buyingPrice and it's a float number
   if (!sell.buyingPrice || isNaN(sell.buyingPrice)) return false;
 
-  // Validate is has sellingPrice and it's a float number
+  // Validate if has sellingPrice and it's a float number
   if (!sell.sellingPrice || isNaN(sell.sellingPrice)) return false;
 
-  // Validate is has date and validate date format using dayjs
+  // Validate if has date and validate date format using dayjs
   if (!sell.date || !$dayjs(sell.date, { format: "YYYY-MM-DD" }).isValid()) return false;
+
+  // Validate if has category
+  if (!sell.category) return false;
+
+  // Validate if has "isAvailable" and it's a boolean
+  if (typeof sell.isAvailable !== "boolean") return false;
 
   return true;
 };

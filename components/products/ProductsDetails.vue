@@ -82,6 +82,40 @@
           validation="required|numeric|min:1"
           v-model="form.price"
         />
+        <FormKit
+          type="select"
+          name="category"
+          :options="['frutas', 'verduras', 'otro']"
+          label-class="font-medium"
+          messages-class="text-red-500 text-[0.75rem]"
+          input-class="w-full capitalize"
+          outer-class="w-full"
+          label="Categoría"
+          placeholder="Selecciona la categoría del producto"
+          validation="required"
+          v-model="form.category"
+        />
+        <div class="flex flex-col gap-1">
+          <span class="font-medium">¿Disponible?</span>
+          <div class="flex gap-2">
+            <button
+              @click="form.isAvailable = true"
+              type="button"
+              class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+              :class="{ ['bg-primary text-white']: form.isAvailable, ['bg-secondary']: !form.isAvailable }"
+            >
+              Sí
+            </button>
+            <button
+              @click="form.isAvailable = false"
+              type="button"
+              class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+              :class="{ ['bg-primary text-white']: !form.isAvailable, ['bg-secondary']: form.isAvailable }"
+            >
+              No
+            </button>
+          </div>
+        </div>
       </FormKit>
     </template>
     <template #footer>
@@ -124,7 +158,9 @@ const form = ref({
   description: "",
   unit: "Kg",
   step: 0.5,
-  price: 0
+  price: 0,
+  category: "otro",
+  isAvailable: false
 });
 
 // Refs
@@ -159,7 +195,9 @@ async function updateProduct() {
     form.value.description === currentProduct.value.description &&
     form.value.unit === currentProduct.value.unit &&
     parseFloat(form.value.step) === parseFloat(currentProduct.value.step) &&
-    form.value.price === currentProduct.value.price
+    form.value.price === currentProduct.value.price &&
+    form.value.category === currentProduct.value.category &&
+    form.value.isAvailable === currentProduct.value.isAvailable
   ) {
     submitting.value = false;
     useToast("error", "No se han realizado cambios en el producto.");
@@ -173,7 +211,9 @@ async function updateProduct() {
       description: form.value.description,
       unit: form.value.unit,
       step: parseFloat(form.value.step),
-      price: parseFloat(form.value.price)
+      price: parseFloat(form.value.price),
+      category: form.value.category,
+      isAvailable: form.value.isAvailable
     },
     currentProduct.value.id
   );
@@ -265,7 +305,9 @@ const showModal = (productId) => {
     description: product.description,
     unit: product.unit,
     step: product.step ? product.step : 0.5,
-    price: product.price ? product.price : 0
+    price: product.price ? product.price : 0,
+    category: product.category ? product.category : "otro",
+    isAvailable: Object.hasOwn(product, "isAvailable") ? product.isAvailable : false
   };
 
   // Show modal

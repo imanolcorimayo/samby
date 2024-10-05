@@ -2,7 +2,7 @@
   <div>
     <NuxtLoadingIndicator color="#a0a4d9" :height="10" :throttle="0" :rtl="false" :continuous="true" />
     <NuxtLayout>
-      <NuxtPage/>
+      <NuxtPage />
     </NuxtLayout>
   </div>
 </template>

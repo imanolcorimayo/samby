@@ -24,10 +24,13 @@
               <div class="flex flex-col">
                 <span class="text-sm">Unidad: {{ product.unit }}</span>
                 <span class="text-sm">Salto: {{ product.step ?? 0.5 }}</span>
+                <span class="text-sm capitalize">Categoría: {{ product.category ?? "Otro" }}</span>
               </div>
             </div>
-            <div>
+            <div class="flex flex-col justify-between items-end">
               <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
+              <span v-if="product.isAvailable" class="text-sm font-medium text-success">Disponible</span>
+              <span v-else class="text-sm font-medium text-danger">No disponible</span>
             </div>
           </div>
         </div>
