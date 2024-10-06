@@ -71,6 +71,7 @@
                     :class="{
                       'bg-green-50 text-green-800 ring-green-600/20': order.orderStatus == 'entregado',
                       'bg-red-50 text-red-800 ring-red-600/20': order.orderStatus == 'cancelado',
+                      'bg-blue-50 text-blue-800 ring-blue-600/20': order.orderStatus == 'pendiente-de-confirmacion',
                       'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ['pendiente', 'pendiente-modificado'].includes(
                         order.orderStatus
                       )

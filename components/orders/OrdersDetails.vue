@@ -1,7 +1,7 @@
 <template>
   <ModalStructure ref="mainModal">
     <template #header>
-      <div class="flex justify-between items-center w-full">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-3">
         <div class="flex flex-col gap-2 w-full">
           <div class="flex flex-col cursor-pointer w-full">
             <span class="font-bold text-xl">Detalles del pedido</span>
@@ -11,10 +11,11 @@
           </div>
         </div>
         <span
-          class="h-fit inline-flex items-center rounded-md px-2 py-1 font-semibold ring-1 ring-inset"
+          class="h-fit inline-flex items-center rounded-md px-2 py-1 font-semibold ring-1 ring-inset text-center text-nowrap"
           :class="{
             'bg-green-50 text-green-800 ring-green-600/20': currentOrder.orderStatus == 'entregado',
             'bg-red-50 text-red-800 ring-red-600/20': currentOrder.orderStatus == 'cancelado',
+            'bg-blue-50 text-blue-800 ring-blue-600/20': currentOrder.orderStatus == 'pendiente-de-confirmacion',
             'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ['pendiente', 'pendiente-modificado'].includes(
               currentOrder.orderStatus
             )

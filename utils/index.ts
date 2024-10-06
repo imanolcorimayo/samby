@@ -127,7 +127,7 @@ export const formattedDate = (date: string) => {
 
 export const formatStatus = (status: string) => {
   // Replace "-" with " " and capitalize the all first letters
-  return status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  return status.replaceAll("-", " ").replaceAll(/\b\w/g, (l) => l.toUpperCase());
 };
 
 export const createMessage = (products: any, client: any, shippingPrice: any, totalWithShipping: any) => {

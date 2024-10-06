@@ -167,13 +167,6 @@ export const useOrdersStore = defineStore("orders", {
         return null;
       }
     },
-    clearLastInsertedOrder() {
-      this.$state.lastInsertedOrder = {
-        order: {},
-        orderId: false,
-        createdAt: false
-      };
-    },
     async fetchPendingOrders() {
       const db = useFirestore();
       const user = useCurrentUser();
@@ -190,7 +183,7 @@ export const useOrdersStore = defineStore("orders", {
       try {
         const q = query(
           collection(db, "pedido"),
-          where("orderStatus", "in", ["pendiente", "pendiente-modificado"]),
+          where("orderStatus", "in", ["pendiente", "pendiente-modificado", "pendiente-de-confirmacion"]),
           orderBy("shippingDate", "asc")
         );
 
