@@ -14,7 +14,7 @@
           class="h-fit inline-flex items-center rounded-md px-2 py-1 font-semibold ring-1 ring-inset text-center text-nowrap"
           :class="{
             'bg-green-50 text-green-800 ring-green-600/20': currentOrder.orderStatus == 'entregado',
-            'bg-red-50 text-red-800 ring-red-600/20': currentOrder.orderStatus == 'cancelado',
+            'bg-red-50 text-red-800 ring-red-600/20': ['cancelado', 'rechazado'].includes(currentOrder.orderStatus),
             'bg-blue-50 text-blue-800 ring-blue-600/20': currentOrder.orderStatus == 'pendiente-de-confirmacion',
             'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ['pendiente', 'pendiente-modificado'].includes(
               currentOrder.orderStatus
@@ -139,7 +139,7 @@
       >
         <LucideEdit /> Modificar
       </button>
-      <div class="flex justify-between gap-1">
+      <div class="flex justify-between gap-1" v-if="currentOrder.orderStatus !== 'pendiente-de-confirmacion'">
         <div
           v-if="submitting && !isOrderModified && isEditable"
           class="flex-1 flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap"
@@ -148,7 +148,7 @@
         </div>
         <button
           v-else-if="!isOrderModified && isEditable"
-          @click="markAsCancelled()"
+          @click="updateStatus('cancelado')"
           class="flex-1 flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
         >
           <IcRoundArchive /> Cancelar venta
@@ -161,10 +161,38 @@
         </div>
         <button
           v-else-if="!isOrderModified && isEditable"
-          @click="markAsDelivered(currentOrder.id)"
+          @click="updateStatus('entregado')"
           class="flex-1 flex items-center justify-center gap-1 btn bg-primary text-white text-nowrap"
         >
           <IconParkOutlineCheckOne /> Marcar entregado
+        </button>
+      </div>
+      <div class="flex justify-between gap-1" v-else>
+        <div
+          v-if="submitting && !isOrderModified && isEditable"
+          class="flex-1 flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap"
+        >
+          loading...
+        </div>
+        <button
+          v-else-if="!isOrderModified && isEditable"
+          @click="updateStatus('rechazado')"
+          class="flex-1 flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
+        >
+          <IcRoundArchive /> Rechazar pedido
+        </button>
+        <div
+          v-if="submitting && !isOrderModified && isEditable"
+          class="flex-1 flex items-center justify-center gap-1 btn bg-primary text-white text-nowrap"
+        >
+          loading...
+        </div>
+        <button
+          v-else-if="!isOrderModified && isEditable"
+          @click="updateStatus('pendiente')"
+          class="flex-1 flex items-center justify-center gap-1 btn bg-primary text-white text-nowrap"
+        >
+          <IconParkOutlineCheckOne /> Aceptar pedido
         </button>
       </div>
       <div class="flex justify-between gap-1">
@@ -234,11 +262,17 @@ const autocompleteProducts = computed(() => {
   });
 });
 const isEditable = computed(() => {
-  return !["entregado", "cancelado"].includes(currentOrder.value.orderStatus);
+  return !["entregado", "cancelado", "rechazado"].includes(currentOrder.value.orderStatus);
 });
 
 // ----- Define Methods -----
-async function markAsCancelled() {
+async function updateStatus(status) {
+  // Check the valid status
+  if (!["pendiente", "pendiente-modificado", "entregado", "cancelado", "rechazado"].includes(status)) {
+    useToast(ToastEvents.error, "El estado seleccionado no es válido, por favor intenta nuevamente");
+    return;
+  }
+
   // If submitting, do nothing
   if (submitting.value) return;
 
@@ -254,14 +288,17 @@ async function markAsCancelled() {
   }
 
   // Update the order
-  const orderUpdated = await ordersStore.updateStatusOrder(currentOrder.value.id, "cancelado");
+  const orderUpdated = await ordersStore.updateStatusOrder(currentOrder.value.id, status);
 
   if (orderUpdated) {
-    useToast(ToastEvents.success, "Pedido cancelado correctamente");
+    useToast(ToastEvents.success, `Pedido marcado como "${status}" correctamente`);
     mainModal.value.closeModal();
     submitting.value = false;
   } else {
-    useToast(ToastEvents.error, "Hubo un error al cancelar el pedido, por favor intenta nuevamente");
+    useToast(
+      ToastEvents.error,
+      `Hubo un error marcar el pedido como "${status}" el pedido, por favor intenta nuevamente`
+    );
     submitting.value = false;
   }
 }

@@ -39,12 +39,6 @@ export const validateSell = (sell: any) => {
   // Validate if has date and validate date format using dayjs
   if (!sell.date || !$dayjs(sell.date, { format: "YYYY-MM-DD" }).isValid()) return false;
 
-  // Validate if has category
-  if (!sell.category) return false;
-
-  // Validate if has "isAvailable" and it's a boolean
-  if (typeof sell.isAvailable !== "boolean") return false;
-
   return true;
 };
 
@@ -70,6 +64,12 @@ export const validateProduct = (product: any) => {
   if (!product.price || isNaN(product.price)) {
     return false;
   }
+
+  // Validate if has category
+  if (!product.category) return false;
+
+  // Validate if has "isAvailable" and it's a boolean
+  if (typeof product.isAvailable !== "boolean") return false;
 
   return true;
 };

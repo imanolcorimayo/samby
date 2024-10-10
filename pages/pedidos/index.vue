@@ -62,15 +62,23 @@
           <div class="flex flex-col gap-3 p-2 py-4 bg-secondary border-b">
             <button class="flex flex-col items-start w-full" @click="showDetails(order.id)">
               <div class="flex justify-between w-full">
-                <span class="flex items-center gap-3 font-medium"
-                  ><MingcuteUser4Fill class="text-[2rem]" />{{ order.client.clientName }}</span
-                >
+                <div class="flex flex-col items-start">
+                  <span
+                    class="flex items-center gap-1 text-sm text-blue-700 font-medium"
+                    v-if="order.client.fromEmprendeVerde"
+                  >
+                    <PhSealCheckDuotone class="text-blue-700" /> Usuario EmprendeVerde
+                  </span>
+                  <span class="flex items-center gap-3 font-medium"
+                    ><MingcuteUser4Fill class="text-[2rem]" />{{ order.client.clientName }}</span
+                  >
+                </div>
                 <div class="flex items-center gap-2">
                   <span
                     class="inline-flex items-center rounded-md px-2 py-1 text-sm font-semibold ring-1 ring-inset"
                     :class="{
                       'bg-green-50 text-green-800 ring-green-600/20': order.orderStatus == 'entregado',
-                      'bg-red-50 text-red-800 ring-red-600/20': order.orderStatus == 'cancelado',
+                      'bg-red-50 text-red-800 ring-red-600/20': ['cancelado', 'rechazado'].includes(order.orderStatus),
                       'bg-blue-50 text-blue-800 ring-blue-600/20': order.orderStatus == 'pendiente-de-confirmacion',
                       'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ['pendiente', 'pendiente-modificado'].includes(
                         order.orderStatus
@@ -102,6 +110,7 @@
                 <button
                   @click="markAsDelivered(order.id)"
                   class="flex items-center gap-1 btn-sm bg-primary text-white text-sm"
+                  v-if="order.orderStatus !== 'pendiente-de-confirmacion'"
                 >
                   <IconParkOutlineCheckOne /> Marcar entregado
                 </button>
@@ -124,6 +133,7 @@
 </template>
 
 <script setup>
+import PhSealCheckDuotone from "~icons/ph/seal-check-duotone";
 import CarbonSalesOps from "~icons/carbon/sales-ops";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import IcRoundPlus from "~icons/ic/round-plus";

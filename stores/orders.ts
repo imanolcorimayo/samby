@@ -138,20 +138,7 @@ export const useOrdersStore = defineStore("orders", {
           userUid: user.value.uid
         });
 
-        // Add order to orders
-        this.$state.pendingOrders.push({
-          ...orderObject,
-          id: newOrder.id,
-          shippingDate: $dayjs(orderObject.shippingDate.toDate()).format("YYYY-MM-DD")
-        });
-
-        // Sort orders by shipping date (ascending order)
-        this.$state.pendingOrders = this.$state.pendingOrders.sort(
-          // @ts-ignore
-          (a: any, b: any) => $dayjs(a.shippingDate).toDate() - $dayjs(b.shippingDate).toDate()
-        );
-
-        // Update last inserted order
+        // Update last inserted order to be shown in the confirmation page
         this.$state.lastInsertedOrder = {
           order: { ...orderObject, id: newOrder.id },
           createdAt: $dayjs(),
@@ -226,7 +213,7 @@ export const useOrdersStore = defineStore("orders", {
 
           reference = query(
             collection(db, "pedido"),
-            where("orderStatus", "in", ["entregado", "cancelado"]),
+            where("orderStatus", "in", ["entregado", "cancelado", "rechazado"]),
             orderBy("shippingDate", "desc"),
             limit(20),
             startAfter(lastVisible)
@@ -234,7 +221,7 @@ export const useOrdersStore = defineStore("orders", {
         } else {
           reference = query(
             collection(db, "pedido"),
-            where("orderStatus", "in", ["entregado", "cancelado"]),
+            where("orderStatus", "in", ["entregado", "cancelado", "rechazado"]),
             orderBy("shippingDate", "desc"),
             limit(20)
           );
@@ -340,16 +327,14 @@ export const useOrdersStore = defineStore("orders", {
         // Check if it's in the pending orders
         const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
 
-        // Move from pending orders to the corresponding status
-        let order = false;
-        if (orderIndex > -1) {
-          order = this.$state.pendingOrders[orderIndex];
+        if (orderIndex > -1 && ["rechazado", "cancelado", "entregado"].includes(status)) {
+          // Move from pending orders to the corresponding status
+          const order = this.$state.pendingOrders[orderIndex];
           this.$state.pendingOrders.splice(orderIndex, 1);
-        }
 
-        if (order && typeof order === "object") {
-          // @ts-ignore
-          this.$state.orders.push({ ...order, orderStatus: status });
+          if (order && typeof order === "object") {
+            this.$state.orders.push({ ...order, orderStatus: status });
+          }
         }
 
         return true;

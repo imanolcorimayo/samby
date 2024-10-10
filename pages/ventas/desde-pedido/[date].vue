@@ -212,6 +212,8 @@ async function uploadAllSales() {
 
   // Validate all fields are fulfilled
   for (const prodId in productForm.value) {
+    // Ensure buying price is a number
+    productForm.value[prodId].buyingPrice = parseFloat(productForm.value[prodId].buyingPrice);
     const isValid = validateSell(productForm.value[prodId]);
 
     if (!isValid) {
