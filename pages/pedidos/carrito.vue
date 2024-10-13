@@ -48,7 +48,7 @@
     <div class="flex flex-col gap-2">
       <span class="font-semibold">Agrega nuevo cliente o selecciona un existente</span>
       <Autocomplete
-        :items="clients"
+        :items="formattedClients"
         property="clientName"
         subItemProperty="address"
         placeholder="Busca con el nombre del cliente"
@@ -162,6 +162,14 @@ const orderCreated = ref(false);
 
 // ------- Define Computed --------
 const totalWithShipping = computed(() => totalAmount.value + (shippingPrice.value ?? 0));
+const formattedClients = computed(() => {
+  return clients.value.map((cl) => {
+    return {
+      ...cl,
+      clientName: `${cl.clientName} ${cl.fromEmprendeVerde ? "**Cliente Emprende Verde**" : ""}`
+    };
+  });
+});
 
 // ------- Define Methods --------
 function saveClient() {
@@ -335,7 +343,8 @@ function selectClient(clientId) {
   client.value = {
     clientName: selectedClient.clientName,
     phone: selectedClient.phone,
-    address: selectedClient.address
+    address: selectedClient.address,
+    fromEmprendeVerde: Boolean(selectedClient.fromEmprendeVerde)
   };
 
   clientSelected.value = true;

@@ -16,6 +16,9 @@
           @click="showClientDetails(client.id)"
         >
           <div class="flex flex-col">
+            <span class="flex items-center gap-1 text-sm text-blue-700 font-medium" v-if="client.fromEmprendeVerde">
+              <PhSealCheckDuotone class="text-blue-700" /> Usuario EmprendeVerde
+            </span>
             <span class="font-semibold">{{ client.clientName }}</span>
             <span class="text-sm">Dirección: {{ client.address }}</span>
             <span class="text-sm">Teléfono: {{ client.phone }}</span>
@@ -29,6 +32,7 @@
 </template>
 
 <script setup>
+import PhSealCheckDuotone from "~icons/ph/seal-check-duotone";
 import IcRoundPlus from "~icons/ic/round-plus";
 
 // ----- Define Pinia Vars --------
