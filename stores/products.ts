@@ -68,6 +68,18 @@ export const useProductsStore = defineStore("products", {
         return null;
       }
 
+      // Safe data handling - Fix step and price to float
+      product.step = parseFloat(product.step);
+      product.price = parseFloat(product.price);
+
+      // Validate product object
+      const isProductValid = validateProduct(product);
+
+      if (!isProductValid) {
+        useToast(ToastEvents.error, "El producto no es válido, contactate con el administrador");
+        return null;
+      }
+
       try {
         // Handle recurrent payments
         const newProduct = await addDoc(collection(db, "producto"), {

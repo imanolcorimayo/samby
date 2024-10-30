@@ -141,7 +141,7 @@
             <span class="text-gray-500">Porcentaje de ganancia basado en la comparación entre costos y ventas</span>
           </div>
           <div>
-            <canvas id="earningsP" width="400" height="200"></canvas>
+            <canvas id="earningsP" width="400" :height="width >= 768 ? '200' : '400'"></canvas>
           </div>
         </div>
         <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
@@ -203,6 +203,7 @@
 
 <script setup>
 import { Chart } from "chart.js/auto";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import isBetween from "dayjs/plugin/isBetween"; // ES 2015
 import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
 import PhTrendUpBold from "~icons/ph/trend-up-bold";
@@ -301,25 +302,30 @@ function createEarningsP() {
     dailySellsInWeek.forEach((daySell) => {
       // Update costs and sells
       costsInWeek += daySell.totalBuying;
-      sellsAmountInWeek += daySell.totalSelling;
+      sellsAmountInWeek += daySell.totalSelling - daySell.totalBuying;
     });
 
-    const totalProfitInWeek = costsInWeek ? ((sellsAmountInWeek - costsInWeek) * 100) / costsInWeek : 0;
+    const totalProfitInWeek = costsInWeek ? (sellsAmountInWeek * 100) / costsInWeek : 0;
 
     totalCosts.push(costsInWeek);
     totalSells.push(sellsAmountInWeek);
     totalProfit.push(totalProfitInWeek.toFixed(1));
   }
 
+  // If screen is small, hide Y labels
+  const displayYLabels = width.value >= 768;
+
   // Data Eagnings percentage
   const data = {
     labels: labels,
     datasets: [
       {
+        type: "line",
         label: "% Ganancia",
         data: totalProfit,
         fill: false,
         borderColor: "rgb(75, 192, 192)",
+        backgroundColor: "rgb(75, 192, 192, 0.2)",
         tension: 0.1,
         yAxisID: "percentage"
       },
@@ -329,7 +335,10 @@ function createEarningsP() {
         fill: false,
         tension: 0.1,
         yAxisID: "y",
-        borderColor: "rgb(255, 99, 132)"
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgb(255, 99, 132)",
+        borderRadius: 5,
+        barThickness: displayYLabels ? 25 : 13 // Fixed width of bars in pixels
       },
       {
         label: "Total en Ventas",
@@ -337,13 +346,16 @@ function createEarningsP() {
         fill: false,
         tension: 0.1,
         yAxisID: "y",
-        borderColor: "rgb(54, 162, 235)"
+        borderColor: "rgb(54, 162, 235)",
+        backgroundColor: "rgb(54, 162, 235)",
+        borderRadius: 5,
+        barThickness: displayYLabels ? 25 : 13 // Fixed width of bars in pixels
       }
     ]
   };
 
   const config = {
-    type: "line",
+    type: "bar",
     data: data,
     options: {
       responsive: true,
@@ -351,13 +363,19 @@ function createEarningsP() {
         y: {
           type: "linear",
           position: "left",
+          stacked: true,
           ticks: {
             // Include a dollar sign in the ticks
             callback: function (value, index, ticks) {
               const million = formatToMillion(value);
 
               return million;
-            }
+            },
+            display: displayYLabels
+          },
+          grid: {
+            display: true,
+            drawBorder: false
           }
         },
         percentage: {
@@ -365,12 +383,22 @@ function createEarningsP() {
             // Include a dollar sign in the ticks
             callback: function (value, index, ticks) {
               return value.toFixed(1) + "%";
-            }
+            },
+            display: displayYLabels
           },
           type: "linear",
           position: "right",
           min: 0,
-          max: 100
+          max: 100,
+          grid: {
+            display: false
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          stacked: true
         }
       },
       // Add % to the tooltip
@@ -386,9 +414,27 @@ function createEarningsP() {
               }
             }
           }
+        },
+        datalabels: {
+          // Configuration for showing values on each point/bar
+          display: true,
+          color: "#333333", // Customize color as needed
+          align: "end", // Position the labels
+          anchor: "end", // Anchor point for labels
+          font: {
+            weight: "bold"
+          },
+          formatter: function (value, context) {
+            if (context.datasetIndex === 0) {
+              return value + "%"; // Format for percentage dataset
+            }
+
+            return formatPrice(value); // Format for other datasets
+          }
         }
       }
-    }
+    },
+    plugins: [ChartDataLabels] // Register the dataLabels plugin
   };
 
   // Create earnings chart

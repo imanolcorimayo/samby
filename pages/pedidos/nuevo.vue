@@ -147,6 +147,9 @@ onMounted(() => {
 
 // ----- Define Methods -------
 function manageProduct(productId, action, productStep = 0.5) {
+  // Convert productStep to float for safety
+  productStep = parseFloat(productStep);
+
   // Clear the previous timeout if user clicks again within the delay
   if (actionTimeout.value) {
     clearTimeout(actionTimeout.value);
@@ -190,6 +193,9 @@ function startTimerToSaveShoppingCart() {
 }
 
 function selectProduct(id, productStep = 0.5) {
+  // Convert productStep to float for safety
+  productStep = parseFloat(productStep);
+
   // Switch the one selected
   selectedProduct.value[id] = true;
 
