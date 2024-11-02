@@ -140,6 +140,7 @@ export const useSellsStore = defineStore("sells", {
       }
     },
     async updateSell(sell: any, sellId: string) {
+      const { $dayjs } = useNuxtApp();
       const db = useFirestore();
       const sellReference = doc(db, "venta", sellId);
       const sellIndex = this.$state.sells.findIndex((el: any) => el.id == sellId);
@@ -154,8 +155,20 @@ export const useSellsStore = defineStore("sells", {
 
       try {
         // Update doc using paymentRef only if it's not one time payment
-        await updateDoc(sellReference, sell);
-        this.$state.sells[sellIndex] = Object.assign({}, { ...this.$state.sells[sellIndex], ...sell });
+        await updateDoc(sellReference, {
+          ...sell,
+          date: Timestamp.fromDate($dayjs(sell.date).toDate()),
+          formattedDate: $dayjs(sell.date).format("DD/MM/YYYY")
+        });
+        this.$state.sells[sellIndex] = Object.assign(
+          {},
+          {
+            ...this.$state.sells[sellIndex],
+            ...sell,
+            date: Timestamp.fromDate($dayjs(sell.date).toDate()),
+            formattedDate: $dayjs(sell.date).format("DD/MM/YYYY")
+          }
+        );
 
         return true;
       } catch (error) {

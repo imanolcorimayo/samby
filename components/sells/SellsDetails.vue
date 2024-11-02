@@ -153,6 +153,9 @@ import FluentStarHalf12Regular from "~icons/fluent/star-half-12-regular";
 import IconoirStarSolid from "~icons/iconoir/star-solid";
 import AkarIconsCircleXFill from "~icons/akar-icons/circle-x-fill";
 
+// ----- Define Useful Properties -----
+const { $dayjs } = useNuxtApp();
+
 // ----- Define Pinia Vars -----
 const sellsStore = useSellsStore();
 const { getSells: sells, areSellsFetched } = storeToRefs(sellsStore);
@@ -203,7 +206,7 @@ async function updateSell() {
     form.value.quality === currentSell.value.quality &&
     form.value.buyingPrice === currentSell.value.buyingPrice &&
     form.value.sellingPrice === currentSell.value.sellingPrice &&
-    form.value.date === currentSell.value.date
+    form.value.date === $dayjs(currentSell.value.date.toDate()).format("YYYY-MM-DD")
   ) {
     submitting.value = false;
     useToast("error", "No se han realizado cambios en la venta.");
@@ -316,8 +319,10 @@ const showModal = (sellId) => {
     quality: sell.quality ? sell.quality : false,
     buyingPrice: sell.buyingPrice,
     sellingPrice: sell.sellingPrice,
-    date: sell.date
+    date: $dayjs(sell.date.toDate()).format("YYYY-MM-DD")
   };
+
+  console.log("form", form.value);
 
   // Get current product
   const product = products.value.find((product) => product.id === sell.product.id);
