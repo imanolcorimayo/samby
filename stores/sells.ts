@@ -12,10 +12,10 @@ import {
   orderBy,
   limit,
   startAfter,
-  Timestamp
+  Timestamp,
+  serverTimestamp
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
-import { serverTimestamp } from "firebase/database";
 
 const defaultObject = {
   fetched: false,
