@@ -62,7 +62,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      env: process.env.ENVIRONMENT
+      env: process.env.ENVIRONMENT,
+      cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+      cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET
     }
   }
 });

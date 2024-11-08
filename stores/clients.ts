@@ -34,6 +34,12 @@ export const useClientsStore = defineStore("clients", {
         return;
       }
 
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
+
       const clients: Array<any> = [];
       // Index store will manage all logic needed in the app to run
       // First check if there is a user
@@ -47,7 +53,9 @@ export const useClientsStore = defineStore("clients", {
 
       // Connect with firebase and get payments structure
       const db = useFirestore();
-      const querySnapshot = await getDocs(query(collection(db, "cliente")));
+      const querySnapshot = await getDocs(
+        query(collection(db, "cliente"), where("businessId", "==", businessId.value))
+      );
 
       querySnapshot.forEach((doc) => {
         clients.push({
@@ -62,6 +70,12 @@ export const useClientsStore = defineStore("clients", {
     async addClient(client: any) {
       const db = useFirestore();
       const user = useCurrentUser();
+
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
 
       if (!user || !user.value) {
         return null;
@@ -79,11 +93,13 @@ export const useClientsStore = defineStore("clients", {
         // Handle recurrent payments
         const newClient = await addDoc(collection(db, "cliente"), {
           ...client,
+          businessId: businessId.value,
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
 
         this.$state.clients.push({
+          businessId: businessId.value,
           id: newClient.id,
           ...client
         });

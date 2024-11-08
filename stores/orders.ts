@@ -87,8 +87,13 @@ export const useOrdersStore = defineStore("orders", {
     async placeOrder(order: any) {
       const db = useFirestore();
       const user = useCurrentUser();
-
       const { $dayjs } = useNuxtApp();
+
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
 
       if (!user || !user.value) {
         return null;
@@ -120,6 +125,7 @@ export const useOrdersStore = defineStore("orders", {
         // Create object to be inserted
         const orderObject = {
           ...order,
+          businessId: businessId.value,
           shippingDate: Timestamp.fromDate(shippingTime),
           createdAt: serverTimestamp(),
           userUid: user.value.uid
@@ -159,6 +165,13 @@ export const useOrdersStore = defineStore("orders", {
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
 
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+
+      if (!businessId.value) {
+        return null;
+      }
+
       // If data is already fetched, return
       if (this.$state.pendingOrdersFetched) {
         return;
@@ -171,6 +184,7 @@ export const useOrdersStore = defineStore("orders", {
         const q = query(
           collection(db, "pedido"),
           where("orderStatus", "in", ["pendiente", "pendiente-modificado", "pendiente-de-confirmacion"]),
+          where("businessId", "==", businessId.value),
           orderBy("shippingDate", "asc")
         );
 
@@ -193,6 +207,12 @@ export const useOrdersStore = defineStore("orders", {
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
 
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
+
       // If data is already fetched, return
       if (this.$state.ordersFetched && !startAfterLastVisible) {
         return;
@@ -214,6 +234,7 @@ export const useOrdersStore = defineStore("orders", {
           reference = query(
             collection(db, "pedido"),
             where("orderStatus", "in", ["entregado", "cancelado", "rechazado"]),
+            where("businessId", "==", businessId.value),
             orderBy("shippingDate", "desc"),
             limit(20),
             startAfter(lastVisible)
@@ -222,6 +243,7 @@ export const useOrdersStore = defineStore("orders", {
           reference = query(
             collection(db, "pedido"),
             where("orderStatus", "in", ["entregado", "cancelado", "rechazado"]),
+            where("businessId", "==", businessId.value),
             orderBy("shippingDate", "desc"),
             limit(20)
           );

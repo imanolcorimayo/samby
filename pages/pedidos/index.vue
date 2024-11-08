@@ -2,7 +2,6 @@
   <div class="flex flex-col gap-[2rem] w-full">
     <OrdersDetails ref="ordersDetails" />
     <OrdersStockDetails ref="ordersStockDetails" />
-    <Navigator v-if="userRole === 'admin'" />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de pedidos</h1>

@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col gap-[2rem] w-full">
-    <Navigator />
     <div class="flex flex-col gap-4">
       <div class="flex justify-between items-center">
         <h1 class="font-semibold text-start">Resumen Financiero</h1>

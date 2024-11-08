@@ -1,7 +1,6 @@
 <template>
   <div class="flex flex-col gap-[2rem] w-full">
     <SellsDetails ref="sellsDetails" />
-    <Navigator />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de ventas</h1>

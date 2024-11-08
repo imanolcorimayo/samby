@@ -27,6 +27,9 @@ logs
 # VSCode
 .vscode
 
+# Yarn
+yarn.lock
+
 # Firebase service account
 /scripts/*.json
 /scripts/update-privileges-to-users*.js

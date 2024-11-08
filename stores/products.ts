@@ -38,7 +38,12 @@ export const useProductsStore = defineStore("products", {
       // Index store will manage all logic needed in the app to run
       // First check if there is a user
       const user = useCurrentUser();
-      const { $dayjs } = useNuxtApp();
+
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
 
       // Safe check, but already handled with middleware
       if (!user || !user.value) {
@@ -48,7 +53,9 @@ export const useProductsStore = defineStore("products", {
 
       // Connect with firebase and get payments structure
       const db = useFirestore();
-      const querySnapshot = await getDocs(query(collection(db, "producto")));
+      const querySnapshot = await getDocs(
+        query(collection(db, "producto"), where("businessId", "==", businessId.value))
+      );
 
       querySnapshot.forEach((doc) => {
         products.push({
@@ -63,6 +70,12 @@ export const useProductsStore = defineStore("products", {
     async addProduct(product: any) {
       const db = useFirestore();
       const user = useCurrentUser();
+
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
 
       if (!user || !user.value) {
         return null;
@@ -84,12 +97,14 @@ export const useProductsStore = defineStore("products", {
         // Handle recurrent payments
         const newProduct = await addDoc(collection(db, "producto"), {
           ...product,
+          businessId: businessId.value,
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
 
         this.$state.products.push({
           id: newProduct.id,
+          businessId: businessId.value,
           ...product
         });
 

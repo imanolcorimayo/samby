@@ -48,6 +48,12 @@ export const useSellsStore = defineStore("sells", {
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
 
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
+
       // Safe check, but already handled with middleware
       if (!user || !user.value) {
         // Handle the case when there is no user
@@ -68,9 +74,20 @@ export const useSellsStore = defineStore("sells", {
       let reference = null;
       if (startAfterLastVisible) {
         const lastVisible = this.$state.lastVisible;
-        reference = query(collection(db, collectionName), orderBy("date", "desc"), limit(40), startAfter(lastVisible));
+        reference = query(
+          collection(db, collectionName),
+          orderBy("date", "desc"),
+          where("businessId", "==", businessId.value),
+          limit(40),
+          startAfter(lastVisible)
+        );
       } else {
-        reference = query(collection(db, collectionName), orderBy("date", "desc"), limit(40));
+        reference = query(
+          collection(db, collectionName),
+          orderBy("date", "desc"),
+          where("businessId", "==", businessId.value),
+          limit(40)
+        );
       }
 
       const querySnapshot = await getDocs(reference);
@@ -102,6 +119,12 @@ export const useSellsStore = defineStore("sells", {
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
 
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
+
       if (!user.value) {
         return false;
       }
@@ -116,6 +139,7 @@ export const useSellsStore = defineStore("sells", {
       try {
         const sellObject = {
           ...sell,
+          businessId: businessId.value,
           date: Timestamp.fromDate($dayjs(sell.date).toDate()),
           product,
           createdAt: serverTimestamp(),
