@@ -168,14 +168,6 @@
                 <IcRoundPlus class="text-gray-500" /> Nuevo Producto
               </NuxtLink>
             </li>
-            <li>
-              <NuxtLink
-                to="/empleado/nuevo"
-                class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
-              >
-                <IcRoundPlus class="text-gray-500" /> Invitar Empleados
-              </NuxtLink>
-            </li>
           </ul>
         </div>
         <TheFooter class="mt-auto" />

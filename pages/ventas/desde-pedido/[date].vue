@@ -250,7 +250,11 @@ async function uploadAllSales() {
     }
 
     // Add sell to the store
-    const saleAdded = await sellsStore.addSell(productForm.value[prodId], { id: prodId, name: prod.productName });
+    const saleAdded = await sellsStore.addSell(
+      productForm.value[prodId],
+      { id: prodId, name: prod.productName },
+      false // Don't update dashboard until all sells are uploaded
+    );
 
     if (!saleAdded) {
       useToast(
@@ -259,6 +263,10 @@ async function uploadAllSales() {
       );
     }
   }
+
+  // Update dashboard
+  const dashboardStore = useDashboardStore();
+  await dashboardStore.updateFullData(route.params.date);
 
   submitting.value = false; // Stop the loader
   useToast(ToastEvents.success, "Ventas cargadas correctamente");

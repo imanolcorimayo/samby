@@ -162,5 +162,7 @@ export const createMessage = (products: any, client: any, shippingPrice: any, to
 };
 
 export const calculateRatio = (total: number, part: number) => {
+  if (total === 0) return 0;
+
   return (part * 100) / total;
 };

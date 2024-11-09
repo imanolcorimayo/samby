@@ -104,32 +104,53 @@ console.log("------------------------ Updating clients ------------------------"
 console.log("------------------------ Finished clients ------------------------");
 console.log("------------------------ Updating Products ------------------------");
 
-//! Update all products
-let allProducts = [];
-try {
-  // Get all products
-  const products = await db.collection("producto").get();
+// //! Update all products
+// let allProducts = [];
+// try {
+//   // Get all products
+//   const products = await db.collection("producto").get();
 
-  allProducts = products.docs.map((product) => {
-    return { ...product.data(), id: product.id };
-  });
+//   allProducts = products.docs.map((product) => {
+//     return { ...product.data(), id: product.id };
+//   });
 
-  // Do for each on product and fix date
-  allProducts.forEach(async (product, index) => {
-    console.log(`Updating product id ${product.id}`);
+//   // Do for each on product and fix date
+//   allProducts.forEach(async (product, index) => {
+//     console.log(`Updating product id ${product.id}`);
 
-    const objectToUpdate = {
-      businessId: BUSINESS_ID
-    };
+//     const objectToUpdate = {
+//       businessId: BUSINESS_ID
+//     };
 
-    console.log("objectToUpdate: ", objectToUpdate);
+//     console.log("objectToUpdate: ", objectToUpdate);
 
-    // Update doc
-    await db.collection("producto").doc(product.id).update(objectToUpdate);
-  });
-} catch (error) {
-  console.error("Error getting or updating 'pedido' documents: ", error);
-  process.exit(1);
-}
+//     // Update doc
+//     await db.collection("producto").doc(product.id).update(objectToUpdate);
+//   });
+// } catch (error) {
+//   console.error("Error getting or updating 'pedido' documents: ", error);
+//   process.exit(1);
+// }
 
 console.log("------------------------ Finished Products ------------------------");
+console.log("------------------------ Updating Data Snapshots ------------------------");
+
+const allCollections = [
+  //"venta", "pedido", "cliente", "producto",
+  "dailyProductRanking",
+  "dailySellTotals"
+];
+
+// Update all data snapshots
+allCollections.forEach(async (collection) => {
+  console.log(`------------------ Updating data snapshot for collection ${collection} ------------------`);
+
+  const snapshot = await db.collection(collection).get();
+
+  snapshot.docs.map(async (doc) => {
+    console.log(`Updating ${collection} id ${doc.id}`);
+    await db.collection(collection).doc(doc.id).update({
+      businessId: BUSINESS_ID
+    });
+  });
+});

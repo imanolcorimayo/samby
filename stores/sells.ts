@@ -113,7 +113,7 @@ export const useSellsStore = defineStore("sells", {
       this.$state.fetched = true;
       this.$state.sells = startAfterLastVisible ? [...this.$state.sells, ...sells] : sells;
     },
-    async addSell(sell: any, product = { id: "", name: "" }) {
+    async addSell(sell: any, product = { id: "", name: "" }, updateDashboard = true) {
       // Get Firestore and Current User
       const db = useFirestore();
       const user = useCurrentUser();
@@ -157,13 +157,19 @@ export const useSellsStore = defineStore("sells", {
           formattedDate: $dayjs(sellObject.date.toDate()).format("DD/MM/YYYY")
         });
 
+        // Connect to dashboard and update it
+        if (updateDashboard) {
+          const dashboardStore = useDashboardStore();
+          await dashboardStore.updateFullData(sell.date);
+        }
+
         return true;
       } catch (error) {
         console.error(error);
         return false;
       }
     },
-    async updateSell(sell: any, sellId: string) {
+    async updateSell(sell: any, sellId: string, updateDashboard = true) {
       const { $dayjs } = useNuxtApp();
       const db = useFirestore();
       const sellReference = doc(db, "venta", sellId);
@@ -193,6 +199,12 @@ export const useSellsStore = defineStore("sells", {
             formattedDate: $dayjs(sell.date).format("DD/MM/YYYY")
           }
         );
+
+        // Connect to dashboard and update it
+        if (updateDashboard) {
+          const dashboardStore = useDashboardStore();
+          await dashboardStore.updateFullData(sell.date);
+        }
 
         return true;
       } catch (error) {

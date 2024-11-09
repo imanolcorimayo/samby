@@ -18,13 +18,6 @@
           >
             <PhEyeClosedBold /> Esconder
           </button>
-          <button
-            @click="updateData"
-            class="btn-sm text-sm bg-secondary shadow flex items-center gap-2 h-fit ring-1 ring-primary text-nowrap hover:bg-primary hover:text-white"
-          >
-            <MdiUpdate />
-            Actualizar Datos
-          </button>
         </div>
       </div>
       <Transition>
@@ -182,18 +175,6 @@
             </tbody>
           </table>
         </div>
-        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
-          <div class="flex flex-col">
-            <span class="font-semibold text-[1.143rem]">Precio semanal por producto</span>
-            <span class="text-gray-500"
-              >Se calcula un promedio del precio del producto cada semana para conocer la variacion respecto al
-              tiempo</span
-            >
-          </div>
-          <div>
-            <canvas id="weeklyPricePerProduct" width="400" :height="width >= 768 ? '200' : '1000'"></canvas>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -219,12 +200,7 @@ const { width } = useWindowSize();
 
 // ----- Define Pinia Vars --------
 const dashboardStore = useDashboardStore();
-const {
-  getDailySells: dailySells,
-  getWeeklyProductPriceComparison: weeklyProductPriceComparison,
-  getProductsRanking: productsRanking,
-  areStatsFetched
-} = storeToRefs(dashboardStore);
+const { getDailySells: dailySells, getProductsRanking: productsRanking, areStatsFetched } = storeToRefs(dashboardStore);
 
 // Function will manage if the data is already fetched
 dashboardStore.fetchData();
@@ -478,125 +454,22 @@ function getStartAndEndPerWeek(maxDate, minDate, nWeeksBack) {
   return { localStartDate, localEndDate };
 }
 
-function createWeeklyPricePerProduct() {
-  // Get labels
-  const labels = weeklyProductPriceComparison.value.map((comparison) => {
-    return comparison.formattedDate;
-  });
-
-  // Create a full list of products, there will be repeated
-  let products = [];
-  weeklyProductPriceComparison.value.forEach((comparison) => {
-    // Week products
-    const weekProducts = comparison.productPrices.map((prod) => prod.name);
-
-    // Add products to the list
-    products = [...products, ...weekProducts];
-  });
-
-  // Remove duplicates
-  products = [...new Set(products)];
-
-  // Create datasets
-  const datasets = products.map((product) => {
-    return {
-      label: product,
-      data: weeklyProductPriceComparison.value.map((comparison) => {
-        const productPrice = comparison.productPrices.find((prod) => prod.name == product);
-
-        return productPrice ? productPrice.price : 0;
-      }),
-      fill: false,
-      tension: 0.1,
-      // Increase point
-      pointRadius: 5
-    };
-  });
-
-  // Create data object to create a chart with each product
-  const data = {
-    labels,
-    datasets
-  };
-
-  // Create config object to create a chart with each product
-  const config = {
-    type: "line",
-    data: data,
-    options: {
-      interaction: {
-        mode: "dataset"
-      },
-      responsive: true,
-      scales: {
-        y: {
-          ticks: {
-            // Include a dollar sign in the ticks
-            /* callback: function (value, index, ticks) {
-              const million = formatToMillion(value);
-
-              return million;
-            } */
-          }
-        }
-      },
-      // Add % to the tooltip
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              let label = context.dataset.label || "";
-
-              if (label) {
-                label += ": ";
-              }
-
-              if (context.parsed.y !== null) {
-                label += formatPrice(context.parsed.y);
-              }
-
-              return label;
-            }
-          }
-        }
-      }
-    }
-  };
-
-  // Create weekly price per product chart
-  createChart("weeklyPricePerProduct", config);
-}
 function getRankingDate() {
   // Use js and send time to search in store
   dashboardStore.getRankingBasedOnDate(rankingDateAux.value);
 }
-async function updateData() {
-  // Show confirm message
-  if (
-    !confirm(
-      "¿Estás seguro de actualizar los datos? Esta acción actualizará las ventas más recientes en los datos de resumen. \nATENCIÓN: Úsalo solo cuando hayas terminado de cargar las ventas del día."
-    )
-  ) {
-    return;
-  }
-
-  await dashboardStore.updateFullData();
-}
 
 // ----- Define Hooks ------------
 onMounted(() => {
-  createEarningsP();
-  createWeeklyPricePerProduct();
+  if (areStatsFetched.value) {
+    createEarningsP();
+  }
 });
 
 // ----- Define Watcher ------------
 
 watch(dailySells, () => {
   createEarningsP();
-});
-
-watch(weeklyProductPriceComparison, () => {
-  createWeeklyPricePerProduct();
 });
 
 watch(productsRanking, () => {
@@ -610,7 +483,6 @@ watch([minDate, maxDate], (newValues) => {
   }
 
   createEarningsP();
-  createWeeklyPricePerProduct();
 });
 
 useHead({
