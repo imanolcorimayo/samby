@@ -67,10 +67,18 @@
           >
           <div class="w-ful flex justify-end">
             <button
+              v-if="!business.isEmployee"
               class="btn bg-secondary text-center ring-1 ring-gray-300"
               @click="newOrUpdateBusiness.showModal(business.id)"
             >
               Editar
+            </button>
+            <button
+              v-if="business.isEmployee"
+              class="btn bg-secondary text-center ring-1 ring-danger"
+              @click="leaveBusiness(business.id)"
+            >
+              Dejar negocio
             </button>
           </div>
         </div>
@@ -89,6 +97,7 @@
 import MageShopFill from "~icons/mage/shop-fill";
 import IcRoundPlus from "~icons/ic/round-plus";
 import BasilLocationSolid from "~icons/basil/location-solid";
+import { ToastEvents } from "~/interfaces";
 
 // ----- Define Pinia Vars -------
 const indexStore = useIndexStore();
@@ -103,7 +112,7 @@ const newOrUpdateBusiness = ref(null);
 const mainModal = ref(null);
 
 // ----- Define Methods ---------
-const joinBusiness = async () => {
+async function joinBusiness() {
   if (submitting.value) return;
   submitting.value = true;
 
@@ -112,7 +121,29 @@ const joinBusiness = async () => {
   submitting.value = false;
 
   mainModal.value.closeModal();
-};
+}
+
+async function leaveBusiness(businessId) {
+  if (submitting.value) return;
+  submitting.value = true;
+
+  // Show confirm dialogue
+  const confirm = await confirmDialogue.value.openDialog();
+
+  if (!confirm) {
+    submitting.value = false;
+    return;
+  }
+
+  // Archive employee and leave business are the same thing
+  // In this case, the businessId of the element is the same as the employeeId
+  const response = await indexStore.archiveEmployee(businessId, true);
+  if (response) {
+    useToast(ToastEvents.success, "Te has salido del negocio correctamente");
+  } // Error messages managed by the store
+
+  submitting.value = false;
+}
 
 useHead({
   title: "Lista de pedidos"

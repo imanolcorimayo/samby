@@ -67,6 +67,17 @@
           placeholder="En caso de que tu negocio tenga un local físico y tus clientes puedan retirar sus pedidos"
           v-model="form.address"
         />
+        <div class="flex flex-col gap-1">
+          <span class="font-medium">Teléfono*</span>
+          <input
+            @input="() => (form.phone = formatPhoneNumber(form.phone))"
+            maxlength="20"
+            v-model="form.phone"
+            type="text"
+            placeholder="Numero de telefono"
+            required
+          />
+        </div>
       </FormKit>
     </template>
     <template #footer>
@@ -110,7 +121,8 @@ const currentBusiness = ref(null);
 const form = ref({
   name: "",
   description: "",
-  address: ""
+  address: "",
+  phone: ""
 });
 
 // Refs
@@ -131,7 +143,8 @@ async function updateOrCreateBusiness() {
       description: form.value.description || null,
       address: form.value.address || null,
       imageUrl: imageUrl.value || null,
-      userBusinessImageId: getBusinessImage.value?.id || null
+      userBusinessImageId: getBusinessImage.value?.id || null,
+      phone: form.value.phone
     });
   } else {
     // The validation is managed by the store
@@ -142,7 +155,8 @@ async function updateOrCreateBusiness() {
         description: form.value.description || null,
         address: form.value.address || null,
         imageUrl: imageUrl.value || null,
-        userBusinessImageId: getBusinessImage.value?.id || null
+        userBusinessImageId: getBusinessImage.value?.id || null,
+        phone: form.value.phone
       },
       currentBusiness.value // Used to properly manage the image update
     );
@@ -244,7 +258,8 @@ const showModal = (businessId = false) => {
   form.value = {
     name: "",
     description: "",
-    address: ""
+    address: "",
+    phone: ""
   };
   imageUrl.value = null;
   imageInfo.value = null;
@@ -262,6 +277,7 @@ const showModal = (businessId = false) => {
 
     // Update form values
     form.value.name = currentBusiness.value.name;
+    form.value.phone = currentBusiness.value.phone;
     form.value.description = currentBusiness.value.description || "";
     form.value.address = currentBusiness.value.address || "";
 

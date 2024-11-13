@@ -127,6 +127,14 @@ export const useIndexStore = defineStore("index", {
               }
               return b.businessId === currentBusinessId.value;
             });
+
+            // If for some reason the business is not found it might have an old businessId
+            if (!business) {
+              currentBusinessId.value = null;
+              // Reload the full page
+              window.location.reload();
+              return;
+            }
           }
 
           // If for some reason the business is not found it might have an old businessId
@@ -286,6 +294,15 @@ export const useIndexStore = defineStore("index", {
         return false;
       }
 
+      // Validate it has phone
+      if (!businessInfo.phone || typeof businessInfo.phone !== "string" || businessInfo.phone.length < 14) {
+        useToast(
+          ToastEvents.error,
+          "El teléfono del negocio no es válido. Si el error persiste, contactese con soporte"
+        );
+        return false;
+      }
+
       try {
         // Validate this user does not have 3 business already
         // Get all business for this user
@@ -300,12 +317,21 @@ export const useIndexStore = defineStore("index", {
         // Create business
         const newBusiness = await addDoc(collection(db, "userBusiness"), {
           name: businessInfo.name,
+          phone: businessInfo.phone,
           description: businessInfo.description || null,
           address: businessInfo.address || null,
           imageUrl: businessInfo.imageUrl || null,
           userBusinessImageId: businessInfo.userBusinessImageId || null,
           isEmployee: false,
           userUid: user.value.uid,
+          createdAt: serverTimestamp()
+        });
+
+        // Create the role for this business
+        await addDoc(collection(db, "roles"), {
+          userUid: user.value.uid,
+          businessId: newBusiness.id,
+          role: "propietario",
           createdAt: serverTimestamp()
         });
 
@@ -324,6 +350,7 @@ export const useIndexStore = defineStore("index", {
           this.currentBusiness = {
             id: newBusiness.id,
             name: businessInfo.name,
+            phone: businessInfo.phone,
             imageUrl: businessInfo.imageUrl || null,
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
             employees: [],
@@ -337,6 +364,7 @@ export const useIndexStore = defineStore("index", {
           {
             id: newBusiness.id,
             name: businessInfo.name,
+            phone: businessInfo.phone,
             description: businessInfo.description || null,
             address: businessInfo.address || null,
             imageUrl: businessInfo.imageUrl || null,
@@ -369,11 +397,21 @@ export const useIndexStore = defineStore("index", {
         return false;
       }
 
+      // Validate it has phone
+      if (!businessNewInfo.phone || typeof businessNewInfo.phone !== "string" || businessNewInfo.phone.length < 14) {
+        useToast(
+          ToastEvents.error,
+          "El teléfono del negocio no es válido. Si el error persiste, contactese con soporte"
+        );
+        return false;
+      }
+
       // Check if nothing changed
       if (
         businessNewInfo.name === current.name &&
         businessNewInfo.description === current.description &&
         businessNewInfo.address === current.address &&
+        businessNewInfo.phone === current.phone &&
         businessNewInfo.imageUrl === current.imageUrl
       ) {
         useToast(ToastEvents.info, "No se ha realizado ningún cambio");
@@ -386,6 +424,7 @@ export const useIndexStore = defineStore("index", {
         // Update business
         await updateDoc(doc(db, "userBusiness", current.id), {
           name: businessNewInfo.name,
+          phone: businessNewInfo.phone,
           description: businessNewInfo.description || null,
           address: businessNewInfo.address || null,
           ...(imageChanged
@@ -412,6 +451,7 @@ export const useIndexStore = defineStore("index", {
             JSON.stringify({
               id: current.id,
               name: businessNewInfo.name,
+              phone: businessNewInfo.phone,
               description: businessNewInfo.description || null,
               address: businessNewInfo.address || null,
               imageUrl: businessNewInfo.imageUrl || null,
@@ -421,6 +461,25 @@ export const useIndexStore = defineStore("index", {
               createdAt: $dayjs().format("DD/MM/YYYY")
             })
           );
+        }
+
+        // When name or photo changes, it affect the employee's business view,
+        // so we need to update them too
+        if (businessNewInfo.name !== current.name || imageChanged) {
+          const userBusiness = await getDocs(
+            query(
+              collection(db, "userBusiness"),
+              where("businessId", "==", current.id),
+              where("isEmployee", "==", true)
+            )
+          );
+
+          userBusiness.docs.forEach(async (doc) => {
+            await updateDoc(doc.ref, {
+              name: businessNewInfo.name,
+              imageUrl: businessNewInfo.imageUrl || null
+            });
+          });
         }
 
         return true;
@@ -618,7 +677,7 @@ export const useIndexStore = defineStore("index", {
         return false;
       }
     },
-    async archiveEmployee(employeeId: string) {
+    async archiveEmployee(employeeId: string, fromEmployee: boolean = false) {
       // Get Firestore and Current User
       const db = useFirestore();
       const user = useCurrentUser();
@@ -635,6 +694,11 @@ export const useIndexStore = defineStore("index", {
           status: "Archivado",
           userUid: null
         });
+
+        // When employee leave business we just reload so the page updates accordingly
+        if (fromEmployee) {
+          window.location.reload();
+        }
 
         // Get object from store and update it
         const index = this.currentBusiness.employees.findIndex((e: any) => e.id === employeeId);
@@ -654,7 +718,6 @@ export const useIndexStore = defineStore("index", {
       // Get Firestore and Current User
       const db = useFirestore();
       const user = useCurrentUser();
-      const { $dayjs } = useNuxtApp();
 
       if (!user.value) {
         return false;
@@ -795,7 +858,7 @@ export const useIndexStore = defineStore("index", {
 
         // Update current business id in localStorage in case it's not set
         if (!this.currentBusiness.id) {
-          useLocalStorage("cBId", business.id);
+          useLocalStorage("cBId", businessInfo.businessId);
 
           // Create thumbnail
           businessInfo.imageUrlThumbnail = null;
@@ -806,11 +869,13 @@ export const useIndexStore = defineStore("index", {
           // Update store
           this.currentBusiness = {
             id: business.id,
+            businessId: businessInfo.businessId,
             name: businessInfo.name,
+            isEmployee: true,
             imageUrl: businessInfo.imageUrl || null,
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
             employees: [],
-            type: "empleado"
+            type: businessInfo.role.toLowerCase()
           };
         }
 
@@ -819,11 +884,13 @@ export const useIndexStore = defineStore("index", {
           ...this.businesses,
           {
             id: business.id,
+            businessId: businessInfo.businessId,
             name: businessInfo.name,
+            isEmployee: true,
             imageUrl: businessInfo.imageUrl || null,
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
             employees: [],
-            type: "empleado"
+            type: businessInfo.role.toLowerCase()
           }
         ];
 
