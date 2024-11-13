@@ -1,6 +1,6 @@
 <template>
   <div class="w-full min-h-screen flex justify-between">
-    <transition name="slide">
+    <transition name="slide" class="relative">
       <div
         v-if="showSideBar"
         ref="menu"
@@ -54,7 +54,7 @@
                 >
                   <li v-for="business in indexStore.businesses" class="w-full">
                     <button
-                      @click="changeBusiness(business.id)"
+                      @click="indexStore.changeCurrentBusiness(business.isEmployee ? business.businessId : business.id)"
                       class="flex justify-between items-center gap-2 p-4 hover:bg-primary/60 w-full text-start"
                     >
                       <div
@@ -102,6 +102,7 @@
           </li>
           <li>
             <NuxtLink
+              v-if="indexStore.isOwner"
               to="/ventas"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -110,6 +111,7 @@
           </li>
           <li>
             <NuxtLink
+              v-if="indexStore.isOwner"
               to="/clientes"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -118,6 +120,7 @@
           </li>
           <li>
             <NuxtLink
+              v-if="indexStore.isOwner"
               to="/dashboard"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -126,6 +129,7 @@
           </li>
           <li>
             <NuxtLink
+              v-if="indexStore.isOwner"
               to="/productos"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -134,6 +138,7 @@
           </li>
           <li>
             <NuxtLink
+              v-if="indexStore.isOwner"
               to="/empleados"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -141,11 +146,12 @@
             </NuxtLink>
           </li>
         </ul>
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-3" v-if="indexStore.isOwner">
           <span class="font-medium text-gray-500 text-sm">Acciones de gestión</span>
           <ul class="flex flex-col gap-2 text-sm">
             <li>
               <NuxtLink
+                v-if="indexStore.isOwner"
                 to="/pedidos/nuevo"
                 class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
               >
@@ -154,6 +160,7 @@
             </li>
             <li>
               <NuxtLink
+                v-if="indexStore.isOwner"
                 to="/ventas/nuevo"
                 class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
               >
@@ -162,6 +169,7 @@
             </li>
             <li>
               <NuxtLink
+                v-if="indexStore.isOwner"
                 to="/productos/nuevo"
                 class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
               >
@@ -170,7 +178,14 @@
             </li>
           </ul>
         </div>
-        <TheFooter class="mt-auto" />
+        <div class="mt-auto">
+          <button @click="signOut" class="flex items-center gap-2 text-gray-700 px-2 py-4">
+            <SiSignOutFill />
+            Cerrar Sesión
+          </button>
+
+          <TheFooter />
+        </div>
       </div>
     </transition>
     <div class="flex-1 flex flex-col max-h-screen overflow-y-scroll py-[1.429rem]">
@@ -212,11 +227,13 @@ import ClarityEmployeeGroupSolid from "~icons/clarity/employee-group-solid";
 import IcRoundPlus from "~icons/ic/round-plus";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import GravityUiGear from "~icons/gravity-ui/gear";
+import SiSignOutFill from "~icons/si/sign-out-fill";
 
 // ------ Define Useful Properties --------
 const route = useRoute();
 const config = useRuntimeConfig();
 const { width } = useWindowSize();
+const auth = useFirebaseAuth();
 
 // ------ Define Pinia Vars --------
 const ordersStore = useOrdersStore();
@@ -244,15 +261,22 @@ onMounted(() => {
 });
 
 // ------ Define Methods --------
-function switchMenu() {
-  showSideBar.value = !showSideBar.value;
+async function signOut() {
+  if (!auth) return;
+
+  // Sign out from firebase
+  await auth.signOut();
+
+  // Redirect to welcome page
+  if (!route.fullPath.includes("/welcome")) {
+    return await navigateTo("/welcome");
+  }
+  // If already in landing page, reload
+  location.reload();
 }
 
-async function changeBusiness(businessId) {
-  await indexStore.changeCurrentBusiness(businessId);
-
-  // Reload the full page
-  window.location.reload();
+function switchMenu() {
+  showSideBar.value = !showSideBar.value;
 }
 
 // ------ Define Computed --------

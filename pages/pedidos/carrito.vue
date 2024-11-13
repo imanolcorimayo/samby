@@ -70,7 +70,7 @@
           <span>Telefono</span>
           <input
             :disabled="clientSelected"
-            @input="formatPhoneNumber"
+            @input="() => (client.phone = formatPhoneNumber(client.phone))"
             maxlength="20"
             v-model="client.phone"
             type="text"
@@ -280,40 +280,6 @@ async function confirmOrder() {
   }
 
   loading.value = false;
-}
-
-function formatPhoneNumber() {
-  // Check if the client has " 9" in the phone number
-  if (client.value.phone === "+54 9") {
-    client.value.phone = "";
-    return;
-  }
-
-  // Check if the client has " 9 " in the phone number
-  const has9InPhone = client.value.phone.includes(" 9 ");
-
-  // Remove all non-numeric characters except "+"
-  let cleanNumber = client.value.phone.replace(/[^\d+]/g, "");
-
-  let mobPhoneAux = "";
-  if (cleanNumber.startsWith("+54") && !has9InPhone) {
-    mobPhoneAux = "+54 9 ";
-    cleanNumber = cleanNumber.substring(3);
-  } else if (cleanNumber.startsWith("+549") && has9InPhone) {
-    mobPhoneAux = "+54 9 ";
-    cleanNumber = cleanNumber.substring(4);
-  }
-
-  // Format as (351) 346-7739
-  if (cleanNumber.length >= 3 && !cleanNumber.startsWith("+54")) {
-    cleanNumber = cleanNumber.replace(/^(\d{3})(\d)/, "($1) $2");
-  }
-  if (cleanNumber.length >= 9) {
-    cleanNumber = cleanNumber.replace(/^(\(\d{3}\) \d{3})(\d{1,4})/, "$1-$2");
-  }
-
-  // Limit the length to 15 characters (Argentina format)
-  client.value.phone = mobPhoneAux + cleanNumber.substring(0, 14);
 }
 
 function removeFromShopping(product) {

@@ -1,16 +1,6 @@
 import { getIdTokenResult } from "firebase/auth";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  getDoc,
-  addDoc,
-  doc,
-  updateDoc,
-  deleteDoc,
-  orderBy
-} from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, orderBy } from "firebase/firestore";
+import { ToastEvents } from "~/interfaces";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   // If going to /welcome or blocked just continue
@@ -18,31 +8,64 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (to.path.includes("/welcome") || to.path.includes("/blocked") || process.server) return;
 
   const user = await getCurrentUser();
+  const db = useFirestore();
   const indexStore = useIndexStore();
 
-  // If user exist then they can navigate to any page
-  if (user) {
-    // Get id token results
-    const idTokenResult = await getIdTokenResult(user);
+  // Redirect to sign-in
+  if (!user) {
+    return navigateTo({
+      path: "/welcome",
+      query: {
+        redirect: to.fullPath
+      }
+    });
+  }
 
-    // Update user role
-    indexStore.updateUserRole(idTokenResult.claims.role ?? "employee");
+  // Business id, if not found redirect to /negocios
+  const businessId = useLocalStorage("cBId", null);
+  if (to.path !== "/negocios" && !businessId.value) {
+    return navigateTo("/negocios");
+  }
 
-    // Allowed routed to navigate for non admin users
-    const allowedRoutes = ["/pedidos", "/blocked", "/404"];
+  try {
+    // Validate the user role
+    const role = await getDocs(
+      query(collection(db, "roles"), where("userUid", "==", user.uid), where("businessId", "==", businessId.value))
+    );
 
-    if ((idTokenResult.claims.role && idTokenResult.claims.role === "admin") || allowedRoutes.includes(to.path)) {
+    // If user has no role, redirect to /negocios
+    if (role.empty && to.path !== "/negocios") {
+      useToast(
+        ToastEvents.error,
+        "No tienes permisos para acceder a esta sección. Elegí un negocio para continuar. Contactate con soporte si tenés problemas."
+      );
+      return navigateTo("/negocios");
+    }
+
+    // If user has no role and is trying to access /negocios, just continue
+    if (role.empty && to.path === "/negocios") {
       return;
     }
 
-    return navigateTo("/pedidos");
-  }
+    // Get the user role
+    const userRole = role.docs[0].data().role;
 
-  // Redirect to sign-in page
-  return navigateTo({
-    path: "/welcome",
-    query: {
-      redirect: to.fullPath
+    // Update in store to manage roles globally
+    indexStore.updateUserRole(userRole);
+
+    // Allowed routed to navigate for non admin users
+    const allowedRoutes = ["/pedidos", "/blocked", "/404", "/negocios", "/"];
+
+    if (userRole === "propietario" || allowedRoutes.includes(to.path)) {
+      return;
     }
-  });
+
+    useToast(
+      ToastEvents.error,
+      "No tienes permisos para acceder a esta sección. Contactate con soporte si tenés problemas."
+    );
+    return navigateTo("/pedidos");
+  } catch (error) {
+    console.error("ERROR ", error);
+  }
 });

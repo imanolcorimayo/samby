@@ -322,8 +322,6 @@ const showModal = (sellId) => {
     date: $dayjs(sell.date.toDate()).format("YYYY-MM-DD")
   };
 
-  console.log("form", form.value);
-
   // Get current product
   const product = products.value.find((product) => product.id === sell.product.id);
 

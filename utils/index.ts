@@ -166,3 +166,37 @@ export const calculateRatio = (total: number, part: number) => {
 
   return (part * 100) / total;
 };
+
+export const formatPhoneNumber = function (phone = "") {
+  // Check if the client has " 9" in the phone number
+  if (phone === "+54 9") {
+    phone = "";
+    return;
+  }
+
+  // Check if the client has " 9 " in the phone number
+  const has9InPhone = phone.includes(" 9 ");
+
+  // Remove all non-numeric characters except "+"
+  let cleanNumber = phone.replace(/[^\d+]/g, "");
+
+  let mobPhoneAux = "";
+  if (cleanNumber.startsWith("+54") && !has9InPhone) {
+    mobPhoneAux = "+54 9 ";
+    cleanNumber = cleanNumber.substring(3);
+  } else if (cleanNumber.startsWith("+549") && has9InPhone) {
+    mobPhoneAux = "+54 9 ";
+    cleanNumber = cleanNumber.substring(4);
+  }
+
+  // Format as (351) 346-7739
+  if (cleanNumber.length >= 3 && !cleanNumber.startsWith("+54")) {
+    cleanNumber = cleanNumber.replace(/^(\d{3})(\d)/, "($1) $2");
+  }
+  if (cleanNumber.length >= 9) {
+    cleanNumber = cleanNumber.replace(/^(\(\d{3}\) \d{3})(\d{1,4})/, "$1-$2");
+  }
+
+  // Limit the length to 15 characters (Argentina format)
+  return mobPhoneAux + cleanNumber.substring(0, 14);
+};

@@ -1,5 +1,5 @@
+import { update } from "firebase/database";
 import {
-  Timestamp,
   addDoc,
   collection,
   doc,
@@ -27,10 +27,12 @@ const defaultObject = {
     description: "",
     address: "",
     imageUrl: "",
+    employees: [],
     createdAt: ""
   },
   businesses: [],
-  businessesFetched: false
+  businessesFetched: false,
+  employeesFetched: false
 };
 export const useIndexStore = defineStore("index", {
   state: (): any => {
@@ -38,10 +40,13 @@ export const useIndexStore = defineStore("index", {
   },
   getters: {
     getUserRole: (state) => state.userRole,
+    isOwner: (state) => state.userRole === "propietario",
     getBusinessImage: (state) => state.businessImage,
     areBusinessesFetched: (state) => state.businessesFetched,
+    areEmployeesFetched: (state) => state.employeesFetched,
     getBusinesses: (state) => state.businesses,
-    getCurrentBusiness: (state) => state.currentBusiness
+    getCurrentBusiness: (state) => state.currentBusiness,
+    getEmployees: (state) => state.currentBusiness.employees
   },
   actions: {
     async updateUserRole(role: string) {
@@ -60,7 +65,11 @@ export const useIndexStore = defineStore("index", {
       try {
         // Get all business for this user
         const userBusiness = await getDocs(
-          query(collection(db, "userBusiness"), where("userUid", "==", user.value.uid))
+          query(
+            collection(db, "userBusiness"),
+            where("userUid", "==", user.value.uid),
+            where("isEmployee", "==", false)
+          )
         );
 
         // Get owned businesses
@@ -81,26 +90,127 @@ export const useIndexStore = defineStore("index", {
           };
         });
 
-        // TODO: Manage business as employee
+        // Get businesses where this user is an employee
+        const userEmployeeBusiness = await getDocs(
+          query(collection(db, "userBusiness"), where("userUid", "==", user.value.uid), where("isEmployee", "==", true))
+        );
+
+        this.businesses = [
+          ...this.businesses,
+          ...userEmployeeBusiness.docs.map((doc) => {
+            const docData = doc.data();
+
+            // Create thumbnail
+            docData.imageUrlThumbnail = null;
+            if (docData.imageUrl) {
+              docData.imageUrlThumbnail = docData.imageUrl.replace("upload/", "upload/c_thumb,w_200,g_face/");
+            }
+
+            return {
+              id: doc.id,
+              ...docData,
+              type: docData.role.toLowerCase(),
+              createdAt: $dayjs(docData.createdAt.toDate()).format("DD/MM/YYYY")
+            };
+          })
+        ];
 
         // Update current business id in localStorage in case it's not set
+        const currentBusinessId = useLocalStorage("cBId", null);
         if (!this.currentBusiness.id && this.businesses.length > 0) {
-          const currentBusinessId = useLocalStorage("cBId", this.businesses[0].id);
-
           // Find matching business
-          const business = this.businesses.find((b: any) => b.id === currentBusinessId.value);
+          let business = this.businesses[0];
+          if (currentBusinessId.value) {
+            business = this.businesses.find((b: any) => {
+              if (!b.isEmployee) {
+                return b.id === currentBusinessId.value;
+              }
+              return b.businessId === currentBusinessId.value;
+            });
+          }
+
+          // If for some reason the business is not found it might have an old businessId
+          if (!business) {
+            currentBusinessId.value = null;
+            return;
+          }
+
+          // Always save the original businessId
+          currentBusinessId.value = !business.isEmployee ? business.id : business.businessId;
 
           // Update store
           this.currentBusiness = {
-            id: business.id,
+            id: !business.isEmployee ? business.id : business.businessId,
             name: business.name,
             imageUrl: business.imageUrl,
             imageUrlThumbnail: business.imageUrlThumbnail,
+            employees: [],
             type: business.type
           };
         }
 
+        // If not business is found, clear the current business id
+        if (currentBusinessId.value) {
+          const business = this.businesses.find((b: any) => {
+            if (!b.isEmployee) {
+              return b.id === currentBusinessId.value;
+            }
+            return b.businessId === currentBusinessId.value;
+          });
+
+          if (!business) {
+            currentBusinessId.value = null;
+            return;
+          }
+        }
+
         this.$state.businessesFetched = true;
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        useToast(ToastEvents.error, "Hubo un error al obtener la información, por favor intenta nuevamente");
+        return false;
+      }
+    },
+    async fetchEmployees() {
+      // Get Firestore and Current User
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
+
+      if (!user.value || this.employeesFetched) {
+        return false;
+      }
+
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
+
+      try {
+        // Get all employees for this business
+        const userBusiness = await getDocs(
+          query(
+            collection(db, "userBusiness"),
+            where("businessId", "==", businessId.value),
+            where("isEmployee", "==", true)
+          )
+        );
+
+        // Get owned businesses
+        this.currentBusiness.employees = userBusiness.docs.map((doc) => {
+          const docData = doc.data();
+          return {
+            id: doc.id,
+            ...docData,
+            type: "empleado",
+            createdAt: $dayjs(docData.createdAt.toDate()).format("DD/MM/YYYY")
+          };
+        });
+
+        this.$state.employeesFetched = true;
 
         return true;
       } catch (error) {
@@ -194,6 +304,7 @@ export const useIndexStore = defineStore("index", {
           address: businessInfo.address || null,
           imageUrl: businessInfo.imageUrl || null,
           userBusinessImageId: businessInfo.userBusinessImageId || null,
+          isEmployee: false,
           userUid: user.value.uid,
           createdAt: serverTimestamp()
         });
@@ -215,6 +326,7 @@ export const useIndexStore = defineStore("index", {
             name: businessInfo.name,
             imageUrl: businessInfo.imageUrl || null,
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
+            employees: [],
             type: "propietario" // Only owner can create a business
           };
         }
@@ -379,6 +491,7 @@ export const useIndexStore = defineStore("index", {
             name: this.$state.businesses[0].name,
             imageUrl: this.$state.businesses[0].imageUrl,
             imageUrlThumbnail: this.$state.businesses[0].imageUrlThumbnail,
+            employees: [],
             type: this.$state.businesses[0].type
           };
         }
@@ -403,20 +516,321 @@ export const useIndexStore = defineStore("index", {
         const cBId = useLocalStorage("cBId", businessId);
         cBId.value = businessId;
 
-        // Update store
-        const business = this.businesses.find((b: any) => b.id === businessId);
-        this.currentBusiness = {
-          id: business.id,
-          name: business.name,
-          imageUrl: business.imageUrl,
-          imageUrlThumbnail: business.imageUrlThumbnail,
-          type: business.type
-        };
+        // Reload the full page
+        window.location.reload();
 
         return true;
       } catch (error) {
         console.error(error);
         useToast(ToastEvents.error, "Hubo un error al cambiar de negocio, por favor intenta nuevamente");
+        return false;
+      }
+    },
+    // This count as a new userBusiness but for an employee, so the properties are different
+    async saveEmployee(businessInfo: any) {
+      // Get Firestore and Current User
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
+
+      if (!user.value) {
+        return false;
+      }
+
+      // Validate information
+      if (!businessInfo.name || typeof businessInfo.name !== "string") {
+        useToast(ToastEvents.error, "El nombre del negocio es requerido. Si el error persiste, contactese con soporte");
+        return false;
+      }
+      if (!businessInfo.employeeName || typeof businessInfo.employeeName !== "string") {
+        useToast(
+          ToastEvents.error,
+          "El nombre del empleado es requerido. Si el error persiste, contactese con soporte"
+        );
+        return false;
+      }
+      if (
+        !businessInfo.role ||
+        typeof businessInfo.role !== "string" ||
+        !["Propietario", "Empleado"].includes(businessInfo.role)
+      ) {
+        useToast(ToastEvents.error, "El rol del empleado es requerido. Si el error persiste, contactese con soporte");
+        return false;
+      }
+      if (!businessInfo.businessId || typeof businessInfo.businessId !== "string") {
+        useToast(
+          ToastEvents.error,
+          "No se estan validando los campos correctamente. Si el error persiste, contactese con soporte"
+        );
+        return false;
+      }
+
+      try {
+        // Validate this businessId does not have 3 employees already
+        // Get all employees for this businessId
+        const userBusiness = await getDocs(
+          query(
+            collection(db, "userBusiness"),
+            where("businessId", "==", businessInfo.businessId),
+            where("status", "!=", "Archivado")
+          )
+        );
+        if (userBusiness.docs.length >= 3) {
+          useToast(
+            ToastEvents.error,
+            "No puedes tener mas de 3 empleados registrados. Para aumentar este limite contactate con soporte"
+          );
+          return false;
+        }
+
+        const objectToSave = {
+          name: businessInfo.name,
+          imageUrl: businessInfo.imageUrl || null,
+          employeeName: businessInfo.employeeName,
+          businessId: businessInfo.businessId,
+          phone: businessInfo.phone || null,
+          role: businessInfo.role,
+          status: "Pendiente de aprobación",
+          isEmployee: true,
+          code: `${businessInfo.businessId}-${Math.floor(1000 + Math.random() * 9000)}`,
+          userUid: null, // This will be updated once accepted the invitation
+          acceptedAt: null,
+          createdAt: serverTimestamp()
+        };
+
+        // Create employee
+        const newEmployee = await addDoc(collection(db, "userBusiness"), objectToSave);
+
+        // Update employees
+        this.currentBusiness.employees = [
+          ...this.currentBusiness.employees,
+          {
+            ...objectToSave,
+            id: newEmployee.id,
+            createdAt: $dayjs().format("DD/MM/YYYY")
+          }
+        ];
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        useToast(ToastEvents.error, "Hubo un error al guardar la información, por favor intenta nuevamente");
+        return false;
+      }
+    },
+    async archiveEmployee(employeeId: string) {
+      // Get Firestore and Current User
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
+
+      if (!user.value) {
+        return false;
+      }
+
+      try {
+        // Update employee
+        await updateDoc(doc(db, "userBusiness", employeeId), {
+          archivedAt: serverTimestamp(),
+          status: "Archivado",
+          userUid: null
+        });
+
+        // Get object from store and update it
+        const index = this.currentBusiness.employees.findIndex((e: any) => e.id === employeeId);
+        if (index > -1) {
+          this.currentBusiness.employees[index].status = "Archivado";
+          this.currentBusiness.employees[index].archivedAt = $dayjs().format("DD/MM/YYYY");
+        }
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        useToast(ToastEvents.error, "Hubo un error al archivar el empleado, por favor intenta nuevamente");
+        return false;
+      }
+    },
+    async updateEmployee(employeeNewInfo: any, current: any) {
+      // Get Firestore and Current User
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
+
+      if (!user.value) {
+        return false;
+      }
+
+      if (!employeeNewInfo.employeeName || typeof employeeNewInfo.employeeName !== "string") {
+        useToast(
+          ToastEvents.error,
+          "El nombre del empleado es requerido. Si el error persiste, contactese con soporte"
+        );
+        return false;
+      }
+      if (
+        !employeeNewInfo.role ||
+        typeof employeeNewInfo.role !== "string" ||
+        !["Propietario", "Empleado"].includes(employeeNewInfo.role)
+      ) {
+        useToast(ToastEvents.error, "El rol del empleado es requerido. Si el error persiste, contactese con soporte");
+        return false;
+      }
+
+      // Check if nothing changed. Only a few items can be modified
+      if (
+        employeeNewInfo.employeeName === current.employeeName &&
+        employeeNewInfo.role === current.role &&
+        employeeNewInfo.phone === current.phone
+      ) {
+        useToast(ToastEvents.info, "No se ha realizado ningún cambio");
+        return false;
+      }
+
+      try {
+        // Update employee
+        await updateDoc(doc(db, "userBusiness", current.id), {
+          employeeName: employeeNewInfo.employeeName,
+          phone: employeeNewInfo.phone || null,
+          role: employeeNewInfo.role
+        });
+
+        // Update employee in store
+        const index = this.currentBusiness.employees.findIndex((e: any) => e.id === current.id);
+        if (index > -1) {
+          this.currentBusiness.employees[index] = JSON.parse(
+            JSON.stringify({
+              ...current,
+              employeeName: employeeNewInfo.employeeName,
+              phone: employeeNewInfo.phone || null,
+              role: employeeNewInfo.role
+            })
+          );
+        }
+
+        // Update role in roles collection in case it changed
+        if (employeeNewInfo.role !== current.role) {
+          const role = await getDocs(
+            query(
+              collection(db, "roles"),
+              where("userUid", "==", current.userUid),
+              where("businessId", "==", current.businessId)
+            )
+          );
+
+          if (role.docs.length === 0) {
+            useToast(
+              ToastEvents.error,
+              "Hubo un error al actualizar el rol del empleado, por favor contactese con soporte"
+            );
+            return false;
+          }
+
+          await updateDoc(doc(db, "roles", role.docs[0].id), {
+            role: employeeNewInfo.role.toLowerCase(),
+            updatedAt: serverTimestamp()
+          });
+        }
+
+        return true;
+      } catch (error) {}
+    },
+    async joinBusiness(code: string) {
+      // Get Firestore and Current User
+      const db = useFirestore();
+      const user = useCurrentUser();
+
+      if (!user.value) {
+        return false;
+      }
+
+      // Validate information
+      if (!code || typeof code !== "string") {
+        useToast(ToastEvents.error, "El código es requerido. Por favor ingresalo e intenta nuevamente");
+        return false;
+      }
+
+      if (!code.includes("-")) {
+        useToast(ToastEvents.error, "El código ingresado no es válido. Por favor intenta nuevamente");
+        return false;
+      }
+
+      try {
+        // Get business with this code
+        const userBusiness = await getDocs(
+          query(
+            collection(db, "userBusiness"),
+            where("code", "==", code),
+            where("status", "==", "Pendiente de aprobación"),
+            where("userUid", "==", null)
+          )
+        );
+
+        if (userBusiness.docs.length === 0) {
+          useToast(
+            ToastEvents.error,
+            "El código ingresado no es válido. Es probable que ya haya sido utilizado o estes intentando unirte a tu propio negocio"
+          );
+          return false;
+        }
+
+        // Update business
+        const business = userBusiness.docs[0];
+        await updateDoc(doc(db, "userBusiness", business.id), {
+          status: "Activo",
+          userUid: user.value.uid,
+          acceptedAt: serverTimestamp()
+        });
+
+        // Get business information
+        const businessInfo = business.data();
+
+        // Add user role document depending on the information
+        await addDoc(collection(db, "roles"), {
+          userUid: user.value.uid,
+          // Here we use businessId because it's the owner's businessId
+          businessId: businessInfo.businessId,
+          role: businessInfo.role.toLowerCase(),
+          createdAt: serverTimestamp()
+        });
+
+        // Update current business id in localStorage in case it's not set
+        if (!this.currentBusiness.id) {
+          useLocalStorage("cBId", business.id);
+
+          // Create thumbnail
+          businessInfo.imageUrlThumbnail = null;
+          if (businessInfo.imageUrl) {
+            businessInfo.imageUrlThumbnail = businessInfo.imageUrl.replace("upload/", "upload/c_thumb,w_200,g_face/");
+          }
+
+          // Update store
+          this.currentBusiness = {
+            id: business.id,
+            name: businessInfo.name,
+            imageUrl: businessInfo.imageUrl || null,
+            imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
+            employees: [],
+            type: "empleado"
+          };
+        }
+
+        // Update businesses
+        this.businesses = [
+          ...this.businesses,
+          {
+            id: business.id,
+            name: businessInfo.name,
+            imageUrl: businessInfo.imageUrl || null,
+            imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
+            employees: [],
+            type: "empleado"
+          }
+        ];
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        useToast(ToastEvents.error, "Hubo un error al guardar la información, por favor intenta nuevamente");
         return false;
       }
     }

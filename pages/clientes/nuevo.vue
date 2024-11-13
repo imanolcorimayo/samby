@@ -25,7 +25,7 @@
     <div class="flex flex-col gap-1">
       <span class="font-medium">Teléfono</span>
       <input
-        @input="formatPhoneNumber"
+        @input="() => (form.phone = formatPhoneNumber(form.phone))"
         maxlength="20"
         v-model="form.phone"
         type="text"
@@ -109,41 +109,6 @@ async function submitHandler() {
   submitted.value = true;
   submitting.value = false;
 }
-
-function formatPhoneNumber() {
-  // Check if the client has " 9" in the phone number
-  if (form.value.phone === "+54 9") {
-    form.value.phone = "";
-    return;
-  }
-
-  // Check if the client has " 9 " in the phone number
-  const has9InPhone = form.value.phone.includes(" 9 ");
-
-  // Remove all non-numeric characters except "+"
-  let cleanNumber = form.value.phone.replace(/[^\d+]/g, "");
-
-  let mobPhoneAux = "";
-  if (cleanNumber.startsWith("+54") && !has9InPhone) {
-    mobPhoneAux = "+54 9 ";
-    cleanNumber = cleanNumber.substring(3);
-  } else if (cleanNumber.startsWith("+549") && has9InPhone) {
-    mobPhoneAux = "+54 9 ";
-    cleanNumber = cleanNumber.substring(4);
-  }
-
-  // Format as (351) 346-7739
-  if (cleanNumber.length >= 3 && !cleanNumber.startsWith("+54")) {
-    cleanNumber = cleanNumber.replace(/^(\d{3})(\d)/, "($1) $2");
-  }
-  if (cleanNumber.length >= 9) {
-    cleanNumber = cleanNumber.replace(/^(\(\d{3}\) \d{3})(\d{1,4})/, "$1-$2");
-  }
-
-  // Limit the length to 15 characters (Argentina format)
-  form.value.phone = mobPhoneAux + cleanNumber.substring(0, 14);
-}
-
 useHead({
   title: "Nuevo cliente"
 });

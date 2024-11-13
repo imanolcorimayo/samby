@@ -9,7 +9,7 @@
       <div class="flex gap-2">
         <input v-model="search" type="text" class="" placeholder="Buscar..." />
         <NuxtLink
-          v-if="userRole === 'admin'"
+          v-if="indexStore.isOwner"
           to="/pedidos/nuevo"
           class="btn bg-primary text-white flex items-center text-nowrap"
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo
@@ -43,7 +43,7 @@
             <span class="">Pedidos del: {{ $dayjs(orderDates[index]).format("DD/MM/YYYY") }}</span>
             <NuxtLink
               class="flex justify-center items-center gap-1 btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
-              v-if="!isPendingShown && userRole === 'admin'"
+              v-if="!isPendingShown && indexStore.isOwner"
               :to="`/ventas/desde-pedido/${$dayjs(orderDates[index]).format('YYYY-MM-DD')}`"
             >
               <CarbonSalesOps />
@@ -145,7 +145,6 @@ import IconParkOutlineTransactionOrder from "~icons/icon-park-outline/transactio
 
 // ----- Define Pinia Vars --------
 const indexStore = useIndexStore();
-const { getUserRole: userRole } = storeToRefs(indexStore);
 const ordersStore = useOrdersStore();
 const { getPendingOrders: pendingOrders, getOrders: orders, arePendingOrdersFetched } = storeToRefs(ordersStore);
 

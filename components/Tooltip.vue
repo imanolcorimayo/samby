@@ -4,7 +4,8 @@
     <div
       v-if="isOpen"
       ref="tooltipBody"
-      class="absolute z-[25] right-0 sm:left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-fit h-fit"
+      class="absolute z-[25] mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-fit h-fit"
+      :class="{ 'left-0': position === 'left', 'right-0': position === 'right' }"
     >
       <slot name="content"></slot>
     </div>
@@ -12,6 +13,13 @@
 </template>
 
 <script setup>
+const props = defineProps({
+  position: {
+    type: String,
+    default: "left"
+  }
+});
+
 // ----- Define Useful Properties ---------
 
 // ----- Define Vars ------
