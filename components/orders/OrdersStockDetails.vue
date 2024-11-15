@@ -51,6 +51,7 @@ import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
 // ----- Define Useful Properties -----
 const { $dayjs } = useNuxtApp();
 // ----- Define Pinia Vars -----
+const indexStore = useIndexStore();
 
 // ----- Define Vars -----
 const pendingOrders = ref([]);
@@ -84,7 +85,18 @@ const finalList = computed(() => {
 // ----- Define Methods -----
 function sendListMessage() {
   // Clean the client's phone number to contain only numbers
-  const cleanPhone = 3513545369; // Meli's number
+  // const phone = 3513545369; // Meli's number
+  const phone = indexStore.currentBusiness.phone; // Meli's number
+
+  if (!phone) {
+    useToast(
+      "error",
+      "No se ha encontrado un número de teléfono para enviar el mensaje. Actualizalo en la configuración de la empresa."
+    );
+    return;
+  }
+
+  const cleanPhone = phone.replace(/\D/g, "");
 
   // Message creation
   let message = `Lista de productos que necesitamos comprar para el ${$dayjs(dateToFilter.value).format(

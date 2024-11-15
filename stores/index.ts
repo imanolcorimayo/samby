@@ -150,6 +150,7 @@ export const useIndexStore = defineStore("index", {
           this.currentBusiness = {
             id: !business.isEmployee ? business.id : business.businessId,
             name: business.name,
+            phone: business.phone,
             imageUrl: business.imageUrl,
             imageUrlThumbnail: business.imageUrlThumbnail,
             employees: [],
@@ -482,6 +483,19 @@ export const useIndexStore = defineStore("index", {
           });
         }
 
+        // Check if the current business is the one being updated
+        if (this.currentBusiness.id === current.id) {
+          this.currentBusiness = {
+            id: current.id,
+            name: businessNewInfo.name,
+            phone: businessNewInfo.phone,
+            imageUrl: businessNewInfo.imageUrl || null,
+            imageUrlThumbnail: businessNewInfo.imageUrlThumbnail || null,
+            employees: [],
+            type: "propietario" // Only owner can create a business
+          };
+        }
+
         return true;
       } catch (error) {
         console.error(error);
@@ -548,6 +562,7 @@ export const useIndexStore = defineStore("index", {
           this.currentBusiness = {
             id: this.$state.businesses[0].id,
             name: this.$state.businesses[0].name,
+            phone: this.$state.businesses[0].phone,
             imageUrl: this.$state.businesses[0].imageUrl,
             imageUrlThumbnail: this.$state.businesses[0].imageUrlThumbnail,
             employees: [],
@@ -871,6 +886,7 @@ export const useIndexStore = defineStore("index", {
             id: business.id,
             businessId: businessInfo.businessId,
             name: businessInfo.name,
+            phone: businessInfo.phone,
             isEmployee: true,
             imageUrl: businessInfo.imageUrl || null,
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,

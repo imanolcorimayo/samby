@@ -3,15 +3,34 @@
     <ProductsDetails ref="productsDetails" />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
-        <span class="text-[1.143rem] font-semibold">Lista de productos</span>
-        <NuxtLink to="/productos/nuevo" class="btn bg-primary text-white flex items-center"
+        <h1 class="text-start font-semibold">Lista de productos</h1>
+        <NuxtLink ref="newButton" to="/productos/nuevo" class="btn bg-primary text-white flex items-center"
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo Producto
         </NuxtLink>
       </div>
-      <div class="flex flex-col gap-[0.571rem]" v-if="products.length">
+      <div
+        class="flex flex-row gap-2 w-full"
+        :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
+      >
+        <div class="w-full">
+          <div class="absolute p-[0.714rem]">
+            <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
+          </div>
+          <FormKit
+            type="text"
+            name="search"
+            input-class="w-full pl-[2.5rem!important]"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            placeholder="Buscá por nombre, descripción o categoría"
+            v-model="search"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col gap-[0.571rem]" v-if="productsCleaned.length">
         <div
           class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow"
-          v-for="(product, index) in products"
+          v-for="(product, index) in productsCleaned"
           :key="index"
           @click="showProductsDetails(product.id)"
         >
@@ -43,14 +62,46 @@
 
 <script setup>
 import IcRoundPlus from "~icons/ic/round-plus";
+import AntDesignSearchOutlined from "~icons/ant-design/search-outlined";
 
 // ----- Define Pinia Vars --------
 const productsStore = useProductsStore();
 const { products, areProductsFetched } = storeToRefs(productsStore);
 
 // ----- Define Vars -----
+const search = ref("");
 // Refs
 const productsDetails = ref(null);
+const newButton = ref(null);
+
+// VueUse
+const buttonIsVisible = useElementVisibility(newButton);
+
+// ----- Define Computed -----
+const productsCleaned = computed(() => {
+  // Check products
+  if (!products.value) return [];
+
+  // Filter products based on search
+  let searchProducts = products.value;
+  if (search.value) {
+    searchProducts = products.value.filter((product) => {
+      // Check if productName includes search
+      const nameIncludes = product.productName.toLowerCase().includes(search.value.toLowerCase());
+
+      // Check if description includes search
+      const descriptionIncludes = product.description.toLowerCase().includes(search.value.toLowerCase());
+
+      // Check if category includes search
+      const category = product.category ?? "otro";
+      const categoryIncludes = category.toLowerCase().includes(search.value.toLowerCase());
+
+      return nameIncludes || descriptionIncludes || categoryIncludes;
+    });
+  }
+
+  return searchProducts;
+});
 
 // ----- Define Methods -----
 function showProductsDetails(id) {

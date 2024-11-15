@@ -146,7 +146,7 @@ export const useOrdersStore = defineStore("orders", {
 
         // Update last inserted order to be shown in the confirmation page
         this.$state.lastInsertedOrder = {
-          order: { ...orderObject, id: newOrder.id },
+          order: { ...orderObject, shippingDate: orderObject.shippingDate.toDate(), id: newOrder.id },
           createdAt: $dayjs(),
           orderId: newOrder.id
         };

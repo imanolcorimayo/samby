@@ -181,7 +181,7 @@ function formatPhoneNumber() {
     cleanNumber = cleanNumber.substring(4);
   }
 
-  // Format as (351) 346-7739
+  // Format as (111) 111-1111
   if (cleanNumber.length >= 3 && !cleanNumber.startsWith("+54")) {
     cleanNumber = cleanNumber.replace(/^(\d{3})(\d)/, "($1) $2");
   }

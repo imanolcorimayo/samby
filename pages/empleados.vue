@@ -67,9 +67,16 @@ import SolarCopyBold from "~icons/solar/copy-bold";
 
 // ----- Define Pinia Vars --------
 const indexStore = useIndexStore();
-const { getEmployees: employees, areEmployeesFetched } = storeToRefs(indexStore);
+const { getEmployees: employees, areEmployeesFetched, areBusinessesFetched } = storeToRefs(indexStore);
 
-indexStore.fetchEmployees();
+if (!areBusinessesFetched.value) {
+  // Wait 1 second when business are not fetched since this cleans up the employees
+  setTimeout(() => {
+    indexStore.fetchEmployees();
+  }, 1000);
+} else {
+  indexStore.fetchEmployees();
+}
 
 // ----- Define Vars -----
 // Refs
