@@ -4,9 +4,7 @@
     <div class="flex justify-between items-center">
       <div class="flex flex-col gap-0">
         <h1 class="text-start">Agregar nuevo pedido</h1>
-        <p class="text-gray-600" ref="subtitle">
-          Agrega los productos que hagan falta y confirma el pedido en el carrito
-        </p>
+        <p class="text-gray-600">Agrega los productos que hagan falta y confirma el pedido en el carrito</p>
       </div>
       <NuxtLink
         to="/pedidos"
@@ -17,10 +15,7 @@
       </NuxtLink>
     </div>
     <!-- Search -->
-    <div
-      class="flex sm:flex-row gap-2 w-full"
-      :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
-    >
+    <div class="flex sm:flex-row gap-2 w-full sticky top-0">
       <div class="w-full">
         <div class="absolute p-[0.714rem]">
           <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
@@ -120,12 +115,6 @@ const selectedProduct = ref({});
 const productsQuantity = ref({});
 const submitting = ref(false);
 const actionTimeout = ref(null);
-
-// Refs
-const subtitle = ref(null);
-
-// VueUse
-const buttonIsVisible = useElementVisibility(subtitle);
 
 // Function will manage if the data is already fetched
 productsStore.fetchData();

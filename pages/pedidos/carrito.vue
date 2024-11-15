@@ -166,7 +166,7 @@ const formattedClients = computed(() => {
   return clients.value.map((cl) => {
     return {
       ...cl,
-      clientName: `${cl.clientName} ${cl.fromEmprendeVerde ? "**Cliente Emprende Verde**" : ""}`
+      clientName: `${cl.clientName} ${cl.fromEmprendeVerde ? "(Desde app de compras)" : "(Creado manualmente)"}`
     };
   });
 });

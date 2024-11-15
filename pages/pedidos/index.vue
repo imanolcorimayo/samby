@@ -6,7 +6,7 @@
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de pedidos</h1>
       </div>
-      <div class="flex gap-2">
+      <div class="flex gap-2 sticky top-0">
         <input v-model="search" type="text" class="" placeholder="Buscar..." />
         <NuxtLink
           v-if="indexStore.isOwner"
@@ -66,8 +66,9 @@
                     class="flex items-center gap-1 text-sm text-blue-700 font-medium"
                     v-if="order.client.fromEmprendeVerde"
                   >
-                    <PhSealCheckDuotone class="text-blue-700" /> Usuario EmprendeVerde
+                    <PhSealCheckDuotone /> Desde app de compras
                   </span>
+                  <span class="flex items-center gap-1 text-sm font-medium" v-else> Creado manualmente </span>
                   <span class="flex items-center gap-3 font-medium"
                     ><MingcuteUser4Fill class="text-[2rem]" />{{ order.client.clientName }}</span
                   >

@@ -4,14 +4,11 @@
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de productos</h1>
-        <NuxtLink ref="newButton" to="/productos/nuevo" class="btn bg-primary text-white flex items-center"
+        <NuxtLink to="/productos/nuevo" class="btn bg-primary text-white flex items-center"
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo Producto
         </NuxtLink>
       </div>
-      <div
-        class="flex flex-row gap-2 w-full"
-        :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
-      >
+      <div class="flex flex-row gap-2 w-full sticky top-0">
         <div class="w-full">
           <div class="absolute p-[0.714rem]">
             <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
@@ -72,10 +69,6 @@ const { products, areProductsFetched } = storeToRefs(productsStore);
 const search = ref("");
 // Refs
 const productsDetails = ref(null);
-const newButton = ref(null);
-
-// VueUse
-const buttonIsVisible = useElementVisibility(newButton);
 
 // ----- Define Computed -----
 const productsCleaned = computed(() => {

@@ -10,13 +10,10 @@
         class="flex items-center gap-[0.571rem] bg-secondary border-[2px] border-primary rounded-[0.428rem] w-fit h-fit btn"
       >
         <EvaArrowBackOutline class="font-bold" />
-        <span class="font-medium" ref="backButton">Ventas</span>
+        <span class="font-medium">Ventas</span>
       </NuxtLink>
     </div>
-    <div
-      class="flex sm:flex-row gap-2 w-full"
-      :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
-    >
+    <div class="flex sm:flex-row gap-2 w-full sticky top-0">
       <div class="w-full">
         <div class="absolute p-[0.714rem]">
           <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
@@ -197,8 +194,6 @@ import IcTwotoneClear from "~icons/ic/twotone-clear";
 import FluentStarHalf12Regular from "~icons/fluent/star-half-12-regular";
 import IconoirStarSolid from "~icons/iconoir/star-solid";
 import AkarIconsCircleXFill from "~icons/akar-icons/circle-x-fill";
-
-import { collection, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
 // ----- Define Useful Properties -------
@@ -216,12 +211,6 @@ const form = ref({
   sellingPrice: "",
   date: $dayjs().format("YYYY-MM-DD")
 });
-
-// Refs
-const backButton = ref(null);
-
-// VueUse
-const buttonIsVisible = useElementVisibility(backButton);
 
 // ----- Define Pinia Vars --------
 const productsStore = useProductsStore();

@@ -5,13 +5,10 @@
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de ventas</h1>
         <NuxtLink to="/ventas/nuevo" class="btn bg-primary text-white flex items-center text-nowrap"
-          ><IcRoundPlus class="text-[1.143rem]" ref="newButton" /> Nueva venta
+          ><IcRoundPlus class="text-[1.143rem]" /> Nueva venta
         </NuxtLink>
       </div>
-      <div
-        class="flex flex-row gap-2 w-full"
-        :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
-      >
+      <div class="flex flex-row gap-2 w-full sticky top-0">
         <div class="w-full">
           <div class="absolute p-[0.714rem]">
             <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
@@ -153,11 +150,7 @@ const submitting = ref(false);
 const filterDate = ref("");
 
 // Refs
-const newButton = ref(null);
 const sellsDetails = ref(null);
-
-// VueUse
-const buttonIsVisible = useElementVisibility(newButton);
 
 // ----- Define Computed -------
 const sellsCleaned = computed(() => {

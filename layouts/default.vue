@@ -188,15 +188,14 @@
         </div>
       </div>
     </transition>
-    <div class="flex-1 flex flex-col max-h-screen overflow-y-scroll py-[1.429rem]">
+    <div class="flex-1 flex flex-col max-h-screen overflow-y-scroll pt-[1.429rem] relative">
       <TheHeader class="md:hidden" @switchMenu="switchMenu" />
       <main class="flex-1 flex px-2 max-w-[80rem] mx-auto w-full">
         <slot />
       </main>
-
       <NuxtLink
         to="/pedidos/carrito"
-        class="flex justify-between items-center bottom-0 w-full max-w-[80rem] bg-primary p-[1.429rem] text-white mt-4 fixed position-middle"
+        class="flex justify-between items-center w-full max-w-[80rem] bg-primary p-[1.429rem] text-white mt-4 mx-auto sticky bottom-0"
         v-if="doesOrderExist && showCartBannerInRoutes"
       >
         <div class="flex items-center gap-2">
@@ -208,10 +207,6 @@
         </div>
         <span class="text-xl font-semibold">{{ formatPrice(totalAmount) }}</span>
       </NuxtLink>
-      <div
-        class="bg-primary h-[5.357rem] mt-4 max-w-[80rem] m-auto"
-        v-if="doesOrderExist && showCartBannerInRoutes"
-      ></div>
     </div>
   </div>
 </template>
@@ -280,7 +275,7 @@ function switchMenu() {
 }
 
 // ------ Define Computed --------
-const showCartBannerInRoutes = computed(() => route.path !== "/pedidos/carrito");
+const showCartBannerInRoutes = computed(() => ["/pedidos", "/pedidos/nuevo"].includes(route.path));
 
 // ------ Define Watchers --------
 watch([width, () => route.path], () => {

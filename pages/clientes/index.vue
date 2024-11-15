@@ -4,14 +4,11 @@
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de clientes</h1>
-        <NuxtLink ref="newButton" to="/clientes/nuevo" class="btn bg-primary text-white flex items-center"
+        <NuxtLink to="/clientes/nuevo" class="btn bg-primary text-white flex items-center"
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo Cliente
         </NuxtLink>
       </div>
-      <div
-        class="flex flex-row gap-2 w-full"
-        :class="{ 'fixed top-0 left-[50%] -translate-x-1/2 w-full p-[1.429rem] max-w-[80rem]': !buttonIsVisible }"
-      >
+      <div class="flex flex-row gap-2 w-full sticky top-0">
         <div class="w-full">
           <div class="absolute p-[0.714rem]">
             <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
@@ -36,8 +33,9 @@
         >
           <div class="flex flex-col">
             <span class="flex items-center gap-1 text-sm text-blue-700 font-medium" v-if="client.fromEmprendeVerde">
-              <PhSealCheckDuotone class="text-blue-700" /> Usuario EmprendeVerde
+              <PhSealCheckDuotone /> Desde app de compras
             </span>
+            <span class="flex items-center gap-1 text-sm font-medium" v-else> Creado manualmente </span>
             <span class="font-semibold">{{ client.clientName }}</span>
             <span class="text-sm">Dirección: {{ client.address }}</span>
             <span class="text-sm">Teléfono: {{ client.phone }}</span>
@@ -63,10 +61,6 @@ const { clients, areClientsFetched } = storeToRefs(clientsStore);
 const search = ref("");
 // Refs
 const clientsDetails = ref(null);
-const newButton = ref(null);
-
-// VueUse
-const buttonIsVisible = useElementVisibility(newButton);
 
 // ----- Define Computed -----
 const clientsCleaned = computed(() => {
