@@ -38,7 +38,7 @@
           label-class="font-medium"
           messages-class="text-red-500 text-[0.75rem]"
           input-class="w-full"
-          label="Fecha de venta"
+          label="Fecha de envío"
           placeholder="yyyy-mm-dd"
           validation="required"
           v-model="shippingDate"

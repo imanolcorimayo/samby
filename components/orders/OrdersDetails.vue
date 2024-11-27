@@ -94,7 +94,14 @@
                 <td class="py-3 text-start">Envío</td>
                 <td class="py-3 hidden sm:block"></td>
                 <td class="py-3"></td>
-                <td class="py-3">{{ formatPrice(currentOrder.shippingPrice) }}</td>
+                <td class="py-3 flex items-center gap-2 max-w-[10rem]">
+                  $<input
+                    v-model="editableOrder.shippingPrice"
+                    type="number"
+                    class="text-center"
+                    placeholder="Ej: 1000"
+                  />
+                </td>
               </tr>
               <tr class="text-center border-b font-bold">
                 <td class="py-3 text-start">Total</td>
@@ -121,10 +128,18 @@
             <span>{{ currentOrder.client.address ?? "N/A" }}</span>
           </div>
         </div>
-
-        <div class="flex flex-col gap-2">
-          <span class="font-semibold text-lg">Fecha de envío</span>
-          <span class="">{{ formattedDate(currentOrder.shippingDate) }} </span>
+        <div class="flex-1 flex flex-col gap-2 w-fit">
+          <FormKit
+            type="date"
+            name="shipping_date"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            input-class="w-fit"
+            label="Fecha de envío"
+            placeholder="yyyy-mm-dd"
+            validation="required"
+            v-model="editableOrder.shippingDate"
+          />
         </div>
       </div>
     </template>
@@ -475,36 +490,6 @@ async function modifyOrder() {
     submitting.value = false;
   } else {
     useToast(ToastEvents.error, "Hubo un error al modificar el pedido, por favor intenta nuevamente");
-    submitting.value = false;
-  }
-}
-
-async function markAsDelivered(orderId) {
-  // If submitting, do nothing
-  if (submitting.value) return;
-
-  // Start the loader
-  submitting.value = true;
-
-  // Confirm dialogue
-  const confirmed = await confirmDialogue.value.openDialog({ edit: true });
-
-  if (!confirmed) {
-    submitting.value = false;
-    return;
-  }
-
-  // Update the order
-  const orderUpdated = await ordersStore.updateStatusOrder(orderId, "entregado");
-
-  if (orderUpdated) {
-    useToast(ToastEvents.success, "Pedido marcado como entregado correctamente");
-    submitting.value = false;
-
-    // Close the modal
-    mainModal.value.closeModal();
-  } else {
-    useToast(ToastEvents.error, "Hubo un error al completar el pedido, por favor intenta nuevamente");
     submitting.value = false;
   }
 }
