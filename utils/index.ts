@@ -200,3 +200,15 @@ export const formatPhoneNumber = function (phone = "") {
   // Limit the length to 15 characters (Argentina format)
   return mobPhoneAux + cleanNumber.substring(0, 14);
 };
+
+// For business configuration
+export const BUSINESS_SHIPPING_TYPES = ["Solo Envío", "Envío y Retiro en Local", "Solo Retiro en Local"];
+export const BUSINESS_SHIPPING_TYPES_UTILS = {
+  delivery: "Solo Envío",
+  both: "Envío y Retiro en Local",
+  pickup: "Solo Retiro en Local"
+};
+
+// For orders
+export const ORDER_SHIPPING_TYPES = ["Envío", "Retiro en Local"];
+export const ORDER_SHIPPING_TYPES_UTILS = { delivery: "Envío", pickup: "Retiro en Local" };

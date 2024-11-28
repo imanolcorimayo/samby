@@ -26,19 +26,46 @@
       </div>
     </div>
 
+    <div v-if="currentBusiness.shippingType === BUSINESS_SHIPPING_TYPES_UTILS.both">
+      <FormKit
+        type="select"
+        name="shipping_type"
+        :options="ORDER_SHIPPING_TYPES"
+        label-class="font-medium"
+        messages-class="text-red-500 text-[0.75rem]"
+        :input-class="`w-full ${!shippingType ? 'text-gray-500' : ''}`"
+        outer-class="w-full flex-1"
+        label="Elegí el método de envío"
+        placeholder="Elejí una opción"
+        v-model="shippingType"
+      />
+    </div>
     <div class="flex flex-col md:flex-row justify-between gap-4">
-      <div class="flex-1 flex flex-col justify-between w-full">
+      <div
+        class="flex-1 flex flex-col justify-between w-full"
+        v-if="currentBusiness.shippingType !== BUSINESS_SHIPPING_TYPES_UTILS.pickup"
+      >
         <span class="font-semibold">Costo de envio</span>
-        <input v-model="shippingPrice" type="number" placeholder="Ej: 1000" />
+        <input
+          v-model="shippingPrice"
+          type="number"
+          placeholder="Ej: 1000"
+          :disabled="shippingType === ORDER_SHIPPING_TYPES_UTILS.pickup"
+        />
       </div>
       <div class="flex-1 flex flex-col gap-2 w-full">
+        <span
+          v-if="currentBusiness.shippingType == BUSINESS_SHIPPING_TYPES_UTILS.pickup"
+          class="text-blue-500 font-medium"
+          >* Tu local esta configurado para retiros en el local únicamente</span
+        >
         <FormKit
           type="date"
           name="shipping_date"
           label-class="font-medium"
           messages-class="text-red-500 text-[0.75rem]"
           input-class="w-full"
-          label="Fecha de envío"
+          label="Fecha de envío o retiro"
           placeholder="yyyy-mm-dd"
           validation="required"
           v-model="shippingDate"
@@ -138,6 +165,10 @@ const clientsStore = useClientsStore();
 clientsStore.fetchData();
 const { clients } = storeToRefs(clientsStore);
 
+const indexStore = useIndexStore();
+indexStore.fetchBusinesses();
+const { getCurrentBusiness: currentBusiness } = storeToRefs(indexStore);
+
 const ordersStore = useOrdersStore();
 const { doesOrderExist, getShoppingCart: products, totalAmount } = storeToRefs(ordersStore);
 
@@ -154,14 +185,32 @@ const clientError = ref({
   phone: false,
   address: false
 });
-const shippingPrice = ref(null);
+
+let initialShippingTypeValue = "";
+let initialShippingPriceValue = currentBusiness.value.shippingPrice ?? 0;
+if (currentBusiness.value.shippingType === BUSINESS_SHIPPING_TYPES_UTILS.both) {
+  initialShippingTypeValue = "";
+} else if (currentBusiness.value.shippingType === BUSINESS_SHIPPING_TYPES_UTILS.shipping) {
+  initialShippingTypeValue = ORDER_SHIPPING_TYPES_UTILS.delivery;
+} else if (currentBusiness.value.shippingType === BUSINESS_SHIPPING_TYPES_UTILS.pickup) {
+  initialShippingTypeValue = ORDER_SHIPPING_TYPES_UTILS.pickup;
+  initialShippingPriceValue = 0;
+}
+const shippingType = ref(initialShippingTypeValue);
+
+const shippingPrice = ref(initialShippingPriceValue);
 // Set for today
 const shippingDate = ref($dayjs().format("YYYY-MM-DD"));
 const clientSelected = ref(false);
 const orderCreated = ref(false);
 
 // ------- Define Computed --------
-const totalWithShipping = computed(() => totalAmount.value + (shippingPrice.value ?? 0));
+const totalWithShipping = computed(() => {
+  // Ensure both values are numbers
+  shippingPrice.value = parseFloat(shippingPrice.value || 0);
+
+  return totalAmount.value + shippingPrice.value;
+});
 const formattedClients = computed(() => {
   return clients.value.map((cl) => {
     return {
@@ -239,11 +288,9 @@ async function confirmOrder() {
     return;
   }
 
-  // Check if shipping price is valid
+  // It can be null, so we just ensure it's a number and equal to 0
   if (!shippingPrice.value) {
-    useToast(ToastEvents.error, "Por favor, complete el costo de envío.");
-    loading.value = false;
-    return;
+    shippingPrice.value = 0;
   }
 
   // Check if shipping date is valid
@@ -260,7 +307,7 @@ async function confirmOrder() {
     return;
   }
 
-  // Place the order
+  // Place the order. Current business is is managed internally
   const orderObject = await ordersStore.placeOrder({
     products: products.value,
     shippingPrice: shippingPrice.value,
@@ -268,6 +315,7 @@ async function confirmOrder() {
     client: client.value,
     totalAmount: totalWithShipping.value,
     totalProductsAmount: totalAmount.value,
+    shippingType: shippingType.value,
     orderStatus: "pendiente"
   });
 
@@ -319,6 +367,14 @@ function selectClient(clientId) {
 function onUnselect() {
   clientSelected.value = false;
 }
+
+watch(shippingType, (newVal) => {
+  if (newVal === ORDER_SHIPPING_TYPES_UTILS.pickup) {
+    shippingPrice.value = 0;
+  } else if (newVal === ORDER_SHIPPING_TYPES_UTILS.delivery) {
+    shippingPrice.value = currentBusiness.value.shippingPrice ?? 0;
+  }
+});
 
 useHead({
   title: "Confirmar Pedido"

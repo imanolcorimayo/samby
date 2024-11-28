@@ -153,6 +153,8 @@ export const useIndexStore = defineStore("index", {
             phone: business.phone,
             imageUrl: business.imageUrl,
             imageUrlThumbnail: business.imageUrlThumbnail,
+            shippingPrice: business.shippingPrice || null,
+            shippingType: business.shippingType || null,
             employees: [],
             type: business.type
           };
@@ -323,6 +325,8 @@ export const useIndexStore = defineStore("index", {
           address: businessInfo.address || null,
           imageUrl: businessInfo.imageUrl || null,
           userBusinessImageId: businessInfo.userBusinessImageId || null,
+          shippingPrice: businessInfo.shippingPrice || null,
+          shippingType: businessInfo.shippingType || null,
           isEmployee: false,
           userUid: user.value.uid,
           createdAt: serverTimestamp()
@@ -354,6 +358,8 @@ export const useIndexStore = defineStore("index", {
             phone: businessInfo.phone,
             imageUrl: businessInfo.imageUrl || null,
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
+            shippingPrice: businessInfo.shippingPrice || null,
+            shippingType: businessInfo.shippingType || null,
             employees: [],
             type: "propietario" // Only owner can create a business
           };
@@ -369,6 +375,8 @@ export const useIndexStore = defineStore("index", {
             description: businessInfo.description || null,
             address: businessInfo.address || null,
             imageUrl: businessInfo.imageUrl || null,
+            userBusinessImageId: businessInfo.userBusinessImageId || null,
+            shippingPrice: businessInfo.shippingPrice || null,
             type: "propietario", // Only owner can create a business
             userUid: user.value.uid,
             createdAt: $dayjs().format("DD/MM/YYYY")
@@ -413,7 +421,9 @@ export const useIndexStore = defineStore("index", {
         businessNewInfo.description === current.description &&
         businessNewInfo.address === current.address &&
         businessNewInfo.phone === current.phone &&
-        businessNewInfo.imageUrl === current.imageUrl
+        businessNewInfo.imageUrl === current.imageUrl &&
+        businessNewInfo.shippingPrice === current.shippingPrice &&
+        businessNewInfo.shippingType === current.shippingType
       ) {
         useToast(ToastEvents.info, "No se ha realizado ningún cambio");
         return false;
@@ -428,6 +438,8 @@ export const useIndexStore = defineStore("index", {
           phone: businessNewInfo.phone,
           description: businessNewInfo.description || null,
           address: businessNewInfo.address || null,
+          shippingPrice: businessNewInfo.shippingPrice || null,
+          shippingType: businessNewInfo.shippingType || null,
           ...(imageChanged
             ? { imageUrl: businessNewInfo.imageUrl, userBusinessImageId: businessNewInfo.userBusinessImageId }
             : {})
@@ -457,6 +469,8 @@ export const useIndexStore = defineStore("index", {
               address: businessNewInfo.address || null,
               imageUrl: businessNewInfo.imageUrl || null,
               userBusinessImageId: businessNewInfo.userBusinessImageId || null,
+              shippingPrice: businessNewInfo.shippingPrice || null,
+              shippingType: businessNewInfo.shippingType || null,
               type: "propietario", // Only owner can create a business
               userUid: user.value.uid,
               createdAt: $dayjs().format("DD/MM/YYYY")
@@ -491,6 +505,8 @@ export const useIndexStore = defineStore("index", {
             phone: businessNewInfo.phone,
             imageUrl: businessNewInfo.imageUrl || null,
             imageUrlThumbnail: businessNewInfo.imageUrlThumbnail || null,
+            shippingPrice: businessNewInfo.shippingPrice || null,
+            shippingType: businessNewInfo.shippingType || null,
             employees: [],
             type: "propietario" // Only owner can create a business
           };
@@ -565,6 +581,8 @@ export const useIndexStore = defineStore("index", {
             phone: this.$state.businesses[0].phone,
             imageUrl: this.$state.businesses[0].imageUrl,
             imageUrlThumbnail: this.$state.businesses[0].imageUrlThumbnail,
+            shippingPrice: this.$state.businesses[0].shippingPrice || null,
+            shippingType: this.$state.businesses[0].shippingType || null,
             employees: [],
             type: this.$state.businesses[0].type
           };
@@ -890,6 +908,8 @@ export const useIndexStore = defineStore("index", {
             isEmployee: true,
             imageUrl: businessInfo.imageUrl || null,
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
+            shippingPrice: businessInfo.shippingPrice || null,
+            shippingType: businessInfo.shippingType || null,
             employees: [],
             type: businessInfo.role.toLowerCase()
           };

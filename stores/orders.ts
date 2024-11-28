@@ -109,8 +109,16 @@ export const useOrdersStore = defineStore("orders", {
 
       // Double check if shipping price is valid
       if (!order.shippingPrice) {
-        useToast(ToastEvents.error, "Por favor, complete el costo de envío.");
-        return null;
+        order.shippingPrice = 0;
+      }
+
+      if (!["Envío", "Retiro en Local", null].includes(order.shippingType)) {
+        order.shippingType = null;
+        order.shippingPrice = 0;
+      } else if (order.shippingType === "Retiro en Local" && order.shippingPrice !== 0) {
+        order.shippingPrice = 0;
+      } else if (order.shippingType === null && order.shippingPrice !== 0) {
+        order.shippingType = "Envío";
       }
 
       // Double check products still exits

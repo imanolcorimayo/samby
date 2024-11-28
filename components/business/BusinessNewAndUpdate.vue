@@ -18,7 +18,7 @@
       <FormKit
         type="form"
         id="business-create-modify"
-        :form-class="`flex flex-col gap-4 w-full ${submitted ? 'hidden' : ''}`"
+        :form-class="`flex flex-col gap-4 w-full py-4 ${submitted ? 'hidden' : ''}`"
         submit-label="Nuevo Producto"
         @submit="updateOrCreateBusiness"
         :actions="false"
@@ -78,6 +78,32 @@
             required
           />
         </div>
+        <div class="flex justify-between gap-4">
+          <FormKit
+            type="select"
+            name="shipping_type"
+            :options="BUSINESS_SHIPPING_TYPES"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            input-class="w-full"
+            outer-class="w-full flex-1"
+            label="Decidí cómo vas a vender"
+            placeholder="Elejí una opción"
+            v-model="form.shippingType"
+          />
+          <FormKit
+            type="number"
+            name="shipping_price"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            input-class="w-full"
+            help="Ingresa 0 ó dejalo vacío si el envío es gratuito"
+            help-class="text-xs"
+            label="Precio de envío (opcional)"
+            placeholder="Si ofreces envíos, ingresa el precio"
+            v-model="form.shippingPrice"
+          />
+        </div>
       </FormKit>
     </template>
     <template #footer>
@@ -122,7 +148,9 @@ const form = ref({
   name: "",
   description: "",
   address: "",
-  phone: ""
+  phone: "",
+  shippingType: "",
+  shippingPrice: ""
 });
 
 // Refs
@@ -144,7 +172,9 @@ async function updateOrCreateBusiness() {
       address: form.value.address || null,
       imageUrl: imageUrl.value || null,
       userBusinessImageId: getBusinessImage.value?.id || null,
-      phone: form.value.phone
+      phone: form.value.phone,
+      shippingType: form.value.shippingType,
+      shippingPrice: form.value.shippingPrice
     });
   } else {
     // The validation is managed by the store
@@ -156,7 +186,9 @@ async function updateOrCreateBusiness() {
         address: form.value.address || null,
         imageUrl: imageUrl.value || null,
         userBusinessImageId: getBusinessImage.value?.id || null,
-        phone: form.value.phone
+        phone: form.value.phone,
+        shippingType: form.value.shippingType,
+        shippingPrice: form.value.shippingPrice
       },
       currentBusiness.value // Used to properly manage the image update
     );
@@ -280,6 +312,8 @@ const showModal = (businessId = false) => {
     form.value.phone = currentBusiness.value.phone;
     form.value.description = currentBusiness.value.description || "";
     form.value.address = currentBusiness.value.address || "";
+    form.value.shippingType = currentBusiness.value.shippingType || "";
+    form.value.shippingPrice = currentBusiness.value.shippingPrice || "";
 
     // Update image URL
     imageUrl.value = currentBusiness.value.imageUrl || null;
