@@ -190,7 +190,7 @@ let initialShippingTypeValue = "";
 let initialShippingPriceValue = currentBusiness.value.shippingPrice ?? 0;
 if (currentBusiness.value.shippingType === BUSINESS_SHIPPING_TYPES_UTILS.both) {
   initialShippingTypeValue = "";
-} else if (currentBusiness.value.shippingType === BUSINESS_SHIPPING_TYPES_UTILS.shipping) {
+} else if (currentBusiness.value.shippingType === BUSINESS_SHIPPING_TYPES_UTILS.delivery) {
   initialShippingTypeValue = ORDER_SHIPPING_TYPES_UTILS.delivery;
 } else if (currentBusiness.value.shippingType === BUSINESS_SHIPPING_TYPES_UTILS.pickup) {
   initialShippingTypeValue = ORDER_SHIPPING_TYPES_UTILS.pickup;

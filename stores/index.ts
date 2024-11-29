@@ -432,8 +432,7 @@ export const useIndexStore = defineStore("index", {
       try {
         const imageChanged = businessNewInfo.userBusinessImageId !== current.userBusinessImageId;
 
-        // Update business
-        await updateDoc(doc(db, "userBusiness", current.id), {
+        const objectToUpdate = {
           name: businessNewInfo.name,
           phone: businessNewInfo.phone,
           description: businessNewInfo.description || null,
@@ -443,7 +442,10 @@ export const useIndexStore = defineStore("index", {
           ...(imageChanged
             ? { imageUrl: businessNewInfo.imageUrl, userBusinessImageId: businessNewInfo.userBusinessImageId }
             : {})
-        });
+        };
+
+        // Update business
+        await updateDoc(doc(db, "userBusiness", current.id), objectToUpdate);
 
         // Update user business image
         if (imageChanged) {
@@ -456,6 +458,14 @@ export const useIndexStore = defineStore("index", {
             businessId: false
           });
         }
+
+        // Update employee businesses if any
+        const userBusiness = await getDocs(
+          query(collection(db, "userBusiness"), where("businessId", "==", current.id), where("isEmployee", "==", true))
+        );
+        userBusiness.docs.forEach(async (doc) => {
+          await updateDoc(doc.ref, objectToUpdate);
+        });
 
         // Update business in store
         const index = this.getBusinesses.findIndex((b: any) => b.id === current.id);
@@ -476,25 +486,6 @@ export const useIndexStore = defineStore("index", {
               createdAt: $dayjs().format("DD/MM/YYYY")
             })
           );
-        }
-
-        // When name or photo changes, it affect the employee's business view,
-        // so we need to update them too
-        if (businessNewInfo.name !== current.name || imageChanged) {
-          const userBusiness = await getDocs(
-            query(
-              collection(db, "userBusiness"),
-              where("businessId", "==", current.id),
-              where("isEmployee", "==", true)
-            )
-          );
-
-          userBusiness.docs.forEach(async (doc) => {
-            await updateDoc(doc.ref, {
-              name: businessNewInfo.name,
-              imageUrl: businessNewInfo.imageUrl || null
-            });
-          });
         }
 
         // Check if the current business is the one being updated
