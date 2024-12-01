@@ -65,20 +65,19 @@
           <span class="flex items-center gap-2 text-sm font-thin"
             ><BasilLocationSolid class="text-gray-400" />{{ business.address || "N/A" }}</span
           >
-          <div class="w-ful flex justify-end">
-            <button
-              v-if="!business.isEmployee"
-              class="btn bg-secondary text-center ring-1 ring-gray-300"
-              @click="newOrUpdateBusiness.showModal(business.id)"
-            >
-              Editar
-            </button>
+          <div class="w-ful flex justify-end gap-2">
             <button
               v-if="business.isEmployee"
               class="btn bg-secondary text-center ring-1 ring-danger"
               @click="leaveBusiness(business.id)"
             >
               Dejar negocio
+            </button>
+            <button
+              class="btn bg-secondary text-center ring-1 ring-gray-300"
+              @click="newOrUpdateBusiness.showModal(business.id)"
+            >
+              Editar
             </button>
           </div>
         </div>

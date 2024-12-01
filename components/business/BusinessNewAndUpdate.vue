@@ -177,10 +177,16 @@ async function updateOrCreateBusiness() {
       shippingPrice: form.value.shippingPrice
     });
   } else {
+    // Manipulate business id when is an employee who is editing
+    let businessId = currentBusiness.value.id;
+    if (currentBusiness.value.isEmployee && currentBusiness.value.businessId) {
+      businessId = currentBusiness.value.businessId;
+    }
+
     // The validation is managed by the store
     informationSaved = await indexStore.updateBusiness(
       {
-        id: currentBusiness.value.id,
+        id: businessId,
         name: form.value.name,
         description: form.value.description || null,
         address: form.value.address || null,
@@ -190,7 +196,7 @@ async function updateOrCreateBusiness() {
         shippingType: form.value.shippingType,
         shippingPrice: form.value.shippingPrice
       },
-      currentBusiness.value // Used to properly manage the image update
+      currentBusiness.value // Used to properly manage the image update and update in the employees case
     );
   }
 

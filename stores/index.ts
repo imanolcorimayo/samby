@@ -49,8 +49,26 @@ export const useIndexStore = defineStore("index", {
     getEmployees: (state) => state.currentBusiness.employees
   },
   actions: {
-    async updateUserRole(role: string) {
-      this.userRole = role;
+    async updateUserRole() {
+      const user = await getCurrentUser();
+      const db = useFirestore();
+      const businessId = useLocalStorage("cBId", null);
+
+      // Validate the user role
+      const role = await getDocs(
+        query(collection(db, "roles"), where("userUid", "==", user.uid), where("businessId", "==", businessId.value))
+      );
+
+      // If user has no role, redirect to /negocios
+      if (role.empty) {
+        return false;
+      }
+
+      // Get the user role
+      const userRole = role.docs[0].data().role;
+
+      this.userRole = userRole;
+      return userRole;
     },
     async fetchBusinesses() {
       // Get Firestore and Current User
@@ -158,6 +176,8 @@ export const useIndexStore = defineStore("index", {
             employees: [],
             type: business.type
           };
+
+          this.updateUserRole();
         }
 
         // If not business is found, clear the current business id
@@ -445,12 +465,15 @@ export const useIndexStore = defineStore("index", {
         };
 
         // Update business
-        await updateDoc(doc(db, "userBusiness", current.id), objectToUpdate);
+        // Only businessNewInfo will contain the proper businessId
+        await updateDoc(doc(db, "userBusiness", businessNewInfo.id), objectToUpdate);
 
         // Update user business image
+        // Don't use current.id since it might contain an employee businessId, which is different from
+        // businessNewInfo.id (the actual business id)
         if (imageChanged) {
           await updateDoc(doc(db, "userBusinessImage", businessNewInfo.userBusinessImageId), {
-            businessId: current.id
+            businessId: businessNewInfo.id
           });
 
           // Update previous image to have businessId = false
@@ -461,13 +484,18 @@ export const useIndexStore = defineStore("index", {
 
         // Update employee businesses if any
         const userBusiness = await getDocs(
-          query(collection(db, "userBusiness"), where("businessId", "==", current.id), where("isEmployee", "==", true))
+          query(
+            collection(db, "userBusiness"),
+            where("businessId", "==", businessNewInfo.id),
+            where("isEmployee", "==", true)
+          )
         );
         userBusiness.docs.forEach(async (doc) => {
           await updateDoc(doc.ref, objectToUpdate);
         });
 
-        // Update business in store
+        // Here we use current.id since the businesses listed in the store
+        // Are only the ones belonging to the employee or the owner's
         const index = this.getBusinesses.findIndex((b: any) => b.id === current.id);
         if (index > -1) {
           this.$state.businesses[index] = JSON.parse(
@@ -489,6 +517,7 @@ export const useIndexStore = defineStore("index", {
         }
 
         // Check if the current business is the one being updated
+        // Same here, we use current.id
         if (this.currentBusiness.id === current.id) {
           this.currentBusiness = {
             id: current.id,
@@ -499,7 +528,7 @@ export const useIndexStore = defineStore("index", {
             shippingPrice: businessNewInfo.shippingPrice || null,
             shippingType: businessNewInfo.shippingType || null,
             employees: [],
-            type: "propietario" // Only owner can create a business
+            type: "propietario" // Only owner can update a business
           };
         }
 

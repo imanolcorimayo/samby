@@ -8,7 +8,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (to.path.includes("/welcome") || to.path.includes("/blocked") || process.server) return;
 
   const user = await getCurrentUser();
-  const db = useFirestore();
   const indexStore = useIndexStore();
 
   // Redirect to sign-in
@@ -28,30 +27,16 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   }
 
   try {
-    // Validate the user role
-    const role = await getDocs(
-      query(collection(db, "roles"), where("userUid", "==", user.uid), where("businessId", "==", businessId.value))
-    );
+    // Update in store to manage roles globally
+    const userRole = await indexStore.updateUserRole();
 
-    // If user has no role, redirect to /negocios
-    if (role.empty && to.path !== "/negocios") {
+    if (!userRole && to.path !== "/negocios") {
       useToast(
         ToastEvents.error,
         "No tienes permisos para acceder a esta sección. Elegí un negocio para continuar. Contactate con soporte si tenés problemas."
       );
       return navigateTo("/negocios");
     }
-
-    // If user has no role and is trying to access /negocios, just continue
-    if (role.empty && to.path === "/negocios") {
-      return;
-    }
-
-    // Get the user role
-    const userRole = role.docs[0].data().role;
-
-    // Update in store to manage roles globally
-    indexStore.updateUserRole(userRole);
 
     // Allowed routed to navigate for non admin users
     const allowedRoutes = ["/pedidos", "/blocked", "/404", "/negocios", "/"];
