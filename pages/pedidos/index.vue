@@ -20,14 +20,14 @@
           <button
             @click="showOrders('pending')"
             class="py-1 px-2 rounded-[.428rem]"
-            :class="{ 'bg-secondary shadow': orderType == 'pending' }"
+            :class="{ 'bg-secondary shadow': orderStatus == 'pending' }"
           >
             Pendientes
           </button>
           <button
             @click="showOrders('completed')"
             class="py-1 px-2 rounded-[.428rem]"
-            :class="{ 'bg-secondary shadow': orderType == 'completed' }"
+            :class="{ 'bg-secondary shadow': orderStatus == 'completed' }"
           >
             Completados
           </button>
@@ -94,18 +94,27 @@
             </button>
             <div class="flex flex-col gap-1 w-full">
               <div class="flex justify-between py-1 px-3 rounded-md bg-gray-50">
-                <span class="font-medium">Fecha de envío</span>
+                <span class="font-medium">Fecha de entrega</span>
                 <span class="font-medium">{{ formattedDate(order.shippingDate) }}</span>
               </div>
               <div class="flex justify-between py-1 px-3 rounded-md">
-                <span class="font-medium">Envío</span>
-                <span class="font-medium">{{ formatPrice(order.shippingPrice) }}</span>
+                <span class="font-medium">Método de entrega</span>
+                <span
+                  class="font-medium"
+                  v-if="order.shippingType && order.shippingType === ORDER_SHIPPING_TYPES_UTILS.delivery"
+                  >{{ order.shippingType }} ({{ formatPrice(order.shippingPrice) }})</span
+                >
+                <span class="font-medium" v-else-if="order.shippingType">{{ order.shippingType }}</span>
+                <span class="font-medium" v-else-if="order.shippingPrice > 0"
+                  >Envío ({{ formatPrice(order.shippingPrice) }})</span
+                >
+                <span class="font-medium" v-else>A convenir</span>
               </div>
               <div class="flex justify-between py-1 px-3 rounded-md bg-gray-50">
                 <span class="font-medium">Total</span>
                 <span class="font-semibold">{{ formatPrice(order.totalAmount) }}</span>
               </div>
-              <div class="flex justify-between py-1 px-3" v-if="orderType == 'pending'">
+              <div class="flex justify-between py-1 px-3" v-if="orderStatus == 'pending'">
                 <span class=""></span>
                 <button
                   @click="markAsDelivered(order.id)"
@@ -118,7 +127,7 @@
             </div>
           </div>
         </div>
-        <div class="mt-3" v-if="orderType !== 'pending'">
+        <div class="mt-3" v-if="orderStatus !== 'pending'">
           <button @click="loadMoreOrders" class="btn bg-secondary ring-1 ring-primary flex gap-1 items-center">
             <IcRoundPlus /> Ver mas pedidos
           </button>
@@ -155,7 +164,7 @@ ordersStore.fetchPendingOrders();
 // ----- Define Vars -------
 const submitting = ref(null);
 const filteredOrders = ref(pendingOrders.value);
-const orderType = ref("pending");
+const orderStatus = ref("pending");
 const search = ref("");
 const isPendingShown = ref(true);
 
@@ -166,7 +175,7 @@ const confirmDialogue = ref(null);
 
 // ----- Define Computed -------
 const orderDates = computed(() => {
-  if (orderType.value === "pending") {
+  if (orderStatus.value === "pending") {
     return pendingOrders.value.map((order) => order.shippingDate);
   }
 
@@ -183,7 +192,7 @@ const showDetails = (orderId) => {
 
 async function showOrders(status) {
   submitting.value = true;
-  orderType.value = status;
+  orderStatus.value = status;
   if (status === "pending") {
     filteredOrders.value = pendingOrders.value;
     isPendingShown.value = true;
@@ -258,7 +267,7 @@ watch(pendingOrders, () => {
 });
 
 watch(search, () => {
-  const ordersToUse = orderType.value === "pending" ? pendingOrders.value : orders.value;
+  const ordersToUse = orderStatus.value === "pending" ? pendingOrders.value : orders.value;
 
   if (search.value) {
     filteredOrders.value = ordersToUse.filter((order) => {

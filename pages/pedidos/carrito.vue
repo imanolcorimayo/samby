@@ -65,7 +65,7 @@
           label-class="font-medium"
           messages-class="text-red-500 text-[0.75rem]"
           input-class="w-full"
-          label="Fecha de envío o retiro"
+          label="Fecha de entrega"
           placeholder="yyyy-mm-dd"
           validation="required"
           v-model="shippingDate"
@@ -295,7 +295,7 @@ async function confirmOrder() {
 
   // Check if shipping date is valid
   if (!shippingDate.value) {
-    useToast(ToastEvents.error, "Por favor, complete la fecha de envío.");
+    useToast(ToastEvents.error, "Por favor, complete la fecha de entrega.");
     loading.value = false;
     return;
   }

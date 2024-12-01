@@ -3,7 +3,7 @@
     <div class="flex flex-col items-center gap-[1rem]">
       <IconParkOutlineCheckOne class="text-[3rem] text-success" />
       <span class="text-[2rem] font-semibold text-center">¡Pedido Confirmado!</span>
-      <span class="text-gray-500 text-center">Fecha de envío: {{ formattedDate }} </span>
+      <span class="text-gray-500 text-center">Fecha de entrega: {{ formattedDate }} </span>
     </div>
     <div class="flex flex-col gap-3">
       <span class="font-semibold text-xl">Resumen del pedido</span>
@@ -24,10 +24,24 @@
             <td class="py-3">{{ formatPrice(product.total) }}</td>
           </tr>
           <tr class="text-center border-b font-semibold">
-            <td class="py-3 text-start">Envío</td>
+            <td class="py-3 text-start">Método de entrega</td>
             <td class="py-3"></td>
             <td class="py-3"></td>
-            <td class="py-3">{{ formatPrice(lastInsertedOrder.order.shippingPrice) }}</td>
+            <td
+              class="py-3"
+              v-if="
+                lastInsertedOrder.order.shippingType &&
+                lastInsertedOrder.order.shippingType === ORDER_SHIPPING_TYPES_UTILS.delivery
+              "
+            >
+              {{ lastInsertedOrder.order.shippingType }} ({{ formatPrice(lastInsertedOrder.order.shippingPrice) }})
+            </td>
+            <td class="py-3" v-else-if="lastInsertedOrder.order.shippingType">
+              {{ lastInsertedOrder.order.shippingType }}
+            </td>
+            <td class="py-3" v-else-if="lastInsertedOrder.order.shippingPrice > 0">
+              Envío ({{ formatPrice(lastInsertedOrder.order.shippingPrice) }})
+            </td>
           </tr>
           <tr class="text-center border-b font-semibold">
             <td class="py-3 text-start">Total</td>

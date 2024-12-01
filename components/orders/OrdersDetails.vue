@@ -90,11 +90,16 @@
                 <td class="py-3"></td>
                 <td class="py-3"></td>
               </tr>
-              <tr class="text-center border-b">
+              <tr
+                class="text-center border-b"
+                v-if="
+                  editableOrder.shippingType == ORDER_SHIPPING_TYPES_UTILS.delivery || currentOrder.shippingPrice > 0
+                "
+              >
                 <td class="py-3 text-start">Envío</td>
                 <td class="py-3 hidden sm:block"></td>
                 <td class="py-3"></td>
-                <td class="py-3 flex items-center gap-2 max-w-[10rem]">
+                <td class="py-3 py-3 flex items-center gap-2 max-w-[10rem]">
                   $<input
                     v-model="editableOrder.shippingPrice"
                     type="number"
@@ -111,6 +116,25 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <span class="font-semibold text-lg">Método de entrega</span>
+          <div v-if="editableOrder.shippingType === ORDER_SHIPPING_TYPES_UTILS.pickup" class="flex gap-1">
+            <span class="font-medium">{{ editableOrder.shippingType }}</span>
+          </div>
+          <div
+            v-else-if="
+              editableOrder.shippingType === ORDER_SHIPPING_TYPES_UTILS.delivery || editableOrder.shippingPrice > 0
+            "
+            class="flex gap-1"
+          >
+            <span class="font-medium">{{ ORDER_SHIPPING_TYPES_UTILS.delivery }}:</span>
+            <span>{{ formatPrice(editableOrder.shippingPrice) }}</span>
+          </div>
+          <div v-else class="flex gap-1">
+            <span class="font-medium">A convenir</span>
+          </div>
         </div>
 
         <div class="flex flex-col gap-2">
@@ -135,7 +159,7 @@
             label-class="font-medium"
             messages-class="text-red-500 text-[0.75rem]"
             input-class="w-fit"
-            label="Fecha de envío"
+            label="Fecha de entrega"
             placeholder="yyyy-mm-dd"
             validation="required"
             v-model="editableOrder.shippingDate"
@@ -504,6 +528,8 @@ watch(
   },
   { deep: true }
 );
+
+watch(() => editableOrder.value.shippingPrice, updateOrderFinancial);
 
 // ----- Define Expose -----
 defineExpose({ showModal });
