@@ -228,7 +228,7 @@ async function updateProduct() {
       productName: form.value.productName,
       description: form.value.description,
       imageUrl: imageUrl.value || form.value.imageUrl || null,
-      productImageId: getCurrentProductImage.value.id || form.value.productImageId || null,
+      productImageId: getCurrentProductImage.value?.id || form.value.productImageId || null,
       unit: form.value.unit,
       step: parseFloat(form.value.step),
       price: parseFloat(form.value.price),
@@ -327,8 +327,6 @@ function openProductUploadWidget() {
         if (!error && result && result.event === "success") {
           // Set loader
           submitting.value = true;
-
-          console.log("Upload Widget result: ", result);
 
           // Set the image URL
           imageUrl.value = result.info.secure_url;

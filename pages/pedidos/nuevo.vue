@@ -47,41 +47,57 @@
         v-for="(product, index) in productsCleaned"
         :key="index"
       >
-        <div class="flex justify-between items-center p-[0.714rem]">
-          <div class="flex flex-col cursor-pointer">
-            <span class="font-semibold">{{ product.productName }}</span>
-            <span class="text-gray-500">Unidad: {{ product.unit }}</span>
+        <div class="flex justify-between items-center p-[0.714rem] gap-4">
+          <div class="rounded-lg overflow-hidden w-fit flex-nowrap min-w-[100px] max-w-[100px] h-[100px]">
+            <img
+              class="min-w-[100px] max-w-[100px] h-[100px]"
+              v-if="product.imageUrl"
+              :src="product.imageUrl"
+              alt="Imagen del producto"
+            />
+            <img
+              class="min-w-[100px] max-w-[100px] h-[100px]"
+              v-else
+              src="/img/default-product.webp"
+              alt="Imagen de un producto generico"
+            />
           </div>
-          <div class="flex flex-col items-end gap-3">
-            <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
-            <div v-if="!selectedProduct[product.id]">
-              <button
-                @click="selectProduct(product.id, product.step ?? 0.5)"
-                class="p-[0.428rem] text-white rounded-full bg-gray-200"
-              >
-                <TablerPlus class="text-black text-[0.857rem]" />
-              </button>
+          <div class="flex flex-col w-full items-end">
+            <div class="flex flex-col cursor-pointer w-full">
+              <span class="font-semibold">{{ product.productName }}</span>
+              <span class="text-gray-500">Unidad: {{ product.unit }}</span>
             </div>
-            <div v-else class="flex items-center gap-2">
-              <button
-                @click="manageProduct(product.id, 'remove', product.step ?? 0.5)"
-                class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
-              >
-                <MiRemove v-if="productsQuantity[product.id] > 1" class="text-black text-[0.857rem]" />
-                <TablerTrash v-else class="text-black text-[0.857rem]" />
-              </button>
-              <input
-                @change="manageProduct(product.id, 'typing', product.step ?? 0.5)"
-                type="number"
-                class="text-[0.857rem!important] w-[4rem!important] p-[0.428rem!important] rounded-[0.214rem] ring-1 ring-gray-500 text-center text-nowrap max-h-[2.143rem]"
-                v-model="productsQuantity[product.id]"
-              />
-              <button
-                @click="manageProduct(product.id, 'add', product.step ?? 0.5)"
-                class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
-              >
-                <TablerPlus class="text-black text-[0.857rem]" />
-              </button>
+            <div class="flex flex-col items-end gap-3">
+              <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
+              <div v-if="!selectedProduct[product.id]">
+                <button
+                  @click="selectProduct(product.id, product.step ?? 0.5)"
+                  class="p-[0.428rem] text-white rounded-full bg-gray-200"
+                >
+                  <TablerPlus class="text-black text-[0.857rem]" />
+                </button>
+              </div>
+              <div v-else class="flex items-center gap-2">
+                <button
+                  @click="manageProduct(product.id, 'remove', product.step ?? 0.5)"
+                  class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
+                >
+                  <MiRemove v-if="productsQuantity[product.id] > 1" class="text-black text-[0.857rem]" />
+                  <TablerTrash v-else class="text-black text-[0.857rem]" />
+                </button>
+                <input
+                  @change="manageProduct(product.id, 'typing', product.step ?? 0.5)"
+                  type="number"
+                  class="text-[0.857rem!important] w-[4rem!important] p-[0.428rem!important] rounded-[0.214rem] ring-1 ring-gray-500 text-center text-nowrap max-h-[2.143rem]"
+                  v-model="productsQuantity[product.id]"
+                />
+                <button
+                  @click="manageProduct(product.id, 'add', product.step ?? 0.5)"
+                  class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
+                >
+                  <TablerPlus class="text-black text-[0.857rem]" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
