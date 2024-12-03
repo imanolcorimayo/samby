@@ -17,7 +17,8 @@ import { ToastEvents } from "~/interfaces";
 
 const defaultObject = {
   fetched: false,
-  products: []
+  products: [],
+  currentProductImage: null
 };
 export const useProductsStore = defineStore("products", {
   state: (): any => {
@@ -26,7 +27,8 @@ export const useProductsStore = defineStore("products", {
   getters: {
     getState: (state) => state,
     getProducts: (state) => state.products,
-    areProductsFetched: (state) => state.fetched
+    areProductsFetched: (state) => state.fetched,
+    getCurrentProductImage: (state) => state.currentProductImage
   },
   actions: {
     async fetchData() {
@@ -67,6 +69,65 @@ export const useProductsStore = defineStore("products", {
       this.$state.fetched = true;
       this.$state.products = products;
     },
+    async saveProductImage(imageInformation: any) {
+      // Get Firestore and Current User
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
+
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
+
+      if (!user.value) {
+        return false;
+      }
+
+      // Validate information
+      //! Important
+      // TODO: For now it's ok to save this info but if the user base grows, we should consider managing this differently
+      if (
+        !imageInformation.imageUrl ||
+        typeof imageInformation.imageUrl !== "string" ||
+        !imageInformation.imagePublicId ||
+        typeof imageInformation.imagePublicId !== "string"
+      ) {
+        useToast(
+          ToastEvents.error,
+          "La informacion de la imagen no es válida, por favor intenta nuevamente o contacta al soporte"
+        );
+        return false;
+      }
+
+      try {
+        // Object to create
+        const newImageObj = {
+          ...imageInformation,
+          userUid: user.value.uid,
+          createdAt: serverTimestamp(),
+          businessId: businessId.value,
+          productId: false // This will be updated later
+        };
+
+        // Update user information
+        const newProductImage = await addDoc(collection(db, "productImage"), newImageObj);
+
+        // Update store
+        this.currentProductImage = {
+          ...newImageObj,
+          id: newProductImage.id,
+          createdAt: $dayjs().format("DD/MM/YYYY")
+        };
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        useToast(ToastEvents.error, "Hubo un error al guardar la imagen, por favor intenta nuevamente");
+        return false;
+      }
+    },
     async addProduct(product: any) {
       const db = useFirestore();
       const user = useCurrentUser();
@@ -101,6 +162,22 @@ export const useProductsStore = defineStore("products", {
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
+
+        // Update product image
+        // Triple check the flow matches the product image creation
+        if (
+          product.productImageId &&
+          this.currentProductImage.id &&
+          this.currentProductImage.id == product.productImageId
+        ) {
+          await updateDoc(doc(db, "productImage", product.productImageId), {
+            productId: newProduct.id
+          });
+
+          // Once image is saved and updated, we reset the current product image
+          // so other picture can be uploaded and this one is not used as default
+          this.currentProductImage = null;
+        }
 
         this.$state.products.push({
           id: newProduct.id,
@@ -148,10 +225,10 @@ export const useProductsStore = defineStore("products", {
         return false;
       }
     },
-    async updateProduct(product: any, productId: string) {
+    async updateProduct(product: any, current: any) {
       const db = useFirestore();
-      const productReference = doc(db, "producto", productId);
-      const productIndex = this.$state.products.findIndex((el: any) => el.id == productId);
+      const productReference = doc(db, "producto", current.id);
+      const productIndex = this.$state.products.findIndex((el: any) => el.id == current.id);
 
       // Validate sell object
       const isProductValid = validateProduct(product);
@@ -162,9 +239,25 @@ export const useProductsStore = defineStore("products", {
       }
 
       try {
+        const imageChanged = product.productImageId !== current.productImageId;
+
         // Update doc using paymentRef only if it's not one time payment
         await updateDoc(productReference, product);
         this.$state.products[productIndex] = Object.assign({}, { ...this.$state.products[productIndex], ...product });
+
+        // Update the productImage collection accordingly
+        if (imageChanged) {
+          await updateDoc(doc(db, "productImage", product.productImageId), {
+            productId: current.id
+          });
+
+          if (current.productImageId) {
+            // Update previous image to have productId = false
+            await updateDoc(doc(db, "productImage", current.productImageId), {
+              productId: false
+            });
+          }
+        }
 
         return true;
       } catch (error) {

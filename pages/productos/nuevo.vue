@@ -11,6 +11,19 @@
       <h1 class="text-start">Nuevo producto</h1>
       <p class="text-gray-600">Los productos cargados van a listarse para ser usados a la hora de cargar ventas</p>
     </div>
+    <div class="flex flex-col items-start sm:flex-row sm:items-end gap-4">
+      <img
+        class="w-[20rem] h-[20rem] rounded-lg"
+        v-if="!imageUrl"
+        src="/img/default-product.webp"
+        alt="Pre-visualización de la imagen"
+      />
+      <img class="w-[20rem] h-[20rem] rounded-lg" v-else :src="imageUrl" alt="Pre-visualización de la imagen" />
+      <button @click="openProductUploadWidget" type="button" class="flex gap-1 btn bg-secondary h-fit items-center">
+        Elejir imagen
+        <span class="text-sm font-medium">(Opcional)</span>
+      </button>
+    </div>
     <FormKit
       type="text"
       name="product_name"
@@ -139,6 +152,7 @@
 </template>
 
 <script setup>
+import { ToastEvents } from "~/interfaces";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 
 // ----- Define Pinia Vars -----
@@ -150,12 +164,15 @@ const submitting = ref(false);
 const form = ref({
   productName: "",
   description: "",
+  imageUrl: productsStore.currentProductImage?.imageUrl || null,
+  productImageId: productsStore.currentProductImage?.id || null,
   unit: "Kg",
   step: 0.5,
   price: 0,
   category: "otro",
   isAvailable: true
 });
+const imageUrl = ref("");
 
 // ----- Define Methods -------
 async function submitHandler() {
@@ -166,7 +183,11 @@ async function submitHandler() {
   submitting.value = true;
 
   // Add the product to the store
-  await productsStore.addProduct({ ...form.value });
+  await productsStore.addProduct({
+    ...form.value,
+    imageUrl: imageUrl.value || null,
+    productImageId: productsStore.currentProductImage?.id || null
+  });
 
   // Clean values
   form.value = {
@@ -183,7 +204,71 @@ async function submitHandler() {
   submitting.value = false;
 }
 
+function openProductUploadWidget() {
+  // Ensure the Cloudinary widget script has loaded before calling it
+  if (window.cloudinary) {
+    // Start loading to be artificially slow, since the widget takes some time to load
+    submitting.value = true;
+    setTimeout(() => {
+      submitting.value = false;
+    }, 1000);
+
+    const widget = window.cloudinary.createUploadWidget(
+      {
+        cloudName: "dr82qpxal",
+        uploadPreset: "product_pic",
+        sources: ["local", "camera"],
+        cropping: true, // Optional: Enable cropping
+        multiple: false, // Allow single upload only
+        croppingAspectRatio: 1, // Forces a 1:1 aspect ratio for square crop
+        croppingDefaultSelection: "300x300", // Default crop size for selection
+
+        clientAllowedFormats: ["png", "webp", "jpeg"], //restrict uploading to image files only
+        maxImageFileSize: 1000000, //restrict file size to less than 1MB
+        maxImageWidth: 300, //Scales the image down to a width of 300 pixels before uploading
+        transformation: [
+          { width: 300, height: 300, crop: "fill" } // Ensures the image is 300x300
+        ],
+        return_delete_token: true
+      },
+      async (error, result) => {
+        if (!error && result && result.event === "success") {
+          // Set loader
+          submitting.value = true;
+
+          // Set the image URL
+          imageUrl.value = result.info.secure_url;
+
+          // Save the image URL (e.g., in Firestore) and associate it with the user
+          // User id and Business id will be managed in the store's function
+          // Errors are managed by the store
+          await productsStore.saveProductImage({
+            imageUrl: result.info.secure_url,
+            imagePublicId: result.info.public_id
+          });
+
+          // Remove loader
+          submitting.value = false;
+        }
+      }
+    );
+
+    widget.open();
+  } else {
+    useToast(ToastEvents.error, "Tenemos un error inesperado, por favor intenta de nuevo o contactanos");
+    console.error("Cloudinary widget script has not loaded");
+  }
+}
+
 useHead({
-  title: "Nuevo producto"
+  title: "Nuevo producto",
+  // Add the Cloudinary script
+  script: [
+    {
+      src: "https://upload-widget.cloudinary.com/latest/global/all.js",
+      type: "text/javascript",
+      async: true
+    }
+  ]
 });
 </script>

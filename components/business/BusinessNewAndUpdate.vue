@@ -191,7 +191,7 @@ async function updateOrCreateBusiness() {
         description: form.value.description || null,
         address: form.value.address || null,
         imageUrl: imageUrl.value || null,
-        userBusinessImageId: getBusinessImage.value?.id || null,
+        userBusinessImageId: getBusinessImage.value?.id || form.value.userBusinessImageId || null,
         phone: form.value.phone,
         shippingType: form.value.shippingType,
         shippingPrice: form.value.shippingPrice
@@ -269,14 +269,11 @@ function openUploadWidget() {
 
           // Save the image URL (e.g., in Firestore) and associate it with the user
           // User id and Business id will be managed in the store's function
-          const saveResult = await indexStore.saveBusinessImage({
+          // Errors are managed by the store
+          await indexStore.saveBusinessImage({
             imageUrl: result.info.secure_url,
             imagePublicId: result.info.public_id
           });
-
-          if (saveResult) {
-            useToast(ToastEvents.success, "Imagen subida correctamente");
-          } // False will be handled by the store
 
           // Remove loader
           submitting.value = false;

@@ -31,8 +31,12 @@
           :key="index"
           @click="showProductsDetails(product.id)"
         >
-          <div class="flex justify-between">
-            <div class="flex flex-col gap-1">
+          <div class="flex justify-between gap-3">
+            <div class="rounded-lg overflow-hidden w-fit">
+              <img class="w-[100px]" v-if="product.imageUrl" :src="product.imageUrl" alt="Imagen del producto" />
+              <img class="w-[100px]" v-else src="/img/default-product.webp" alt="Imagen de un producto generico" />
+            </div>
+            <div class="flex-1 flex flex-col gap-1">
               <div class="flex flex-col">
                 <span class="font-semibold">{{ product.productName }}</span>
                 <span class="text-sm">{{ product.description }}</span>
