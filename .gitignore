@@ -32,5 +32,6 @@ yarn.lock
 
 # Firebase service account
 /scripts/*.json
+/scripts/*.kmz
 /scripts/update-privileges-to-users*.js
 /scripts/export-prod-to-develop.js
