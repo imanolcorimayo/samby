@@ -36,7 +36,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
    * Creates a Leaflet map, fetches the GeoJSON file, and adds polygons with popups.
    * @param {string} elementId - The DOM element ID where the map will be mounted.
    */
-  async function createMap(elementId) {
+  async function createMap(elementId, clientGeoJson) {
     // 1) Load Leaflet CSS + JS
     loadLeafletCSS();
     const L = await loadLeafletJS();
@@ -50,9 +50,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     }).addTo(map);
 
     // 4) Fetch the GeoJSON file (it should be in /public)
-    const response = await fetch("/barrios.geojson");
+    const response = await fetch("/barrios.json");
     if (!response.ok) {
-      console.error("Failed to load barrios.geojson:", response.statusText);
+      console.error("Failed to load barrios.json:", response.statusText);
       return;
     }
     const geojsonData = await response.json();
@@ -74,6 +74,20 @@ export default defineNuxtPlugin(async (nuxtApp) => {
           fillOpacity: 0.2
         };
       }
+    }).addTo(map);
+
+    // 6) Add client markers
+    L.geoJSON(clientGeoJson, {
+      onEachFeature(feature, layer) {
+        const { name, address } = feature.properties;
+        // Customize your popup content as needed
+        layer.bindPopup(`<b>${name}</b><br>${address}`);
+      }
+      // Optional style or marker options for points
+      /* pointToLayer(feature, latlng) {
+        // Return a custom marker, circle, or default marker
+        return L.marker(latlng);
+      } */
     }).addTo(map);
 
     // Return the map instance if needed

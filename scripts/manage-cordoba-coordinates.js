@@ -182,7 +182,7 @@ function neighborhoodsToGeoJSON(neighborhoods) {
     console.log(geoJson.features[2]);
 
     // Save the GeoJSON to a file
-    fs.writeFileSync("barrios.geojson", JSON.stringify(geoJson, null, 2), "utf8");
+    fs.writeFileSync("barrios.json", JSON.stringify(geoJson, null, 2), "utf8");
 
     // Example: Save to a JSON file
     fs.writeFileSync("neighborhoods.json", JSON.stringify(neighborhoods, null, 2), "utf8");
