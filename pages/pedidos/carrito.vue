@@ -178,6 +178,7 @@ const client = ref({
   phone: "",
   address: ""
 });
+const clientId = ref(null);
 const loading = ref(false);
 const clientError = ref({
   alreadyExists: false,
@@ -253,6 +254,9 @@ function saveClient() {
         phone: false,
         address: false
       };
+
+      // It returns the saved client in Firestore, so it contains the ID
+      clientId.value = clientToSave.id;
       return;
     } else {
       useToast(ToastEvents.error, "Error al agregar el cliente. Por favor, intente de nuevo.");
@@ -308,16 +312,19 @@ async function confirmOrder() {
   }
 
   // Place the order. Current business is is managed internally
-  const orderObject = await ordersStore.placeOrder({
-    products: products.value,
-    shippingPrice: shippingPrice.value,
-    shippingDate: shippingDate.value,
-    client: client.value,
-    totalAmount: totalWithShipping.value,
-    totalProductsAmount: totalAmount.value,
-    shippingType: shippingType.value,
-    orderStatus: "pendiente"
-  });
+  const orderObject = await ordersStore.placeOrder(
+    {
+      products: products.value,
+      shippingPrice: shippingPrice.value,
+      shippingDate: shippingDate.value,
+      client: client.value,
+      totalAmount: totalWithShipping.value,
+      totalProductsAmount: totalAmount.value,
+      shippingType: shippingType.value,
+      orderStatus: "pendiente"
+    },
+    clientId.value
+  );
 
   // Check if it was successful
   if (orderObject) {
@@ -336,8 +343,8 @@ function removeFromShopping(product) {
   useToast(ToastEvents.success, "Producto eliminado del carrito.");
 }
 
-function selectClient(clientId) {
-  const selectedClient = clients.value.find((c) => c.id === clientId);
+function selectClient(cId) {
+  const selectedClient = clients.value.find((c) => c.id === cId);
 
   if (!selectedClient) {
     useToast(ToastEvents.error, "Cliente no encontrado. Por favor, intente de nuevo.");
@@ -348,6 +355,8 @@ function selectClient(clientId) {
       phone: "",
       address: ""
     };
+
+    clientId.value = null;
 
     clientSelected.value = false;
 
@@ -360,6 +369,8 @@ function selectClient(clientId) {
     address: selectedClient.address,
     fromEmprendeVerde: Boolean(selectedClient.fromEmprendeVerde)
   };
+
+  clientId.value = cId;
 
   clientSelected.value = true;
 }

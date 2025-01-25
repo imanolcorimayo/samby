@@ -84,7 +84,7 @@ export const useOrdersStore = defineStore("orders", {
       );
       // Update Local Storage
     },
-    async placeOrder(order: any) {
+    async placeOrder(order: any, clientId: string) {
       const db = useFirestore();
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
@@ -136,7 +136,8 @@ export const useOrdersStore = defineStore("orders", {
           businessId: businessId.value,
           shippingDate: Timestamp.fromDate(shippingTime),
           createdAt: serverTimestamp(),
-          userUid: user.value.uid
+          userUid: user.value.uid,
+          clientId: clientId
         };
 
         // Handle recurrent payments

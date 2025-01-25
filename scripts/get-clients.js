@@ -24,7 +24,8 @@ async function fetchAndSaveClients() {
   try {
     const snapshot = await db.collection("cliente").get();
     allClients = snapshot.docs.map((doc) => {
-      return { ...doc.data(), id: doc.id };
+      const client = doc.data();
+      return { ...client, id: doc.id, createdAt: client.createdAt.toDate().toISOString() };
     });
   } catch (error) {
     console.error("Error getting documents:", error);
