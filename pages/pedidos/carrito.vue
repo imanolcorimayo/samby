@@ -222,7 +222,7 @@ const formattedClients = computed(() => {
 });
 
 // ------- Define Methods --------
-function saveClient() {
+async function saveClient() {
   // Check if loading
   if (loading.value) return;
 
@@ -244,7 +244,7 @@ function saveClient() {
 
   // Add client if it doesn't exist
   if (!clientToSave) {
-    clientToSave = clientsStore.addClient(client.value);
+    clientToSave = await clientsStore.addClient(client.value);
     if (clientToSave) {
       useToast(ToastEvents.success, "Cliente agregado correctamente.");
       loading.value = false;
