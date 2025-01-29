@@ -1,3 +1,5 @@
+import fs from "fs";
+
 export default defineNuxtPlugin(async (nuxtApp) => {
   /**
    * Dynamically load Leaflet CSS by adding <link> to head
@@ -36,13 +38,16 @@ export default defineNuxtPlugin(async (nuxtApp) => {
    * Creates a Leaflet map, fetches the GeoJSON file, and adds polygons with popups.
    * @param {string} elementId - The DOM element ID where the map will be mounted.
    */
-  async function createMap(elementId, clientGeoJson) {
+  async function createMap(elementId, updateGeoJsonZone) {
     // 1) Load Leaflet CSS + JS
     loadLeafletCSS();
     const L = await loadLeafletJS();
 
     // 2) Create the map
-    const map = L.map(elementId).setView([-31.4167, -64.1833], 12);
+    const map = L.map(elementId, {
+      zoomDelta: 0.25,
+      zoomSnap: 0
+    }).setView([-31.4167, -64.1833], 12);
 
     // 3) Add a base tile layer (e.g., OpenStreetMap)
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -62,33 +67,32 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       onEachFeature(feature, layer) {
         // Bind a popup using the "name" property from GeoJSON
         if (feature.properties && feature.properties.name) {
-          layer.bindPopup(feature.properties.name);
+          layer.bindPopup(`Nombre: ${feature.properties.name}; ${feature.properties.zoneName}`);
+
+          // Change style
+          layer.setStyle({
+            color: feature.properties.zoneColor || "#0080ff",
+            weight: 2,
+            fillColor: feature.properties.zoneColor || "#0080ff",
+            fillOpacity: 0.2
+          });
         }
-      },
-      style() {
-        // Optional: customize style
-        return {
-          color: "#0080ff",
-          weight: 2,
-          fillColor: "#0080ff",
-          fillOpacity: 0.2
-        };
       }
     }).addTo(map);
 
     // 6) Add client markers
-    L.geoJSON(clientGeoJson, {
-      onEachFeature(feature, layer) {
-        const { name, address } = feature.properties;
-        // Customize your popup content as needed
-        layer.bindPopup(`<b>${name}</b><br>${address}`);
-      }
-      // Optional style or marker options for points
-      /* pointToLayer(feature, latlng) {
-        // Return a custom marker, circle, or default marker
-        return L.marker(latlng);
-      } */
-    }).addTo(map);
+    // L.geoJSON(clientGeoJson, {
+    //   onEachFeature(feature, layer) {
+    //     const { name, address } = feature.properties;
+    //     // Customize your popup content as needed
+    //     layer.bindPopup(`<b>${name}</b><br>${address}`);
+    //   }
+    //   // Optional style or marker options for points
+    //   /* pointToLayer(feature, latlng) {
+    //     // Return a custom marker, circle, or default marker
+    //     return L.marker(latlng);
+    //   } */
+    // }).addTo(map);
 
     // Return the map instance if needed
     return map;

@@ -3,7 +3,12 @@
   "features": [
     {
       "type": "Feature",
-      "properties": { "name": "CENTRO AMERICA", "id": "zUnrMUcYw1JepmaINogQ" },
+      "properties": {
+        "name": "CENTRO AMERICA",
+        "id": "zUnrMUcYw1JepmaINogQ",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -94,7 +99,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA GRAN PARQUE", "id": "0WnaNleBnKW4Q792meYu" },
+      "properties": {
+        "name": "VILLA GRAN PARQUE",
+        "id": "0WnaNleBnKW4Q792meYu",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -170,7 +180,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MERCANTIL", "id": "dGGejWHKrOXwPCY564Xt" },
+      "properties": {
+        "name": "MERCANTIL",
+        "id": "dGGejWHKrOXwPCY564Xt",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -202,7 +217,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL CERRITO", "id": "ivxtsQKkeqTtp54La4FO" },
+      "properties": {
+        "name": "EL CERRITO",
+        "id": "ivxtsQKkeqTtp54La4FO",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -268,7 +288,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOURDES", "id": "T6KVdOAqyJbsL8arQwmb" },
+      "properties": {
+        "name": "LOURDES",
+        "id": "T6KVdOAqyJbsL8arQwmb",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -284,7 +309,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GUIÑAZU SUD", "id": "3ajAsaLxUiW2afgjJOWV" },
+      "properties": {
+        "name": "GUIÑAZU SUD",
+        "id": "3ajAsaLxUiW2afgjJOWV",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -304,7 +334,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LICEO GENERAL PAZ", "id": "MrLwTd3hccVU3p5SsVCf" },
+      "properties": {
+        "name": "LICEO GENERAL PAZ",
+        "id": "MrLwTd3hccVU3p5SsVCf",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -397,7 +432,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "REMEDIOS DE ESCALADA", "id": "jytAxu8JYknK9pjYI8hW" },
+      "properties": {
+        "name": "REMEDIOS DE ESCALADA",
+        "id": "jytAxu8JYknK9pjYI8hW",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -472,7 +512,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN JOSE", "id": "jXhyRCuxe5JAtce447hT" },
+      "properties": {
+        "name": "SAN JOSE",
+        "id": "jXhyRCuxe5JAtce447hT",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -518,7 +563,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "QUINTAS DE ARGUELLO", "id": "J8KoA6L5rZrTuvq24IAh" },
+      "properties": {
+        "name": "QUINTAS DE ARGUELLO",
+        "id": "J8KoA6L5rZrTuvq24IAh",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -553,7 +603,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALBORADA (N)", "id": "ZprfDZMYpyiTVt50jffN" },
+      "properties": {
+        "name": "ALBORADA (N)",
+        "id": "ZprfDZMYpyiTVt50jffN",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -586,7 +641,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA SOLFERINO", "id": "hm6yTn8joySt57QDdECD" },
+      "properties": {
+        "name": "VILLA SOLFERINO",
+        "id": "hm6yTn8joySt57QDdECD",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -643,7 +703,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GRANJA DE FUNES", "id": "ul2XXqAsy3IYXUR1xPi2" },
+      "properties": {
+        "name": "GRANJA DE FUNES",
+        "id": "ul2XXqAsy3IYXUR1xPi2",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -748,7 +813,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL REFUGIO", "id": "BzIUU60vxGsAoIbUr3DI" },
+      "properties": {
+        "name": "EL REFUGIO",
+        "id": "BzIUU60vxGsAoIbUr3DI",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -832,7 +902,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA SALLE", "id": "ScAnAXUylKh3EdLtmaMI" },
+      "properties": {
+        "name": "LA SALLE",
+        "id": "ScAnAXUylKh3EdLtmaMI",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -885,7 +960,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CLARET", "id": "3HyWXDO9KhWWafAQarr8" },
+      "properties": {
+        "name": "VILLA CLARET",
+        "id": "3HyWXDO9KhWWafAQarr8",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -940,7 +1020,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE JORGE NEWBERY", "id": "2lpPUFF7ygEMmFnda5XZ" },
+      "properties": {
+        "name": "PARQUE JORGE NEWBERY",
+        "id": "2lpPUFF7ygEMmFnda5XZ",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -997,7 +1082,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE LICEO 1A SECCION", "id": "HxPrnqETseRofwL4L0WM" },
+      "properties": {
+        "name": "PARQUE LICEO 1A SECCION",
+        "id": "HxPrnqETseRofwL4L0WM",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1104,7 +1194,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "APEADERO LA TABLADA", "id": "DzSIOzlZFmuk48Iyzaf6" },
+      "properties": {
+        "name": "APEADERO LA TABLADA",
+        "id": "DzSIOzlZFmuk48Iyzaf6",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1208,7 +1303,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PADRE CLARET", "id": "E5ELOhWabDQlwJhHjvXs" },
+      "properties": {
+        "name": "PADRE CLARET",
+        "id": "E5ELOhWabDQlwJhHjvXs",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1283,7 +1383,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALBORADA (S)", "id": "0Vfj1G8f539oVTG8GpL7" },
+      "properties": {
+        "name": "ALBORADA (S)",
+        "id": "0Vfj1G8f539oVTG8GpL7",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1312,7 +1417,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CENTENARIO", "id": "2sibT4G2H1eqlL4jpDy3" },
+      "properties": {
+        "name": "VILLA CENTENARIO",
+        "id": "2sibT4G2H1eqlL4jpDy3",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1386,7 +1496,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MARIANO FRAGUEIRO", "id": "Pvi0ZW1mSBuCJYSBRWjF" },
+      "properties": {
+        "name": "MARIANO FRAGUEIRO",
+        "id": "Pvi0ZW1mSBuCJYSBRWjF",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1434,7 +1549,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL ARENALES", "id": "j0inpmxrIdM89CQee6Ll" },
+      "properties": {
+        "name": "GENERAL ARENALES",
+        "id": "j0inpmxrIdM89CQee6Ll",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1475,7 +1595,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE CAPITAL", "id": "qFwZI2p3q8Gd1Zpd3X8B" },
+      "properties": {
+        "name": "PARQUE CAPITAL",
+        "id": "qFwZI2p3q8Gd1Zpd3X8B",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1707,7 +1832,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PATRICIOS NORTE", "id": "GdJPfY19UvAQB4XsAo31" },
+      "properties": {
+        "name": "PATRICIOS NORTE",
+        "id": "GdJPfY19UvAQB4XsAo31",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1748,7 +1878,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PATRICIOS ESTE", "id": "8QsXBG0BO6tJLTJEX8ic" },
+      "properties": {
+        "name": "PATRICIOS ESTE",
+        "id": "8QsXBG0BO6tJLTJEX8ic",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1787,7 +1922,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE COREMA", "id": "N9hUWdzfgaYZyPJ9ZLkj" },
+      "properties": {
+        "name": "PARQUE COREMA",
+        "id": "N9hUWdzfgaYZyPJ9ZLkj",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1831,7 +1971,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RESIDENCIAL SAN JORGE", "id": "jqUl8hcFq4TyLpIts6rI" },
+      "properties": {
+        "name": "RESIDENCIAL SAN JORGE",
+        "id": "jqUl8hcFq4TyLpIts6rI",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1879,7 +2024,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL BELGRANO", "id": "WsLQr2GbpVFsTfHEAGGl" },
+      "properties": {
+        "name": "GENERAL BELGRANO",
+        "id": "WsLQr2GbpVFsTfHEAGGl",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -1921,7 +2071,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PANAMERICANO", "id": "2qYKWhmWdGux5GV9ky3F" },
+      "properties": {
+        "name": "PANAMERICANO",
+        "id": "2qYKWhmWdGux5GV9ky3F",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2007,7 +2162,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RESIDENCIAL ARAGON", "id": "ADEp16UwGTpSJYQF9ID7" },
+      "properties": {
+        "name": "RESIDENCIAL ARAGON",
+        "id": "ADEp16UwGTpSJYQF9ID7",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2041,7 +2201,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA FLORESTA", "id": "b9gJfIZEC2MbH20lp5rS" },
+      "properties": {
+        "name": "LA FLORESTA",
+        "id": "b9gJfIZEC2MbH20lp5rS",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2164,7 +2329,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CORINA", "id": "VoYyuHP2mdKInj4rN9xx" },
+      "properties": {
+        "name": "VILLA CORINA",
+        "id": "VoYyuHP2mdKInj4rN9xx",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2217,7 +2387,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CRISOL SUD", "id": "xpj5ZD7Ikv96oJD1agwg" },
+      "properties": {
+        "name": "CRISOL SUD",
+        "id": "xpj5ZD7Ikv96oJD1agwg",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2333,7 +2508,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN IGNACIO", "id": "bw6pUlNG2mUDXoVSys4d" },
+      "properties": {
+        "name": "SAN IGNACIO",
+        "id": "bw6pUlNG2mUDXoVSys4d",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2435,7 +2615,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "URQUIZA", "id": "1kg2HGiVfUzl6O3mrznB" },
+      "properties": {
+        "name": "URQUIZA",
+        "id": "1kg2HGiVfUzl6O3mrznB",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2543,7 +2728,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CERRO DE LAS ROSAS", "id": "tmT8SES800ebrzu3NUUH" },
+      "properties": {
+        "name": "CERRO DE LAS ROSAS",
+        "id": "tmT8SES800ebrzu3NUUH",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2885,7 +3075,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PATRICIOS", "id": "3xzTzSG2cLN2xufX9FVX" },
+      "properties": {
+        "name": "PATRICIOS",
+        "id": "3xzTzSG2cLN2xufX9FVX",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2940,7 +3135,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTO PALERMO", "id": "gXupmq6yPSK35t4RCHH7" },
+      "properties": {
+        "name": "ALTO PALERMO",
+        "id": "gXupmq6yPSK35t4RCHH7",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -2975,7 +3175,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN LORENZO NORTE", "id": "oJcmYfVv2bcqt82Siq0d" },
+      "properties": {
+        "name": "SAN LORENZO NORTE",
+        "id": "oJcmYfVv2bcqt82Siq0d",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3005,7 +3210,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "FINCA LA DOROTEA", "id": "raX3SyfUtETpiYhtGjky" },
+      "properties": {
+        "name": "FINCA LA DOROTEA",
+        "id": "raX3SyfUtETpiYhtGjky",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3059,7 +3269,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTOS SAN MARTIN", "id": "jhcrlMfpsxCm8tRWkTUh" },
+      "properties": {
+        "name": "ALTOS SAN MARTIN",
+        "id": "jhcrlMfpsxCm8tRWkTUh",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3109,7 +3324,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ARTURO CAPDEVILA", "id": "THqXwxDA5oHYKmPpmhTC" },
+      "properties": {
+        "name": "ARTURO CAPDEVILA",
+        "id": "THqXwxDA5oHYKmPpmhTC",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3155,7 +3375,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "YOFRE H", "id": "zkAEVWdNRRrNYNYL7zw3" },
+      "properties": {
+        "name": "YOFRE H",
+        "id": "zkAEVWdNRRrNYNYL7zw3",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3243,7 +3468,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "YOFRE NORTE", "id": "SuAR7cLywGVcMv4zOLRK" },
+      "properties": {
+        "name": "YOFRE NORTE",
+        "id": "SuAR7cLywGVcMv4zOLRK",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3317,7 +3547,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "NUEVA ITALIA", "id": "Vf4USLAgQKxispb12Ffh" },
+      "properties": {
+        "name": "NUEVA ITALIA",
+        "id": "Vf4USLAgQKxispb12Ffh",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3409,7 +3644,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTOS DE VILLA CABRERA", "id": "jutMCINIVuqHRLgpXFpb" },
+      "properties": {
+        "name": "ALTOS DE VILLA CABRERA",
+        "id": "jutMCINIVuqHRLgpXFpb",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3458,7 +3698,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GUAYAQUIL", "id": "zSivjoOI2qxwbp0LQw1E" },
+      "properties": {
+        "name": "GUAYAQUIL",
+        "id": "zSivjoOI2qxwbp0LQw1E",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3492,7 +3737,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TALLERES (O)", "id": "y9Fjk1NehDBIOTel7F0R" },
+      "properties": {
+        "name": "TALLERES (O)",
+        "id": "y9Fjk1NehDBIOTel7F0R",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3596,7 +3846,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TALLERES (E)", "id": "pAcTFgxxbMYfLxV5ugyW" },
+      "properties": {
+        "name": "TALLERES (E)",
+        "id": "pAcTFgxxbMYfLxV5ugyW",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -3666,7 +3921,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN VICENTE", "id": "UGDMzYLZdPq1UEg64hRl" },
+      "properties": {
+        "name": "SAN VICENTE",
+        "id": "UGDMzYLZdPq1UEg64hRl",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4234,7 +4494,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION PALMAR", "id": "Rifg0dIDn9PnqEIri5vG" },
+      "properties": {
+        "name": "AMPLIACION PALMAR",
+        "id": "Rifg0dIDn9PnqEIri5vG",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4302,7 +4567,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "20 DE JUNIO", "id": "ME9Mil6LvkKFSbVVvhdN" },
+      "properties": {
+        "name": "20 DE JUNIO",
+        "id": "ME9Mil6LvkKFSbVVvhdN",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4332,7 +4602,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE MONTECRISTO", "id": "GaiUhWjwV6a0L6NW3IL9" },
+      "properties": {
+        "name": "PARQUE MONTECRISTO",
+        "id": "GaiUhWjwV6a0L6NW3IL9",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4372,7 +4647,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CO.VI.CO.", "id": "p7KSWKidneUSNhSjha6L" },
+      "properties": {
+        "name": "CO.VI.CO.",
+        "id": "p7KSWKidneUSNhSjha6L",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4393,7 +4673,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS PINOS", "id": "s00fnk3slTCloiQyaU6Q" },
+      "properties": {
+        "name": "LOS PINOS",
+        "id": "s00fnk3slTCloiQyaU6Q",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -4458,7 +4743,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION PUEYRREDON", "id": "PQJQo2GIHHBxgWkjEKVl" },
+      "properties": {
+        "name": "AMPLIACION PUEYRREDON",
+        "id": "PQJQo2GIHHBxgWkjEKVl",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4522,7 +4812,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION LAS PALMAS", "id": "dGznpLHc7xn9BxKzJiJM" },
+      "properties": {
+        "name": "AMPLIACION LAS PALMAS",
+        "id": "dGznpLHc7xn9BxKzJiJM",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4595,7 +4890,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "URITORCO", "id": "CMD5uG6XRabcyenSG96M" },
+      "properties": {
+        "name": "URITORCO",
+        "id": "CMD5uG6XRabcyenSG96M",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4633,7 +4933,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "INDEPENDENCIA", "id": "7MBgdkfDoO3M8yLtEeFr" },
+      "properties": {
+        "name": "INDEPENDENCIA",
+        "id": "7MBgdkfDoO3M8yLtEeFr",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4706,7 +5011,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COFICO", "id": "Ch5KNzy25aUKO5jHu1Dq" },
+      "properties": {
+        "name": "COFICO",
+        "id": "Ch5KNzy25aUKO5jHu1Dq",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4739,7 +5049,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE DEL ESTE", "id": "gqUEZAKrrlgsDqHnrMfP" },
+      "properties": {
+        "name": "PARQUE DEL ESTE",
+        "id": "gqUEZAKrrlgsDqHnrMfP",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4825,7 +5140,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PATRIA", "id": "ix4kDhY1ssAD9nLRtojL" },
+      "properties": {
+        "name": "PATRIA",
+        "id": "ix4kDhY1ssAD9nLRtojL",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4869,7 +5189,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS DALIAS", "id": "HgQAuz6pjFqdClmMUgKL" },
+      "properties": {
+        "name": "LAS DALIAS",
+        "id": "HgQAuz6pjFqdClmMUgKL",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4905,7 +5230,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "DR RENE FAVALORO", "id": "Tevrg8SrKdQu7T1hkQAF" },
+      "properties": {
+        "name": "DR RENE FAVALORO",
+        "id": "Tevrg8SrKdQu7T1hkQAF",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4945,7 +5275,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PUENTE BLANCO", "id": "89EWFSe52Gjdxt2deUwE" },
+      "properties": {
+        "name": "PUENTE BLANCO",
+        "id": "89EWFSe52Gjdxt2deUwE",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -4991,7 +5326,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "QUINTA SANTA ANA", "id": "8xfCuuTtjUootIxrJncq" },
+      "properties": {
+        "name": "QUINTA SANTA ANA",
+        "id": "8xfCuuTtjUootIxrJncq",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5031,7 +5371,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "OBRERO", "id": "z4SLJsqaSeHNCjexRDBA" },
+      "properties": {
+        "name": "OBRERO",
+        "id": "z4SLJsqaSeHNCjexRDBA",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5074,7 +5419,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS JOSEFINOS", "id": "Z5amPiw1PC8lunRmvdMX" },
+      "properties": {
+        "name": "LOS JOSEFINOS",
+        "id": "Z5amPiw1PC8lunRmvdMX",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5106,7 +5456,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MALDONADO", "id": "6kKWkLzGM7pONB1B75dw" },
+      "properties": {
+        "name": "MALDONADO",
+        "id": "6kKWkLzGM7pONB1B75dw",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5192,7 +5547,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ANEXO LAS PALMAS", "id": "FJXshlz6TOoesbAIsZax" },
+      "properties": {
+        "name": "ANEXO LAS PALMAS",
+        "id": "FJXshlz6TOoesbAIsZax",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5241,7 +5601,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CASEROS", "id": "8OMJyLmhR7aGyjP7X4lm" },
+      "properties": {
+        "name": "CASEROS",
+        "id": "8OMJyLmhR7aGyjP7X4lm",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5280,7 +5645,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ALBERTO ANEXO", "id": "IDTtCwl3u7aYYDAbCgaV" },
+      "properties": {
+        "name": "VILLA ALBERTO ANEXO",
+        "id": "IDTtCwl3u7aYYDAbCgaV",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5346,7 +5716,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ALBERTO", "id": "SBOCru4gZeNLT4A0w42Y" },
+      "properties": {
+        "name": "VILLA ALBERTO",
+        "id": "SBOCru4gZeNLT4A0w42Y",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5403,7 +5778,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RESIDENCIAL AMERICA", "id": "jR2r3eGBLvN42ymHQH05" },
+      "properties": {
+        "name": "RESIDENCIAL AMERICA",
+        "id": "jR2r3eGBLvN42ymHQH05",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5486,7 +5866,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAMADRID", "id": "75sNYvRGPUiqgEhlulw3" },
+      "properties": {
+        "name": "LAMADRID",
+        "id": "75sNYvRGPUiqgEhlulw3",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5546,7 +5931,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA BUSTOS", "id": "q1BbHRed9bqcVdmqyi9W" },
+      "properties": {
+        "name": "VILLA BUSTOS",
+        "id": "q1BbHRed9bqcVdmqyi9W",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5604,7 +5994,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SANTA CLARA DE ASIS", "id": "2S5rJ8B2FEwSuV9VjAUp" },
+      "properties": {
+        "name": "SANTA CLARA DE ASIS",
+        "id": "2S5rJ8B2FEwSuV9VjAUp",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5660,7 +6055,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA UNION", "id": "kcJP3LP9d01QuUOt33oS" },
+      "properties": {
+        "name": "VILLA UNION",
+        "id": "kcJP3LP9d01QuUOt33oS",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5728,7 +6128,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTOS DE VELEZ SARSFIELD", "id": "mRVoKV6dPtS2UxEuYQdJ" },
+      "properties": {
+        "name": "ALTOS DE VELEZ SARSFIELD",
+        "id": "mRVoKV6dPtS2UxEuYQdJ",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5766,7 +6171,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MULLER", "id": "Uad58KK1orxGHaKE9LPn" },
+      "properties": {
+        "name": "MULLER",
+        "id": "Uad58KK1orxGHaKE9LPn",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5891,7 +6301,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PASO DE LOS ANDES", "id": "eYMwmqqd3kp1dwSfyMyH" },
+      "properties": {
+        "name": "PASO DE LOS ANDES",
+        "id": "eYMwmqqd3kp1dwSfyMyH",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -5939,7 +6354,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS JACARANDAES", "id": "9LtrFzgKn4BaWEONDRsk" },
+      "properties": {
+        "name": "LOS JACARANDAES",
+        "id": "9LtrFzgKn4BaWEONDRsk",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6010,7 +6430,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION LOS PLATANOS", "id": "s1OELwhKCfjEcXXHv9uU" },
+      "properties": {
+        "name": "AMPLIACION LOS PLATANOS",
+        "id": "s1OELwhKCfjEcXXHv9uU",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6057,7 +6482,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION ALTAMIRA", "id": "ep6LRQzYrPlVCwEFfNvk" },
+      "properties": {
+        "name": "AMPLIACION ALTAMIRA",
+        "id": "ep6LRQzYrPlVCwEFfNvk",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6129,7 +6559,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CUPANI", "id": "ZSKXCSmjQKTqoG7jHBwO" },
+      "properties": {
+        "name": "CUPANI",
+        "id": "ZSKXCSmjQKTqoG7jHBwO",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6173,7 +6608,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ACOSTA", "id": "WGx4oTnA6yFXYH6zuJfY" },
+      "properties": {
+        "name": "ACOSTA",
+        "id": "WGx4oTnA6yFXYH6zuJfY",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6255,7 +6695,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTAMIRA", "id": "XSu5R4ecZRYZrdVJo7BD" },
+      "properties": {
+        "name": "ALTAMIRA",
+        "id": "XSu5R4ecZRYZrdVJo7BD",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6330,7 +6775,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ARSENALES ANEXO", "id": "K814NSb8RBxhczvh7RLr" },
+      "properties": {
+        "name": "ARSENALES ANEXO",
+        "id": "K814NSb8RBxhczvh7RLr",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6383,7 +6833,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MIRALTA", "id": "7Ik6bdYOtvY6Zc8cxWfO" },
+      "properties": {
+        "name": "MIRALTA",
+        "id": "7Ik6bdYOtvY6Zc8cxWfO",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6437,7 +6892,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CONSORCIO ESPERANZA", "id": "szJ49cYxRQufTIMmysW1" },
+      "properties": {
+        "name": "CONSORCIO ESPERANZA",
+        "id": "szJ49cYxRQufTIMmysW1",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6477,7 +6937,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COLONIA LOLA", "id": "2PYRgoMuzV04z48PNEpc" },
+      "properties": {
+        "name": "COLONIA LOLA",
+        "id": "2PYRgoMuzV04z48PNEpc",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6529,7 +6994,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS GRANADOS", "id": "r0KCmV9pQFXu46KMYcv0" },
+      "properties": {
+        "name": "LOS GRANADOS",
+        "id": "r0KCmV9pQFXu46KMYcv0",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6598,7 +7068,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ZEPPELIN", "id": "My4oATHlyWbdNPec56hU" },
+      "properties": {
+        "name": "VILLA ZEPPELIN",
+        "id": "My4oATHlyWbdNPec56hU",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6654,7 +7129,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS DELICIAS", "id": "axzff645N1a8uZIuKMlc" },
+      "properties": {
+        "name": "LAS DELICIAS",
+        "id": "axzff645N1a8uZIuKMlc",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6748,7 +7228,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA DERNA", "id": "fLbJAbEN3rEb5uaXCHOG" },
+      "properties": {
+        "name": "VILLA DERNA",
+        "id": "fLbJAbEN3rEb5uaXCHOG",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6809,7 +7294,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE SAN VICENTE", "id": "NwOPVgsBGhWDsNAgKsTu" },
+      "properties": {
+        "name": "PARQUE SAN VICENTE",
+        "id": "NwOPVgsBGhWDsNAgKsTu",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6846,7 +7336,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CRISOL NORTE", "id": "nDAdXsDQkUccP11XkTkm" },
+      "properties": {
+        "name": "CRISOL NORTE",
+        "id": "nDAdXsDQkUccP11XkTkm",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6887,7 +7382,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MIRADOR", "id": "NLAGLDlzeOiyGnSlfCrQ" },
+      "properties": {
+        "name": "MIRADOR",
+        "id": "NLAGLDlzeOiyGnSlfCrQ",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -6949,7 +7449,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "INDUSTRIAL ESTE", "id": "XQ1CDBmRW4h7KPkKQppn" },
+      "properties": {
+        "name": "INDUSTRIAL ESTE",
+        "id": "XQ1CDBmRW4h7KPkKQppn",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7016,7 +7521,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MAIPU 2A SECCION", "id": "Dim7QPnsqc49sDcIxAak" },
+      "properties": {
+        "name": "MAIPU 2A SECCION",
+        "id": "Dim7QPnsqc49sDcIxAak",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7070,7 +7580,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMEGHINO NORTE", "id": "QhbiKvQwzkfSxIWtPJjT" },
+      "properties": {
+        "name": "AMEGHINO NORTE",
+        "id": "QhbiKvQwzkfSxIWtPJjT",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7129,7 +7644,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SARMIENTO", "id": "bh8GWkodMvYNWV0S2I81" },
+      "properties": {
+        "name": "SARMIENTO",
+        "id": "bh8GWkodMvYNWV0S2I81",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7174,7 +7694,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION EMPALME", "id": "GVjoP2VbSmlGd34ZfCYO" },
+      "properties": {
+        "name": "AMPLIACION EMPALME",
+        "id": "GVjoP2VbSmlGd34ZfCYO",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7221,7 +7746,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS NARANJOS", "id": "YzFRaZO1laoUFUpri4AI" },
+      "properties": {
+        "name": "LOS NARANJOS",
+        "id": "YzFRaZO1laoUFUpri4AI",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7261,7 +7791,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RIVADAVIA", "id": "H5GoWMNtxM5g9gOvQfz6" },
+      "properties": {
+        "name": "RIVADAVIA",
+        "id": "H5GoWMNtxM5g9gOvQfz6",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7388,7 +7923,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ARGENTINA", "id": "sGPqh5FCa53tLdnb5LZI" },
+      "properties": {
+        "name": "VILLA ARGENTINA",
+        "id": "sGPqh5FCa53tLdnb5LZI",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7424,7 +7964,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "FERROVIARIO  MITRE", "id": "l3l7yA3iok15sluyZYbc" },
+      "properties": {
+        "name": "FERROVIARIO  MITRE",
+        "id": "l3l7yA3iok15sluyZYbc",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7467,7 +8012,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "A.T. E.", "id": "GKypi3hQp1gTTJo4YAh6" },
+      "properties": {
+        "name": "A.T. E.",
+        "id": "GKypi3hQp1gTTJo4YAh6",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7512,7 +8062,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMEGHINO SUD", "id": "eg8V0fzDgB2WR3HIlNrk" },
+      "properties": {
+        "name": "AMEGHINO SUD",
+        "id": "eg8V0fzDgB2WR3HIlNrk",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7570,7 +8125,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MAIPU 1A SECCION", "id": "eLKBhHfyJApXFRcsrm6n" },
+      "properties": {
+        "name": "MAIPU 1A SECCION",
+        "id": "eLKBhHfyJApXFRcsrm6n",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7620,7 +8180,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COLON", "id": "bLHMCU6N5KmVKaF8r8Pf" },
+      "properties": {
+        "name": "COLON",
+        "id": "bLHMCU6N5KmVKaF8r8Pf",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7676,7 +8241,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA REVOL ANEXO", "id": "1xipxZFbX9TBL5h3krnM" },
+      "properties": {
+        "name": "VILLA REVOL ANEXO",
+        "id": "1xipxZFbX9TBL5h3krnM",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7721,7 +8291,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "NUEVA CORDOBA ANEXA", "id": "CHk5W2VvZx7uxt1kaTKv" },
+      "properties": {
+        "name": "NUEVA CORDOBA ANEXA",
+        "id": "CHk5W2VvZx7uxt1kaTKv",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7760,7 +8335,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EMPALME CASAS DE OBREROS Y EMPLEADOS", "id": "4tdjCEJQbvTgrJsll7GV" },
+      "properties": {
+        "name": "EMPALME CASAS DE OBREROS Y EMPLEADOS",
+        "id": "4tdjCEJQbvTgrJsll7GV",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -7808,7 +8388,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN CAYETANO", "id": "M6Big2sy4rgxFv1zMKER" },
+      "properties": {
+        "name": "SAN CAYETANO",
+        "id": "M6Big2sy4rgxFv1zMKER",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8014,7 +8599,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BENJAMIN POLICARPIO CABRAL", "id": "TkS0fhxB9pwQxL4WRdZ3" },
+      "properties": {
+        "name": "BENJAMIN POLICARPIO CABRAL",
+        "id": "TkS0fhxB9pwQxL4WRdZ3",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8050,7 +8640,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTOS SUD DE SAN VICENTE", "id": "0R0jdxYkzyuhlDSpa2l4" },
+      "properties": {
+        "name": "ALTOS SUD DE SAN VICENTE",
+        "id": "0R0jdxYkzyuhlDSpa2l4",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8138,7 +8733,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EMAUS", "id": "c7N1x0VSJOn4n9K8KtlZ" },
+      "properties": {
+        "name": "EMAUS",
+        "id": "c7N1x0VSJOn4n9K8KtlZ",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8207,7 +8807,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TTE. BENJAMIN MATIENZO", "id": "WMu5696B712MrAvxIvVq" },
+      "properties": {
+        "name": "TTE. BENJAMIN MATIENZO",
+        "id": "WMu5696B712MrAvxIvVq",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8297,7 +8902,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JOSE HERNANDEZ", "id": "TRyTxNuhphCmc6B6WAIz" },
+      "properties": {
+        "name": "JOSE HERNANDEZ",
+        "id": "TRyTxNuhphCmc6B6WAIz",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8352,7 +8962,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "S.E.P.", "id": "vnd7Ug7YR75vtoCjW0k8" },
+      "properties": {
+        "name": "S.E.P.",
+        "id": "vnd7Ug7YR75vtoCjW0k8",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8375,7 +8990,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JARDIN DEL PILAR", "id": "WOqLip17OkeNtmz3g3Om" },
+      "properties": {
+        "name": "JARDIN DEL PILAR",
+        "id": "WOqLip17OkeNtmz3g3Om",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8454,7 +9074,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN PABLO", "id": "9cTuQTGKZ4LWhbU3i5Bk" },
+      "properties": {
+        "name": "SAN PABLO",
+        "id": "9cTuQTGKZ4LWhbU3i5Bk",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8512,7 +9137,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RESIDENCIAL SAN CARLOS", "id": "XcVsBQBhkq5lvqAmh6w2" },
+      "properties": {
+        "name": "RESIDENCIAL SAN CARLOS",
+        "id": "XcVsBQBhkq5lvqAmh6w2",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8584,7 +9214,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CABAÑA DEL PILAR", "id": "aCxKwmQN5swW6vpytTjx" },
+      "properties": {
+        "name": "CABAÑA DEL PILAR",
+        "id": "aCxKwmQN5swW6vpytTjx",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8621,7 +9256,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA REVOL", "id": "VmHOTXg7CRfAorzZ5Xw1" },
+      "properties": {
+        "name": "VILLA REVOL",
+        "id": "VmHOTXg7CRfAorzZ5Xw1",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8694,7 +9334,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "DEAN FUNES", "id": "IS1zrG6NQYoyaIZxCbQ2" },
+      "properties": {
+        "name": "DEAN FUNES",
+        "id": "IS1zrG6NQYoyaIZxCbQ2",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8768,7 +9413,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MARCOS SASTRE", "id": "GEbGBoX3yGnFBuCqazZc" },
+      "properties": {
+        "name": "MARCOS SASTRE",
+        "id": "GEbGBoX3yGnFBuCqazZc",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -8831,7 +9481,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JARDIN", "id": "2tdc8RxbnGS6LRUfgHov" },
+      "properties": {
+        "name": "JARDIN",
+        "id": "2tdc8RxbnGS6LRUfgHov",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8898,7 +9553,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "IPONA", "id": "OSA0pYrwF2ykZK9mPsRq" },
+      "properties": {
+        "name": "IPONA",
+        "id": "OSA0pYrwF2ykZK9mPsRq",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8931,7 +9591,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SANTA RITA", "id": "cVKWZs0hG8MPeoZHOBcJ" },
+      "properties": {
+        "name": "SANTA RITA",
+        "id": "cVKWZs0hG8MPeoZHOBcJ",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -8983,7 +9648,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN LORENZO (S)", "id": "gwXpq1H2bytVoPby7aBJ" },
+      "properties": {
+        "name": "SAN LORENZO (S)",
+        "id": "gwXpq1H2bytVoPby7aBJ",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9033,7 +9703,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JOCKEY CLUB", "id": "1HlWtyVO8hx0PbGHQqei" },
+      "properties": {
+        "name": "JOCKEY CLUB",
+        "id": "1HlWtyVO8hx0PbGHQqei",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9088,7 +9763,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION SAN FERNANDO", "id": "AaVIRvodOE8ofUh8o3I2" },
+      "properties": {
+        "name": "AMPLIACION SAN FERNANDO",
+        "id": "AaVIRvodOE8ofUh8o3I2",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9160,7 +9840,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION VELEZ SARSFIELD", "id": "RPLWsKSTp6p9dQzOgRVD" },
+      "properties": {
+        "name": "AMPLIACION VELEZ SARSFIELD",
+        "id": "RPLWsKSTp6p9dQzOgRVD",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9214,7 +9899,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION JARDIN ESPINOSA", "id": "sRxbTB70liAM7cu5Ri6V" },
+      "properties": {
+        "name": "AMPLIACION JARDIN ESPINOSA",
+        "id": "sRxbTB70liAM7cu5Ri6V",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9251,7 +9941,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CARRARA", "id": "QAsAx135ewkJCde1r6Rz" },
+      "properties": {
+        "name": "CARRARA",
+        "id": "QAsAx135ewkJCde1r6Rz",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9282,7 +9977,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SACCHI", "id": "vnuYo746qn1sNVjbcb9J" },
+      "properties": {
+        "name": "SACCHI",
+        "id": "vnuYo746qn1sNVjbcb9J",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9345,7 +10045,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN JAVIER", "id": "tYUzHB7gTOKyxWAwoJL2" },
+      "properties": {
+        "name": "SAN JAVIER",
+        "id": "tYUzHB7gTOKyxWAwoJL2",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9410,7 +10115,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA SAN ISIDRO", "id": "zN1vRuRqP1rN6KS2uEP8" },
+      "properties": {
+        "name": "VILLA SAN ISIDRO",
+        "id": "zN1vRuRqP1rN6KS2uEP8",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9502,7 +10212,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN FELIPE", "id": "ujmdz9yZRTfVh4WUKhRq" },
+      "properties": {
+        "name": "SAN FELIPE",
+        "id": "ujmdz9yZRTfVh4WUKhRq",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9602,7 +10317,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE LOS MOLINOS", "id": "XHGwdT37p2WCfECMzOKh" },
+      "properties": {
+        "name": "PARQUE LOS MOLINOS",
+        "id": "XHGwdT37p2WCfECMzOKh",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9650,7 +10370,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION KENNEDY", "id": "4YcyRDHp6omWNzjCrkMZ" },
+      "properties": {
+        "name": "AMPLIACION KENNEDY",
+        "id": "4YcyRDHp6omWNzjCrkMZ",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9709,7 +10434,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "KENNEDY", "id": "tLy8m7ak2HNUtvpbkM98" },
+      "properties": {
+        "name": "KENNEDY",
+        "id": "tLy8m7ak2HNUtvpbkM98",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9775,7 +10505,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "IRUPE", "id": "Dd18k4UZOUs3gfJCqNXS" },
+      "properties": {
+        "name": "IRUPE",
+        "id": "Dd18k4UZOUs3gfJCqNXS",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9804,7 +10539,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA SAN CARLOS", "id": "kwYbUXhPtUkwIYAnr9HX" },
+      "properties": {
+        "name": "VILLA SAN CARLOS",
+        "id": "kwYbUXhPtUkwIYAnr9HX",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9873,7 +10613,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JARDIN HIPODROMO", "id": "ykcWF93ff73Kaw90Zxa6" },
+      "properties": {
+        "name": "JARDIN HIPODROMO",
+        "id": "ykcWF93ff73Kaw90Zxa6",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -9972,7 +10717,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JOSE IGNACIO RUCCI", "id": "UiIfTPvTD7eHOXLiKVU6" },
+      "properties": {
+        "name": "JOSE IGNACIO RUCCI",
+        "id": "UiIfTPvTD7eHOXLiKVU6",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10079,7 +10829,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "O.S.N.", "id": "4FaDHleXjDIW8Y4DihOh" },
+      "properties": {
+        "name": "O.S.N.",
+        "id": "4FaDHleXjDIW8Y4DihOh",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10103,7 +10858,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RAMON J. CARCANO", "id": "5ReblQv34ek7wesrHPoy" },
+      "properties": {
+        "name": "RAMON J. CARCANO",
+        "id": "5ReblQv34ek7wesrHPoy",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10154,7 +10914,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN PEDRO NOLASCO", "id": "ajDisdsYYZ3RmoUmTGCP" },
+      "properties": {
+        "name": "SAN PEDRO NOLASCO",
+        "id": "ajDisdsYYZ3RmoUmTGCP",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -10236,7 +11001,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE ALAMEDA", "id": "kVJKGW0QQzLLIVcsPguV" },
+      "properties": {
+        "name": "PARQUE ALAMEDA",
+        "id": "kVJKGW0QQzLLIVcsPguV",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10284,7 +11054,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SANTA ISABEL 2A SECCION", "id": "OfrhoMoOAr5yZYmKhGll" },
+      "properties": {
+        "name": "SANTA ISABEL 2A SECCION",
+        "id": "OfrhoMoOAr5yZYmKhGll",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10362,7 +11137,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SANTA ROSA RESIDENCIAL", "id": "hAxp3WHmVr2qZwEZnXk8" },
+      "properties": {
+        "name": "SANTA ROSA RESIDENCIAL",
+        "id": "hAxp3WHmVr2qZwEZnXk8",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10438,7 +11218,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CORONEL OLMEDO", "id": "0Z5uj72Sq1bAkKX0ZJL0" },
+      "properties": {
+        "name": "VILLA CORONEL OLMEDO",
+        "id": "0Z5uj72Sq1bAkKX0ZJL0",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10496,7 +11281,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CARBO", "id": "bskzefM526ZrfmZyoby4" },
+      "properties": {
+        "name": "CARBO",
+        "id": "bskzefM526ZrfmZyoby4",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10573,7 +11363,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COMERCIAL", "id": "VbLzXR4XsYx0VB7lX1Tx" },
+      "properties": {
+        "name": "COMERCIAL",
+        "id": "VbLzXR4XsYx0VB7lX1Tx",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10659,7 +11454,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA RIVADAVIA ANEXO \"A\"", "id": "crx9Vw0x4DglqOeDY9IQ" },
+      "properties": {
+        "name": "VILLA RIVADAVIA ANEXO \"A\"",
+        "id": "crx9Vw0x4DglqOeDY9IQ",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10702,7 +11502,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "POLICIAL", "id": "bmGHAioHm5XDdPvCx0kw" },
+      "properties": {
+        "name": "POLICIAL",
+        "id": "bmGHAioHm5XDdPvCx0kw",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10803,7 +11608,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA RETIRO", "id": "KHS25UOF8n8Rl1VTNxP3" },
+      "properties": {
+        "name": "VILLA RETIRO",
+        "id": "KHS25UOF8n8Rl1VTNxP3",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10909,7 +11719,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CERRO NORTE", "id": "8aTIWbjGmVXxo7MyWIfe" },
+      "properties": {
+        "name": "CERRO NORTE",
+        "id": "8aTIWbjGmVXxo7MyWIfe",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -10977,7 +11792,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "YOFRE SUD", "id": "Q6RQDrqEMzxtEqX88x8X" },
+      "properties": {
+        "name": "YOFRE SUD",
+        "id": "Q6RQDrqEMzxtEqX88x8X",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11044,7 +11864,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PALMAR", "id": "pLrKTyKFNHqvSNlArqEZ" },
+      "properties": {
+        "name": "PALMAR",
+        "id": "pLrKTyKFNHqvSNlArqEZ",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11116,7 +11941,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "U.O.C.R.A.", "id": "Vtitn46HiZheMwqdN3AQ" },
+      "properties": {
+        "name": "U.O.C.R.A.",
+        "id": "Vtitn46HiZheMwqdN3AQ",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11164,7 +11994,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE LICEO 2A SECCION", "id": "BLyhtaN58py9rc2MZUVe" },
+      "properties": {
+        "name": "PARQUE LICEO 2A SECCION",
+        "id": "BLyhtaN58py9rc2MZUVe",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11231,7 +12066,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALEJANDRO CENTENO", "id": "zizOZR56ZJYVAWmPruwg" },
+      "properties": {
+        "name": "ALEJANDRO CENTENO",
+        "id": "zizOZR56ZJYVAWmPruwg",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11276,7 +12116,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SANTA CECILIA", "id": "9cFqmYHJ247KzHb7SXCO" },
+      "properties": {
+        "name": "SANTA CECILIA",
+        "id": "9cFqmYHJ247KzHb7SXCO",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11327,7 +12172,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA MARTA", "id": "QWXB2H0Dnq87JaavUjiV" },
+      "properties": {
+        "name": "VILLA MARTA",
+        "id": "QWXB2H0Dnq87JaavUjiV",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11367,7 +12217,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION PANAMERICANO", "id": "IN3Tp22hkDMtLmxGjW0l" },
+      "properties": {
+        "name": "AMPLIACION PANAMERICANO",
+        "id": "IN3Tp22hkDMtLmxGjW0l",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11439,7 +12294,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PATRICIOS OESTE", "id": "91I3ro3hx0m41M5BXH1G" },
+      "properties": {
+        "name": "PATRICIOS OESTE",
+        "id": "91I3ro3hx0m41M5BXH1G",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11486,7 +12346,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA AZALAIZ", "id": "lt8gJ4wj184SQBzlrYiU" },
+      "properties": {
+        "name": "VILLA AZALAIZ",
+        "id": "lt8gJ4wj184SQBzlrYiU",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11584,7 +12449,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "HIPOLITO IRIGOYEN", "id": "g4Yxi7w76Py4SIhYBc4i" },
+      "properties": {
+        "name": "HIPOLITO IRIGOYEN",
+        "id": "g4Yxi7w76Py4SIhYBc4i",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11622,7 +12492,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN MARTIN NORTE", "id": "GriwQEaxwSN5EUI39UPJ" },
+      "properties": {
+        "name": "SAN MARTIN NORTE",
+        "id": "GriwQEaxwSN5EUI39UPJ",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11661,7 +12536,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL SAVIO", "id": "TOLYkJ4mJiqeyCuJAPaK" },
+      "properties": {
+        "name": "GENERAL SAVIO",
+        "id": "TOLYkJ4mJiqeyCuJAPaK",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11707,7 +12587,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GRANADERO PRINGLES", "id": "iC0eDXwoZlfUKqfoKTIg" },
+      "properties": {
+        "name": "GRANADERO PRINGLES",
+        "id": "iC0eDXwoZlfUKqfoKTIg",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11746,7 +12631,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION RESIDENCIAL AMERICA", "id": "QMJULXHGF1p3RgP1x1Xf" },
+      "properties": {
+        "name": "AMPLIACION RESIDENCIAL AMERICA",
+        "id": "QMJULXHGF1p3RgP1x1Xf",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11822,7 +12712,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ANA MARIA ZUMARAN", "id": "DZAh9Qicu1wqY0vr7a3P" },
+      "properties": {
+        "name": "ANA MARIA ZUMARAN",
+        "id": "DZAh9Qicu1wqY0vr7a3P",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11873,7 +12768,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AYACUCHO", "id": "l5DmQOSkuPJTRxzmhfn8" },
+      "properties": {
+        "name": "AYACUCHO",
+        "id": "l5DmQOSkuPJTRxzmhfn8",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -11947,7 +12847,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS MARGARITAS", "id": "jgx7sFaTi7PNbRZcAtLS" },
+      "properties": {
+        "name": "LAS MARGARITAS",
+        "id": "jgx7sFaTi7PNbRZcAtLS",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12022,7 +12927,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN MARTIN ANEXO", "id": "kov3xbtJIoffGwgN8QbY" },
+      "properties": {
+        "name": "SAN MARTIN ANEXO",
+        "id": "kov3xbtJIoffGwgN8QbY",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12066,7 +12976,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOMAS DE SAN MARTIN", "id": "BzTteTgQRaYLlq983XXJ" },
+      "properties": {
+        "name": "LOMAS DE SAN MARTIN",
+        "id": "BzTteTgQRaYLlq983XXJ",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12114,7 +13029,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN NICOLAS", "id": "dW2x9ixRdulTK8Pgjk0E" },
+      "properties": {
+        "name": "SAN NICOLAS",
+        "id": "dW2x9ixRdulTK8Pgjk0E",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12180,7 +13100,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "URCA", "id": "NxdN8KYcgrsl3ChknBtt" },
+      "properties": {
+        "name": "URCA",
+        "id": "NxdN8KYcgrsl3ChknBtt",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12364,7 +13289,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS PARAISOS", "id": "CWmiEUWgGpK6YXtVeVlN" },
+      "properties": {
+        "name": "LOS PARAISOS",
+        "id": "CWmiEUWgGpK6YXtVeVlN",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12418,7 +13348,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE CHACABUCO", "id": "hS0UPdm5elef3bWhSEDC" },
+      "properties": {
+        "name": "PARQUE CHACABUCO",
+        "id": "hS0UPdm5elef3bWhSEDC",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12481,7 +13416,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CHATEAU CARRERAS", "id": "JiBG7KY2Btfn9vuS8oqB" },
+      "properties": {
+        "name": "CHATEAU CARRERAS",
+        "id": "JiBG7KY2Btfn9vuS8oqB",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12529,7 +13469,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BAJO PALERMO", "id": "h0SkFxu2HDE8Iam4mqSL" },
+      "properties": {
+        "name": "BAJO PALERMO",
+        "id": "h0SkFxu2HDE8Iam4mqSL",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12601,7 +13546,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TABLADA PARK", "id": "TAXhO0Khwb5j9cV10WOj" },
+      "properties": {
+        "name": "TABLADA PARK",
+        "id": "TAXhO0Khwb5j9cV10WOj",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12649,7 +13599,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CENTRO", "id": "KlbdOJn4HKp1sUnyIsha" },
+      "properties": {
+        "name": "CENTRO",
+        "id": "KlbdOJn4HKp1sUnyIsha",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -12940,7 +13895,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALBERDI", "id": "Vx3OmTX9FCF8C53ifACw" },
+      "properties": {
+        "name": "ALBERDI",
+        "id": "Vx3OmTX9FCF8C53ifACw",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -13151,7 +14111,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE CAPITAL SUR", "id": "cO4sV2e0WecNt8UyzRBi" },
+      "properties": {
+        "name": "PARQUE CAPITAL SUR",
+        "id": "cO4sV2e0WecNt8UyzRBi",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -13308,7 +14273,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN MARTIN", "id": "8krLWNU4nDkRsz46j56i" },
+      "properties": {
+        "name": "SAN MARTIN",
+        "id": "8krLWNU4nDkRsz46j56i",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -13465,7 +14435,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE TABLADA", "id": "diLd5xAfZi72gRglcN80" },
+      "properties": {
+        "name": "PARQUE TABLADA",
+        "id": "diLd5xAfZi72gRglcN80",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -13564,7 +14539,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL BUSTOS", "id": "fV6d00csmo960P3KUnVK" },
+      "properties": {
+        "name": "GENERAL BUSTOS",
+        "id": "fV6d00csmo960P3KUnVK",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -13666,7 +14646,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "HOGAR PROPIO", "id": "zdgI5Oc7Acb2qiIDf30n" },
+      "properties": {
+        "name": "HOGAR PROPIO",
+        "id": "zdgI5Oc7Acb2qiIDf30n",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -13727,7 +14712,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA GENERAL URQUIZA", "id": "rlCJh8iHGbcldXdYg5qw" },
+      "properties": {
+        "name": "VILLA GENERAL URQUIZA",
+        "id": "rlCJh8iHGbcldXdYg5qw",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -13886,7 +14876,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "INAUDI", "id": "dEIdoNQTYEbLtWJAjkKN" },
+      "properties": {
+        "name": "INAUDI",
+        "id": "dEIdoNQTYEbLtWJAjkKN",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -13995,7 +14990,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "QUEBRADA DE LAS ROSAS", "id": "Wl0Y18mZ650DXaQMSLGm" },
+      "properties": {
+        "name": "QUEBRADA DE LAS ROSAS",
+        "id": "Wl0Y18mZ650DXaQMSLGm",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14149,7 +15149,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MILITAR GENERAL DEHEZA", "id": "DXKoj46J17UOtog96C28" },
+      "properties": {
+        "name": "MILITAR GENERAL DEHEZA",
+        "id": "DXKoj46J17UOtog96C28",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14212,7 +15217,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN SALVADOR", "id": "sVExaBwZLgLxQLOsslPq" },
+      "properties": {
+        "name": "SAN SALVADOR",
+        "id": "sVExaBwZLgLxQLOsslPq",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14291,7 +15301,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS PALMAS", "id": "I6lUsELSVl96dVhR5DjO" },
+      "properties": {
+        "name": "LAS PALMAS",
+        "id": "I6lUsELSVl96dVhR5DjO",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14381,7 +15396,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TEODORO FELS", "id": "fIssMeHMgGAJ648EsCUc" },
+      "properties": {
+        "name": "TEODORO FELS",
+        "id": "fIssMeHMgGAJ648EsCUc",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14507,7 +15527,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA MAFEKIN", "id": "PIQHQnZePFniCt7bmRai" },
+      "properties": {
+        "name": "VILLA MAFEKIN",
+        "id": "PIQHQnZePFniCt7bmRai",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14549,7 +15574,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TRANVIARIOS", "id": "W9IQJTQo3V4ymV3ZaiAG" },
+      "properties": {
+        "name": "TRANVIARIOS",
+        "id": "W9IQJTQo3V4ymV3ZaiAG",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14608,7 +15638,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "INDUSTRIAL OESTE", "id": "7BAIQoYD8k91gOiTyJnx" },
+      "properties": {
+        "name": "INDUSTRIAL OESTE",
+        "id": "7BAIQoYD8k91gOiTyJnx",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14678,7 +15713,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE REPUBLICA", "id": "mgp6sjxcJ92b95kdP2TZ" },
+      "properties": {
+        "name": "PARQUE REPUBLICA",
+        "id": "mgp6sjxcJ92b95kdP2TZ",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14756,7 +15796,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA MARTINEZ", "id": "qeuhkAQ4WP4FIILIwMke" },
+      "properties": {
+        "name": "VILLA MARTINEZ",
+        "id": "qeuhkAQ4WP4FIILIwMke",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14817,7 +15862,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COMANDANTE ESPORA", "id": "98WzCEvS7YMEDMMHaQLl" },
+      "properties": {
+        "name": "COMANDANTE ESPORA",
+        "id": "98WzCEvS7YMEDMMHaQLl",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14871,7 +15921,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JUAN XXIII", "id": "yoAsGZbWLCaM0zCays0I" },
+      "properties": {
+        "name": "JUAN XXIII",
+        "id": "yoAsGZbWLCaM0zCays0I",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14907,7 +15962,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "NUEVA CORDOBA", "id": "1ZjVAPL8cXnpK7rV2hUC" },
+      "properties": {
+        "name": "NUEVA CORDOBA",
+        "id": "1ZjVAPL8cXnpK7rV2hUC",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -14979,7 +16039,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN RAFAEL", "id": "1SCQy0VVxIPMA4A0OT3y" },
+      "properties": {
+        "name": "SAN RAFAEL",
+        "id": "1SCQy0VVxIPMA4A0OT3y",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -15044,7 +16109,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SANTA ANA RESIDENCIAL", "id": "4AchrMBFstQoE63KatcP" },
+      "properties": {
+        "name": "SANTA ANA RESIDENCIAL",
+        "id": "4AchrMBFstQoE63KatcP",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15085,7 +16155,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL TREBOL", "id": "PPjhlcWz37ECj92erP0D" },
+      "properties": {
+        "name": "EL TREBOL",
+        "id": "PPjhlcWz37ECj92erP0D",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15120,7 +16195,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN FRANCISCO", "id": "vKctJKPjUVubSPWrKZu9" },
+      "properties": {
+        "name": "SAN FRANCISCO",
+        "id": "vKctJKPjUVubSPWrKZu9",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15191,7 +16271,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AVENIDA", "id": "GjbrsUHb2UXf46wSilln" },
+      "properties": {
+        "name": "AVENIDA",
+        "id": "GjbrsUHb2UXf46wSilln",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15240,7 +16325,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COLINAS DE VELEZ SARSFIELD", "id": "B9RS5M0O1dfUkKKiEivm" },
+      "properties": {
+        "name": "COLINAS DE VELEZ SARSFIELD",
+        "id": "B9RS5M0O1dfUkKKiEivm",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15297,7 +16387,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SARGENTO CABRAL", "id": "kbLB11VH7GUzuOPCK7sA" },
+      "properties": {
+        "name": "SARGENTO CABRAL",
+        "id": "kbLB11VH7GUzuOPCK7sA",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15340,7 +16435,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "1RA. JUNTA", "id": "ZZiGvk9iPkqexdqerlhy" },
+      "properties": {
+        "name": "1RA. JUNTA",
+        "id": "ZZiGvk9iPkqexdqerlhy",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15382,7 +16482,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BAJADA SAN ROQUE", "id": "SBMHDM3ofy2uDIUAs0jC" },
+      "properties": {
+        "name": "BAJADA SAN ROQUE",
+        "id": "SBMHDM3ofy2uDIUAs0jC",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15409,7 +16514,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MAURIZI", "id": "9VKd4FgOGAATY86RMjna" },
+      "properties": {
+        "name": "MAURIZI",
+        "id": "9VKd4FgOGAATY86RMjna",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15463,7 +16573,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "1º DE MAYO", "id": "LPffaZimmXZdapeVhimA" },
+      "properties": {
+        "name": "1º DE MAYO",
+        "id": "LPffaZimmXZdapeVhimA",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15557,7 +16672,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CAROLA LORENZINI", "id": "RdmbUlFimTuf7luQLNAJ" },
+      "properties": {
+        "name": "CAROLA LORENZINI",
+        "id": "RdmbUlFimTuf7luQLNAJ",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15586,7 +16706,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EMPALME", "id": "Uqs95SicCcHX5Jen4P2z" },
+      "properties": {
+        "name": "EMPALME",
+        "id": "Uqs95SicCcHX5Jen4P2z",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15667,7 +16792,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RESIDENCIAL OLIVOS", "id": "WrQH0DH5f3ornzebCibQ" },
+      "properties": {
+        "name": "RESIDENCIAL OLIVOS",
+        "id": "WrQH0DH5f3ornzebCibQ",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15753,7 +16883,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BELLA VISTA OESTE", "id": "3S8goF3fkQJj2wjjMPXN" },
+      "properties": {
+        "name": "BELLA VISTA OESTE",
+        "id": "3S8goF3fkQJj2wjjMPXN",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15791,7 +16926,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MARIANO BALCARCE", "id": "r8FUBA9eaA809Csqa6Bi" },
+      "properties": {
+        "name": "MARIANO BALCARCE",
+        "id": "r8FUBA9eaA809Csqa6Bi",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15840,7 +16980,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ROSEDAL", "id": "ZyOEiHPZL8gHdthRzuJ9" },
+      "properties": {
+        "name": "ROSEDAL",
+        "id": "ZyOEiHPZL8gHdthRzuJ9",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15894,7 +17039,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTOS DE SANTA ANA", "id": "ASCb6P2gpVDm9YOAlB1P" },
+      "properties": {
+        "name": "ALTOS DE SANTA ANA",
+        "id": "ASCb6P2gpVDm9YOAlB1P",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -15972,7 +17122,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TALLERES SUD", "id": "jdyE0abAuZRe3ge3QHJw" },
+      "properties": {
+        "name": "TALLERES SUD",
+        "id": "jdyE0abAuZRe3ge3QHJw",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16041,7 +17196,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ROGELIO MARTINEZ", "id": "9we6N8sWdpWGigVjfLfA" },
+      "properties": {
+        "name": "ROGELIO MARTINEZ",
+        "id": "9we6N8sWdpWGigVjfLfA",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16078,7 +17238,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE VELEZ SARSFIELD", "id": "LwfBqP90qBf0FAhBh6YO" },
+      "properties": {
+        "name": "PARQUE VELEZ SARSFIELD",
+        "id": "LwfBqP90qBf0FAhBh6YO",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16152,7 +17317,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION ROSEDAL", "id": "aYfkIzIEaOVxOr8IqhZ6" },
+      "properties": {
+        "name": "AMPLIACION ROSEDAL",
+        "id": "aYfkIzIEaOVxOr8IqhZ6",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16251,7 +17421,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION 1º DE MAYO", "id": "XHSurqXrH7CyzvlDmFNT" },
+      "properties": {
+        "name": "AMPLIACION 1º DE MAYO",
+        "id": "XHSurqXrH7CyzvlDmFNT",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16285,7 +17460,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JOSE IGNACIO DIAZ 1A SECCION", "id": "oVIY07tcR9SU9SvdDYY3" },
+      "properties": {
+        "name": "JOSE IGNACIO DIAZ 1A SECCION",
+        "id": "oVIY07tcR9SU9SvdDYY3",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16380,7 +17560,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JOSE IGNACIO DIAZ 2A SECCION", "id": "Vc7eJxLFqtFhHJfLJpXR" },
+      "properties": {
+        "name": "JOSE IGNACIO DIAZ 2A SECCION",
+        "id": "Vc7eJxLFqtFhHJfLJpXR",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16459,7 +17644,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "FERRER", "id": "SEFQ6LjlQxDMku2Bote9" },
+      "properties": {
+        "name": "FERRER",
+        "id": "SEFQ6LjlQxDMku2Bote9",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16495,7 +17685,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN FERNANDO", "id": "T1qfnqPWlxcEAdrrOY3i" },
+      "properties": {
+        "name": "SAN FERNANDO",
+        "id": "T1qfnqPWlxcEAdrrOY3i",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16556,7 +17751,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS LILAS", "id": "Z7WcJ53kzolXMzMkzXLX" },
+      "properties": {
+        "name": "LAS LILAS",
+        "id": "Z7WcJ53kzolXMzMkzXLX",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16634,7 +17834,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS FLORES", "id": "60pppakyLLBbASTIW1kS" },
+      "properties": {
+        "name": "LAS FLORES",
+        "id": "60pppakyLLBbASTIW1kS",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16741,7 +17946,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CIUDADELA", "id": "7OOluaY7GJXEldgwQD4y" },
+      "properties": {
+        "name": "CIUDADELA",
+        "id": "7OOluaY7GJXEldgwQD4y",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16788,7 +17998,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EJERCITO ARGENTINO", "id": "BknBRPuPoaEH3nwVFydP" },
+      "properties": {
+        "name": "EJERCITO ARGENTINO",
+        "id": "BknBRPuPoaEH3nwVFydP",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16830,7 +18045,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CERRO CHICO", "id": "1CnLIiG7JK8IXS9mjqbg" },
+      "properties": {
+        "name": "CERRO CHICO",
+        "id": "1CnLIiG7JK8IXS9mjqbg",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -16953,7 +18173,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTA CORDOBA", "id": "JVtH4JO4cVVLICaV4DGj" },
+      "properties": {
+        "name": "ALTA CORDOBA",
+        "id": "JVtH4JO4cVVLICaV4DGj",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17313,7 +18538,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "OÑA", "id": "62icS6tMrqs1MkUgXvpY" },
+      "properties": {
+        "name": "OÑA",
+        "id": "62icS6tMrqs1MkUgXvpY",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17366,7 +18596,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE SAN CARLOS", "id": "nE42BFNZb7pQXCCCBhYI" },
+      "properties": {
+        "name": "PARQUE SAN CARLOS",
+        "id": "nE42BFNZb7pQXCCCBhYI",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17400,7 +18635,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN DANIEL", "id": "GQebYy5CqbYxEx2SDpj5" },
+      "properties": {
+        "name": "SAN DANIEL",
+        "id": "GQebYy5CqbYxEx2SDpj5",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17446,7 +18686,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JARDIN ESPINOSA", "id": "xvV7CwXVAgdmXTX6xII8" },
+      "properties": {
+        "name": "JARDIN ESPINOSA",
+        "id": "xvV7CwXVAgdmXTX6xII8",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17509,7 +18754,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CALIFORNIA", "id": "yszGCicZ71NL6E6FNmLY" },
+      "properties": {
+        "name": "CALIFORNIA",
+        "id": "yszGCicZ71NL6E6FNmLY",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17550,7 +18800,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "HORIZONTE", "id": "k9D7Ulg4sPC9OeikeVP1" },
+      "properties": {
+        "name": "HORIZONTE",
+        "id": "k9D7Ulg4sPC9OeikeVP1",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17602,7 +18857,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS SAUCES", "id": "2CClDhV6bvaHkQW41zcT" },
+      "properties": {
+        "name": "LOS SAUCES",
+        "id": "2CClDhV6bvaHkQW41zcT",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17675,7 +18935,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "FERREYRA", "id": "PTBYG3c95jxLBl65RKMd" },
+      "properties": {
+        "name": "FERREYRA",
+        "id": "PTBYG3c95jxLBl65RKMd",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17776,7 +19041,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CABO FARINA", "id": "igd5JSx1Jys0DclXaark" },
+      "properties": {
+        "name": "CABO FARINA",
+        "id": "igd5JSx1Jys0DclXaark",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17816,7 +19086,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ITUZAINGO ANEXO", "id": "ZHxHXmh3BGwDT7dIqeBM" },
+      "properties": {
+        "name": "ITUZAINGO ANEXO",
+        "id": "ZHxHXmh3BGwDT7dIqeBM",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -17875,7 +19150,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ITUZAINGO", "id": "bfXjjzXjsm0He2xCiuHS" },
+      "properties": {
+        "name": "ITUZAINGO",
+        "id": "bfXjjzXjsm0He2xCiuHS",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18060,7 +19340,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SANTA ISABEL 1A SECCION", "id": "w9EICqBGlo5iHKqIl5H1" },
+      "properties": {
+        "name": "SANTA ISABEL 1A SECCION",
+        "id": "w9EICqBGlo5iHKqIl5H1",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18262,7 +19547,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CONGRESO", "id": "BMuBXvfepdNB7GYF1vkZ" },
+      "properties": {
+        "name": "CONGRESO",
+        "id": "BMuBXvfepdNB7GYF1vkZ",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18346,7 +19636,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS EUCALIPTUS", "id": "AChGLePmFIBYbwJb5Fcr" },
+      "properties": {
+        "name": "LOS EUCALIPTUS",
+        "id": "AChGLePmFIBYbwJb5Fcr",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18396,7 +19691,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN ANTONIO", "id": "5pdqHE9xvNNK6uDWZyjr" },
+      "properties": {
+        "name": "SAN ANTONIO",
+        "id": "5pdqHE9xvNNK6uDWZyjr",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18507,7 +19807,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SANTA ISABEL 3A SECCION", "id": "a7GYholsHj678LeymP5t" },
+      "properties": {
+        "name": "SANTA ISABEL 3A SECCION",
+        "id": "a7GYholsHj678LeymP5t",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18543,7 +19848,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "V.I.C.O.R.", "id": "ceCVqriXIIlxdu93wjMu" },
+      "properties": {
+        "name": "V.I.C.O.R.",
+        "id": "ceCVqriXIIlxdu93wjMu",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18591,7 +19901,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE FUTURA", "id": "d3Gr1GBMWBpv5hbl99PM" },
+      "properties": {
+        "name": "PARQUE FUTURA",
+        "id": "d3Gr1GBMWBpv5hbl99PM",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -18686,7 +20001,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BIALET MASSE", "id": "5BclVBMeqH4DuJbmbhZ4" },
+      "properties": {
+        "name": "BIALET MASSE",
+        "id": "5BclVBMeqH4DuJbmbhZ4",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18744,7 +20064,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CLAUDINA", "id": "eSzEE22Iw1juMwk04vFR" },
+      "properties": {
+        "name": "VILLA CLAUDINA",
+        "id": "eSzEE22Iw1juMwk04vFR",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18796,7 +20121,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "KAIROS", "id": "dQAB2vimmpq7dUIAOBG8" },
+      "properties": {
+        "name": "KAIROS",
+        "id": "dQAB2vimmpq7dUIAOBG8",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18829,7 +20159,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "QUINTAS DE SAN JORGE", "id": "ZSrxAXXMfqLmQ62nPBHY" },
+      "properties": {
+        "name": "QUINTAS DE SAN JORGE",
+        "id": "ZSrxAXXMfqLmQ62nPBHY",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18862,7 +20197,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN LUIS DE FRANCIA", "id": "HdwzIp4PRQjaMP4QIiIo" },
+      "properties": {
+        "name": "SAN LUIS DE FRANCIA",
+        "id": "HdwzIp4PRQjaMP4QIiIo",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18912,7 +20252,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CORRAL DE PALOS", "id": "W8CtnxJty6xcpy3JC7Xh" },
+      "properties": {
+        "name": "CORRAL DE PALOS",
+        "id": "W8CtnxJty6xcpy3JC7Xh",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -18953,7 +20298,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RESIDENCIAL VELEZ SARSFIELD", "id": "QuzZxoNgW2KBMf4AVbfZ" },
+      "properties": {
+        "name": "RESIDENCIAL VELEZ SARSFIELD",
+        "id": "QuzZxoNgW2KBMf4AVbfZ",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -19018,7 +20368,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ALBERDI", "id": "r4PteSo1xzH0UTEBpc9B" },
+      "properties": {
+        "name": "VILLA ALBERDI",
+        "id": "r4PteSo1xzH0UTEBpc9B",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -19102,7 +20457,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA SIBURU", "id": "9qUsfL89FjbbBLnNJmY7" },
+      "properties": {
+        "name": "VILLA SIBURU",
+        "id": "9qUsfL89FjbbBLnNJmY7",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -19282,7 +20642,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS CEIBOS", "id": "ANC3xsgONh4sVXXLd3hV" },
+      "properties": {
+        "name": "LOS CEIBOS",
+        "id": "ANC3xsgONh4sVXXLd3hV",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -19316,7 +20681,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA HORTENSIA", "id": "7fMRKkCZOG3x3IfCKS5a" },
+      "properties": {
+        "name": "LA HORTENSIA",
+        "id": "7fMRKkCZOG3x3IfCKS5a",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -19368,7 +20738,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "YAPEYU", "id": "FZGibEK10FGeUEqBtFgH" },
+      "properties": {
+        "name": "YAPEYU",
+        "id": "FZGibEK10FGeUEqBtFgH",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -19675,7 +21050,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ARGUELLO NORTE", "id": "DV4NVBihGvQJqjkjsL50" },
+      "properties": {
+        "name": "ARGUELLO NORTE",
+        "id": "DV4NVBihGvQJqjkjsL50",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -19852,7 +21232,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BRIGADIER SAN MARTIN", "id": "oAWBOoAsJWhbPMIU0BsH" },
+      "properties": {
+        "name": "BRIGADIER SAN MARTIN",
+        "id": "oAWBOoAsJWhbPMIU0BsH",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -19920,7 +21305,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL CABILDO", "id": "36lc4nT7xUnNGmlDxmLI" },
+      "properties": {
+        "name": "EL CABILDO",
+        "id": "36lc4nT7xUnNGmlDxmLI",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20077,7 +21467,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RENACIMIENTO", "id": "iZtgMj9d34SwB5XAhi08" },
+      "properties": {
+        "name": "RENACIMIENTO",
+        "id": "iZtgMj9d34SwB5XAhi08",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20153,7 +21548,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VIVERO NORTE", "id": "YIGtgBDFDhKGS6mxU848" },
+      "properties": {
+        "name": "VIVERO NORTE",
+        "id": "YIGtgBDFDhKGS6mxU848",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20222,7 +21622,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PORTAL DEL JACARANDA", "id": "OxizmS2ss22vHYb2mlFE" },
+      "properties": {
+        "name": "PORTAL DEL JACARANDA",
+        "id": "OxizmS2ss22vHYb2mlFE",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20283,7 +21688,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE MODELO", "id": "gjK8pvF3KthjcJicuzrS" },
+      "properties": {
+        "name": "PARQUE MODELO",
+        "id": "gjK8pvF3KthjcJicuzrS",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20404,7 +21814,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS ROSAS", "id": "1iICYpX4kSurVOVZjiDa" },
+      "properties": {
+        "name": "LAS ROSAS",
+        "id": "1iICYpX4kSurVOVZjiDa",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20547,7 +21962,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION SAN PABLO", "id": "W7LFirEqku2pDQKo62LC" },
+      "properties": {
+        "name": "AMPLIACION SAN PABLO",
+        "id": "W7LFirEqku2pDQKo62LC",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20633,7 +22053,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CORNU", "id": "rXZVNv7aRmX23CHfPsKI" },
+      "properties": {
+        "name": "VILLA CORNU",
+        "id": "rXZVNv7aRmX23CHfPsKI",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20730,7 +22155,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA RIVERA INDARTE", "id": "l8Tt3l5iN7NPrL6xeANI" },
+      "properties": {
+        "name": "VILLA RIVERA INDARTE",
+        "id": "l8Tt3l5iN7NPrL6xeANI",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -20922,7 +22352,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ALLENDE PARQUE", "id": "8ZGmrSZ2ObRLmS2Mxqii" },
+      "properties": {
+        "name": "VILLA ALLENDE PARQUE",
+        "id": "8ZGmrSZ2ObRLmS2Mxqii",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21055,7 +22490,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RECREO DEL NORTE", "id": "t1Legu4fiw0lQf6YzSBq" },
+      "properties": {
+        "name": "RECREO DEL NORTE",
+        "id": "t1Legu4fiw0lQf6YzSBq",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21112,7 +22552,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GUIÑAZU", "id": "hBLV1OHUJKdxbUBgBzTc" },
+      "properties": {
+        "name": "GUIÑAZU",
+        "id": "hBLV1OHUJKdxbUBgBzTc",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21189,7 +22634,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ALICIA RISLER", "id": "aRVK9Oy1xmCJEDfvRhVZ" },
+      "properties": {
+        "name": "VILLA ALICIA RISLER",
+        "id": "aRVK9Oy1xmCJEDfvRhVZ",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21254,7 +22704,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS ALAMOS", "id": "7W6byL26e1BHuAwLtHzi" },
+      "properties": {
+        "name": "LOS ALAMOS",
+        "id": "7W6byL26e1BHuAwLtHzi",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21320,7 +22775,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE ATLANTICA", "id": "L8L3vxLWNaxPqGXU7i2t" },
+      "properties": {
+        "name": "PARQUE ATLANTICA",
+        "id": "L8L3vxLWNaxPqGXU7i2t",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21371,7 +22831,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "NICOLAS AVELLANEDA", "id": "g4cxRmUw6Fn6fM6fnTDx" },
+      "properties": {
+        "name": "NICOLAS AVELLANEDA",
+        "id": "g4cxRmUw6Fn6fM6fnTDx",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21446,7 +22911,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS GIGANTES", "id": "se7fgsdQubUS1CB8O4Ha" },
+      "properties": {
+        "name": "LOS GIGANTES",
+        "id": "se7fgsdQubUS1CB8O4Ha",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21504,7 +22974,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VALLE DEL CERRO", "id": "FAVNiFpwyAyJm0EqYy6n" },
+      "properties": {
+        "name": "VALLE DEL CERRO",
+        "id": "FAVNiFpwyAyJm0EqYy6n",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21640,7 +23115,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COLINAS DEL CERRO", "id": "WmMaySAJrU2TWKtEbPOd" },
+      "properties": {
+        "name": "COLINAS DEL CERRO",
+        "id": "WmMaySAJrU2TWKtEbPOd",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -21969,7 +23449,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "OMBU", "id": "i9zHZWBegKwCeVqtQGYt" },
+      "properties": {
+        "name": "OMBU",
+        "id": "i9zHZWBegKwCeVqtQGYt",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -22070,7 +23555,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA AZALAIZ OESTE", "id": "TqjcX13UYvK5Z2OoZOL3" },
+      "properties": {
+        "name": "VILLA AZALAIZ OESTE",
+        "id": "TqjcX13UYvK5Z2OoZOL3",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -22165,7 +23655,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MARCELO T. DE ALVEAR", "id": "99JXKNGkDppYagRifxzf" },
+      "properties": {
+        "name": "MARCELO T. DE ALVEAR",
+        "id": "99JXKNGkDppYagRifxzf",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -22249,7 +23744,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ESCOBAR", "id": "wyfSGBzhbj1LCD9hcGUF" },
+      "properties": {
+        "name": "ESCOBAR",
+        "id": "wyfSGBzhbj1LCD9hcGUF",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -22430,7 +23930,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MARECHAL", "id": "SYVWaF4cmQP0OIyoc3hr" },
+      "properties": {
+        "name": "MARECHAL",
+        "id": "SYVWaF4cmQP0OIyoc3hr",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -22590,7 +24095,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTO ALBERDI", "id": "qK55Nyt9Bg63CaWcFAv4" },
+      "properties": {
+        "name": "ALTO ALBERDI",
+        "id": "qK55Nyt9Bg63CaWcFAv4",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -22904,7 +24414,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BAJO GALAN", "id": "hAklzpPiqi4kkCQlIknO" },
+      "properties": {
+        "name": "BAJO GALAN",
+        "id": "hAklzpPiqi4kkCQlIknO",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -22969,7 +24484,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CABRERA", "id": "8TW7a7q73swx0rk5JFT1" },
+      "properties": {
+        "name": "VILLA CABRERA",
+        "id": "8TW7a7q73swx0rk5JFT1",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -23139,7 +24659,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA PAEZ", "id": "mC7Nd4rVrAtmpmTT5oMY" },
+      "properties": {
+        "name": "VILLA PAEZ",
+        "id": "mC7Nd4rVrAtmpmTT5oMY",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -23354,7 +24879,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "DUCASSE", "id": "KN0psTaDTKUYpfV2s8fQ" },
+      "properties": {
+        "name": "DUCASSE",
+        "id": "KN0psTaDTKUYpfV2s8fQ",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -23440,7 +24970,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PROVIDENCIA", "id": "Vj9JdNMHdK30JC3Vtwsw" },
+      "properties": {
+        "name": "PROVIDENCIA",
+        "id": "Vj9JdNMHdK30JC3Vtwsw",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -23600,7 +25135,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL PUEYRREDON", "id": "Y44ouyQy99DDSP6Warfo" },
+      "properties": {
+        "name": "GENERAL PUEYRREDON",
+        "id": "Y44ouyQy99DDSP6Warfo",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -23817,7 +25357,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BAJO GENERAL PAZ", "id": "q5HLYBw8JC3Tu1VLwBao" },
+      "properties": {
+        "name": "BAJO GENERAL PAZ",
+        "id": "q5HLYBw8JC3Tu1VLwBao",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -23934,7 +25479,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BAJADA DE PIEDRA", "id": "Q3nPFyW1Zh1r2kvDd6ll" },
+      "properties": {
+        "name": "BAJADA DE PIEDRA",
+        "id": "Q3nPFyW1Zh1r2kvDd6ll",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -23973,7 +25523,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JUNIORS", "id": "ZTFnHu1MsmwC3gjRxwRh" },
+      "properties": {
+        "name": "JUNIORS",
+        "id": "ZTFnHu1MsmwC3gjRxwRh",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -24241,7 +25796,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "FINCAS DEL SUR", "id": "pdJ3kUBzL8bsP9c6HunO" },
+      "properties": {
+        "name": "FINCAS DEL SUR",
+        "id": "pdJ3kUBzL8bsP9c6HunO",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -24309,7 +25869,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COUNTRY LOS ALGARROBOS", "id": "tfaoNxUU1lSwL8Bw68tU" },
+      "properties": {
+        "name": "COUNTRY LOS ALGARROBOS",
+        "id": "tfaoNxUU1lSwL8Bw68tU",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -24382,7 +25947,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE CHATEAU CARRERAS", "id": "Lc5B9bLgvvXYYgWMceQc" },
+      "properties": {
+        "name": "PARQUE CHATEAU CARRERAS",
+        "id": "Lc5B9bLgvvXYYgWMceQc",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26087,7 +27657,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MIRADOR DEL CHATEAU", "id": "sGQCAu2u7WGiUqJuVF3r" },
+      "properties": {
+        "name": "MIRADOR DEL CHATEAU",
+        "id": "sGQCAu2u7WGiUqJuVF3r",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26179,7 +27754,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "DR REMO M. COPELLO", "id": "aaQAQKkOX3Ng3OxWLsq3" },
+      "properties": {
+        "name": "DR REMO M. COPELLO",
+        "id": "aaQAQKkOX3Ng3OxWLsq3",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26219,7 +27799,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA FRANCE", "id": "oPG44A6lH6j6MNNpbLtI" },
+      "properties": {
+        "name": "LA FRANCE",
+        "id": "oPG44A6lH6j6MNNpbLtI",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26317,7 +27902,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTO VERDE", "id": "8oWw3H75ZcHozMTPFwtC" },
+      "properties": {
+        "name": "ALTO VERDE",
+        "id": "8oWw3H75ZcHozMTPFwtC",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26509,7 +28099,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EVITA", "id": "Li9s06MPowUC4nD53vmA" },
+      "properties": {
+        "name": "EVITA",
+        "id": "Li9s06MPowUC4nD53vmA",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26553,7 +28148,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PORTAL DE CORDOBA", "id": "4WaG07c1gAWR3Rry350z" },
+      "properties": {
+        "name": "PORTAL DE CORDOBA",
+        "id": "4WaG07c1gAWR3Rry350z",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26601,7 +28201,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BETANIA", "id": "Q6Zd52QW34exZrM7Z7IT" },
+      "properties": {
+        "name": "BETANIA",
+        "id": "Q6Zd52QW34exZrM7Z7IT",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26655,7 +28260,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BOEDO", "id": "HxqlaYXN3SOMwPsR4VFM" },
+      "properties": {
+        "name": "BOEDO",
+        "id": "HxqlaYXN3SOMwPsR4VFM",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -26732,7 +28342,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MALDONADO", "id": "6kKWkLzGM7pONB1B75dw" },
+      "properties": {
+        "name": "MALDONADO",
+        "id": "6kKWkLzGM7pONB1B75dw",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27292,7 +28907,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COLONIA LOLA", "id": "2PYRgoMuzV04z48PNEpc" },
+      "properties": {
+        "name": "COLONIA LOLA",
+        "id": "2PYRgoMuzV04z48PNEpc",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27374,7 +28994,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ESQUIU", "id": "jpOhIKHSSlBbjgqo35TF" },
+      "properties": {
+        "name": "VILLA ESQUIU",
+        "id": "jpOhIKHSSlBbjgqo35TF",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27467,7 +29092,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL QUEBRACHAL", "id": "B6Z5CV8ItDN2tUG7r6VK" },
+      "properties": {
+        "name": "EL QUEBRACHAL",
+        "id": "B6Z5CV8ItDN2tUG7r6VK",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27531,7 +29161,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CAMINO A VILLA POSE", "id": "C8sqwwPLgJ4MATf0fakn" },
+      "properties": {
+        "name": "CAMINO A VILLA POSE",
+        "id": "C8sqwwPLgJ4MATf0fakn",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27591,7 +29226,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ITUZAINGO II", "id": "fA1HTXRCnoHYFV6aEwoi" },
+      "properties": {
+        "name": "ITUZAINGO II",
+        "id": "fA1HTXRCnoHYFV6aEwoi",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27659,7 +29299,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "DE LOS CUARTETOS", "id": "zdnMTMhbq1Q9xK6tZXXv" },
+      "properties": {
+        "name": "DE LOS CUARTETOS",
+        "id": "zdnMTMhbq1Q9xK6tZXXv",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27700,7 +29345,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CONSORCIO 16 DE NOVIEMBRE", "id": "YshLAhosXRsdOXFN6Jx9" },
+      "properties": {
+        "name": "CONSORCIO 16 DE NOVIEMBRE",
+        "id": "YshLAhosXRsdOXFN6Jx9",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27743,7 +29393,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CORNU", "id": "rXZVNv7aRmX23CHfPsKI" },
+      "properties": {
+        "name": "VILLA CORNU",
+        "id": "rXZVNv7aRmX23CHfPsKI",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27806,7 +29461,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CIUDAD DE JUAN PABLO II", "id": "ZilaJZh11k53HqyyPGOL" },
+      "properties": {
+        "name": "CIUDAD DE JUAN PABLO II",
+        "id": "ZilaJZh11k53HqyyPGOL",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27873,7 +29533,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS CHINGOLOS", "id": "KnWViRjFLJMsG7ReuF2A" },
+      "properties": {
+        "name": "LOS CHINGOLOS",
+        "id": "KnWViRjFLJMsG7ReuF2A",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -27943,7 +29608,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION POETA LUGONES", "id": "iF7Jyy3V4zNCmagd43X2" },
+      "properties": {
+        "name": "AMPLIACION POETA LUGONES",
+        "id": "iF7Jyy3V4zNCmagd43X2",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28013,7 +29683,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA FRATERNIDAD", "id": "p9IaLT0kFqXO26SZOPq4" },
+      "properties": {
+        "name": "LA FRATERNIDAD",
+        "id": "p9IaLT0kFqXO26SZOPq4",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28140,7 +29815,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA EL LIBERTADOR", "id": "HBSBOMXDrjRB45zus4xO" },
+      "properties": {
+        "name": "VILLA EL LIBERTADOR",
+        "id": "HBSBOMXDrjRB45zus4xO",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28375,7 +30055,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS HUERTILLAS", "id": "7b4dBNaCULsh5ImEiTHB" },
+      "properties": {
+        "name": "LAS HUERTILLAS",
+        "id": "7b4dBNaCULsh5ImEiTHB",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28486,7 +30171,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "POSTA DE VARGAS", "id": "M6u97CwH2k0EzmuCDrZX" },
+      "properties": {
+        "name": "POSTA DE VARGAS",
+        "id": "M6u97CwH2k0EzmuCDrZX",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28545,7 +30235,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "OBISPO ANGELELLI", "id": "Augw0NhS4HojZNHyLARq" },
+      "properties": {
+        "name": "OBISPO ANGELELLI",
+        "id": "Augw0NhS4HojZNHyLARq",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28575,7 +30270,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "QUINTAS DE FLORES", "id": "I8hek5jl5DPSyEmjzeLE" },
+      "properties": {
+        "name": "QUINTAS DE FLORES",
+        "id": "I8hek5jl5DPSyEmjzeLE",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28649,7 +30349,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JARDIN DEL SUD", "id": "LXcHNnmDBWgMg01cOdSY" },
+      "properties": {
+        "name": "JARDIN DEL SUD",
+        "id": "LXcHNnmDBWgMg01cOdSY",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28714,7 +30419,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ITUZAINGO II", "id": "fA1HTXRCnoHYFV6aEwoi" },
+      "properties": {
+        "name": "ITUZAINGO II",
+        "id": "fA1HTXRCnoHYFV6aEwoi",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28754,7 +30464,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "DE MIS SUEÑOS", "id": "XjvuIR4sQnf8JS6b54Bh" },
+      "properties": {
+        "name": "DE MIS SUEÑOS",
+        "id": "XjvuIR4sQnf8JS6b54Bh",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28831,7 +30546,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MARIA LASTENIA", "id": "deEZrMwYu7Xd5ztmHM5a" },
+      "properties": {
+        "name": "MARIA LASTENIA",
+        "id": "deEZrMwYu7Xd5ztmHM5a",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -28927,7 +30647,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "OBSERVATORIO", "id": "86RMGIeKicGFt91Xt8Hv" },
+      "properties": {
+        "name": "OBSERVATORIO",
+        "id": "86RMGIeKicGFt91Xt8Hv",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29016,7 +30741,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL PAZ", "id": "z8zuIXYaA4jwOSLhl0kZ" },
+      "properties": {
+        "name": "GENERAL PAZ",
+        "id": "z8zuIXYaA4jwOSLhl0kZ",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29145,7 +30875,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GUEMES", "id": "6YaG3Geq7oX16ekqXDg4" },
+      "properties": {
+        "name": "GUEMES",
+        "id": "6YaG3Geq7oX16ekqXDg4",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29281,7 +31016,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CACERES", "id": "g2ONHSS4nDi9sqosu3bQ" },
+      "properties": {
+        "name": "CACERES",
+        "id": "g2ONHSS4nDi9sqosu3bQ",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29333,7 +31073,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ACHAVAL PEÑA", "id": "gsrB9U2jWU5BNeNEH1qD" },
+      "properties": {
+        "name": "ACHAVAL PEÑA",
+        "id": "gsrB9U2jWU5BNeNEH1qD",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29392,7 +31137,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BELLA VISTA", "id": "ryGi21ZYwbzpWdQzC8a1" },
+      "properties": {
+        "name": "BELLA VISTA",
+        "id": "ryGi21ZYwbzpWdQzC8a1",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29529,7 +31279,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SUAREZ", "id": "P8PjqewECuH1P7gFGsog" },
+      "properties": {
+        "name": "SUAREZ",
+        "id": "P8PjqewECuH1P7gFGsog",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29617,7 +31372,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COLINAS DE BELLA VISTA", "id": "HD1c5WripgayQG5qxA1D" },
+      "properties": {
+        "name": "COLINAS DE BELLA VISTA",
+        "id": "HD1c5WripgayQG5qxA1D",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29666,7 +31426,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA RESERVA", "id": "pCxhbixOYV2Y5CcxN6KH" },
+      "properties": {
+        "name": "LA RESERVA",
+        "id": "pCxhbixOYV2Y5CcxN6KH",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29694,7 +31459,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "25 DE MAYO", "id": "KT54v9KfgLmgkUYC2KiJ" },
+      "properties": {
+        "name": "25 DE MAYO",
+        "id": "KT54v9KfgLmgkUYC2KiJ",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29726,7 +31496,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS FRESNOS", "id": "MykGj8wzubmjEiKPy6c3" },
+      "properties": {
+        "name": "LOS FRESNOS",
+        "id": "MykGj8wzubmjEiKPy6c3",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29772,7 +31547,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ZEPA", "id": "TgGQvjNWYwetxISsbWtw" },
+      "properties": {
+        "name": "ZEPA",
+        "id": "TgGQvjNWYwetxISsbWtw",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29805,7 +31585,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ZEPA", "id": "TgGQvjNWYwetxISsbWtw" },
+      "properties": {
+        "name": "ZEPA",
+        "id": "TgGQvjNWYwetxISsbWtw",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29827,7 +31612,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL QUEBRACHO", "id": "dIQwzChrJW93p8hiqfKG" },
+      "properties": {
+        "name": "EL QUEBRACHO",
+        "id": "dIQwzChrJW93p8hiqfKG",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29897,7 +31687,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA CORONEL OLMEDO", "id": "0Z5uj72Sq1bAkKX0ZJL0" },
+      "properties": {
+        "name": "VILLA CORONEL OLMEDO",
+        "id": "0Z5uj72Sq1bAkKX0ZJL0",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -29970,7 +31765,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN RAMON", "id": "YsVV8zP30kchLGnUeI2H" },
+      "properties": {
+        "name": "SAN RAMON",
+        "id": "YsVV8zP30kchLGnUeI2H",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30056,7 +31856,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL VIEJO ALGARROBO", "id": "DQxrn5QAIsRLqDp5VSo5" },
+      "properties": {
+        "name": "EL VIEJO ALGARROBO",
+        "id": "DQxrn5QAIsRLqDp5VSo5",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30087,7 +31892,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS CAÑUELAS", "id": "ZUWusOU0Jfsyn7zeUYI1" },
+      "properties": {
+        "name": "LAS CAÑUELAS",
+        "id": "ZUWusOU0Jfsyn7zeUYI1",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30145,7 +31955,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "QUINTAS DE ITALIA", "id": "wMZW4SJYsSgl05oA5hfe" },
+      "properties": {
+        "name": "QUINTAS DE ITALIA",
+        "id": "wMZW4SJYsSgl05oA5hfe",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30213,7 +32028,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CAMINO A SAN CARLOS", "id": "7uzhHwX52KW3BTdl4rfh" },
+      "properties": {
+        "name": "CAMINO A SAN CARLOS",
+        "id": "7uzhHwX52KW3BTdl4rfh",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -30386,7 +32206,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ROCIO DEL SUR", "id": "8ySUOMXEj6v238nlgiu0" },
+      "properties": {
+        "name": "ROCIO DEL SUR",
+        "id": "8ySUOMXEj6v238nlgiu0",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30418,7 +32243,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TEJAS DE LA CANDELARIA", "id": "ifsf27YRuAUbRpxt6UIF" },
+      "properties": {
+        "name": "TEJAS DE LA CANDELARIA",
+        "id": "ifsf27YRuAUbRpxt6UIF",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30556,7 +32386,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MUTUAL DE LOS DOCENTES", "id": "w6CVS4iDeJnmbY1d3K4P" },
+      "properties": {
+        "name": "MUTUAL DE LOS DOCENTES",
+        "id": "w6CVS4iDeJnmbY1d3K4P",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30599,7 +32434,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SMATA", "id": "HT9k6CybyLZqYH2FhzpJ" },
+      "properties": {
+        "name": "SMATA",
+        "id": "HT9k6CybyLZqYH2FhzpJ",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30684,7 +32524,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SOLARES DE SANTA MARIA", "id": "qlGmk86eXiarAcm0dq8u" },
+      "properties": {
+        "name": "SOLARES DE SANTA MARIA",
+        "id": "qlGmk86eXiarAcm0dq8u",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30749,7 +32594,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "COOPERATIVA 16 DE NOVIEMBRE", "id": "AFeVtmj6jYi8aSwd5zHi" },
+      "properties": {
+        "name": "COOPERATIVA 16 DE NOVIEMBRE",
+        "id": "AFeVtmj6jYi8aSwd5zHi",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -30968,7 +32818,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "POLICIAL", "id": "bmGHAioHm5XDdPvCx0kw" },
+      "properties": {
+        "name": "POLICIAL",
+        "id": "bmGHAioHm5XDdPvCx0kw",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -31101,7 +32956,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS HORNILLOS", "id": "Z7Pj2OFta0yuyc7ItZ8k" },
+      "properties": {
+        "name": "LOS HORNILLOS",
+        "id": "Z7Pj2OFta0yuyc7ItZ8k",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31137,7 +32997,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JOSE IGNACIO DIAZ 3A SECCION", "id": "TmtOsyyQUh5evXAem0lW" },
+      "properties": {
+        "name": "JOSE IGNACIO DIAZ 3A SECCION",
+        "id": "TmtOsyyQUh5evXAem0lW",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31296,7 +33161,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "23 DE ABRIL", "id": "TJ9rwgMDYAoyQ7c1ktcm" },
+      "properties": {
+        "name": "23 DE ABRIL",
+        "id": "TJ9rwgMDYAoyQ7c1ktcm",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31345,7 +33215,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS ROBLES", "id": "f6oIgT1AazDT3z3rdkCK" },
+      "properties": {
+        "name": "LOS ROBLES",
+        "id": "f6oIgT1AazDT3z3rdkCK",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31442,7 +33317,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GUARNICION AREA CBA", "id": "h45RNZTLkEh7ykGQqqJW" },
+      "properties": {
+        "name": "GUARNICION AREA CBA",
+        "id": "h45RNZTLkEh7ykGQqqJW",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31550,7 +33430,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AERONAUTICO", "id": "CCWlqBEn8RVYPUAtv0Qa" },
+      "properties": {
+        "name": "AERONAUTICO",
+        "id": "CCWlqBEn8RVYPUAtv0Qa",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31669,7 +33554,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS MAGNOLIAS", "id": "FY6MEv4VZmvyLCEM2hDc" },
+      "properties": {
+        "name": "LAS MAGNOLIAS",
+        "id": "FY6MEv4VZmvyLCEM2hDc",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31732,7 +33622,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "POETA LUGONES", "id": "88gNFZknOJuaOzuoZYjS" },
+      "properties": {
+        "name": "POETA LUGONES",
+        "id": "88gNFZknOJuaOzuoZYjS",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31836,7 +33731,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MARQUES DE SOBREMONTE", "id": "CKood0D36vGiK8JMPyge" },
+      "properties": {
+        "name": "MARQUES DE SOBREMONTE",
+        "id": "CKood0D36vGiK8JMPyge",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31929,7 +33829,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JERONIMO LUIS DE CABRERA", "id": "ugsjXvvXEtObGFa0OsNg" },
+      "properties": {
+        "name": "JERONIMO LUIS DE CABRERA",
+        "id": "ugsjXvvXEtObGFa0OsNg",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -31986,7 +33891,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JUAN B. JUSTO", "id": "jyCmPiOy4sGMKSlYx7U6" },
+      "properties": {
+        "name": "JUAN B. JUSTO",
+        "id": "jyCmPiOy4sGMKSlYx7U6",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32040,7 +33950,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL MOSCONI", "id": "81jDAS91y15LkiVIVQ2H" },
+      "properties": {
+        "name": "GENERAL MOSCONI",
+        "id": "81jDAS91y15LkiVIVQ2H",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32093,7 +34008,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "YOFRE I", "id": "iTINRHlfbOduWnEEKVJZ" },
+      "properties": {
+        "name": "YOFRE I",
+        "id": "iTINRHlfbOduWnEEKVJZ",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32166,7 +34086,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CERVECEROS", "id": "iK8gqFfduNhcpXzGmj5q" },
+      "properties": {
+        "name": "CERVECEROS",
+        "id": "iK8gqFfduNhcpXzGmj5q",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32198,7 +34123,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "JOCKEY", "id": "BKlRkU3tP9lc3Ok2moZz" },
+      "properties": {
+        "name": "JOCKEY",
+        "id": "BKlRkU3tP9lc3Ok2moZz",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32331,7 +34261,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA EUCARISTICA", "id": "zcht4SDaCZKw7416E3F1" },
+      "properties": {
+        "name": "VILLA EUCARISTICA",
+        "id": "zcht4SDaCZKw7416E3F1",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32454,7 +34389,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS CAÑITAS", "id": "S4M8M65avf8aAQE9mq1B" },
+      "properties": {
+        "name": "LAS CAÑITAS",
+        "id": "S4M8M65avf8aAQE9mq1B",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32489,7 +34429,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION GENERAL ARTIGAS", "id": "wUMiUHiAdosVzzzLrPv4" },
+      "properties": {
+        "name": "AMPLIACION GENERAL ARTIGAS",
+        "id": "wUMiUHiAdosVzzzLrPv4",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32579,7 +34524,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL ARTIGAS", "id": "GjPgsq8iuPB34O45AiIA" },
+      "properties": {
+        "name": "GENERAL ARTIGAS",
+        "id": "GjPgsq8iuPB34O45AiIA",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32626,7 +34576,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS OLMOS", "id": "zlFHOb52ZM2tdUWXs8kW" },
+      "properties": {
+        "name": "LOS OLMOS",
+        "id": "zlFHOb52ZM2tdUWXs8kW",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32680,7 +34635,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS OLMOS SUD", "id": "5kr6uYXqcD92vHm3tEJe" },
+      "properties": {
+        "name": "LOS OLMOS SUD",
+        "id": "5kr6uYXqcD92vHm3tEJe",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32733,7 +34693,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RESIDENCIAL SUD", "id": "BCTz7yiNhtIwu1TzAhx8" },
+      "properties": {
+        "name": "RESIDENCIAL SUD",
+        "id": "BCTz7yiNhtIwu1TzAhx8",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32773,7 +34738,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ADELA", "id": "fXMyOnEz4z7hQmA08ZAj" },
+      "properties": {
+        "name": "VILLA ADELA",
+        "id": "fXMyOnEz4z7hQmA08ZAj",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32824,7 +34794,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS PLAYAS", "id": "BR9ezXP2o23dpyWZDtfD" },
+      "properties": {
+        "name": "LAS PLAYAS",
+        "id": "BR9ezXP2o23dpyWZDtfD",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32873,7 +34848,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA ASPASIA", "id": "uDEtAVtEv7u7lZbeuTqO" },
+      "properties": {
+        "name": "VILLA ASPASIA",
+        "id": "uDEtAVtEv7u7lZbeuTqO",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32935,7 +34915,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ESTACION FLORES", "id": "mAs7AlFuoU3z3SGFs7ia" },
+      "properties": {
+        "name": "ESTACION FLORES",
+        "id": "mAs7AlFuoU3z3SGFs7ia",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -32990,7 +34975,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RESIDENCIAL SAN ROQUE", "id": "nKKsR0FJtzZ4PYTvH1IZ" },
+      "properties": {
+        "name": "RESIDENCIAL SAN ROQUE",
+        "id": "nKKsR0FJtzZ4PYTvH1IZ",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -33081,7 +35071,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "4 DE FEBRERO", "id": "OFArQHxOgYr33Aef9sSZ" },
+      "properties": {
+        "name": "4 DE FEBRERO",
+        "id": "OFArQHxOgYr33Aef9sSZ",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -33131,7 +35126,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL BOSQUE", "id": "j71WOwrV7Sxb5b9bU37n" },
+      "properties": {
+        "name": "EL BOSQUE",
+        "id": "j71WOwrV7Sxb5b9bU37n",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -33221,7 +35221,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GUARNICION MILITAR CBA", "id": "wg0jF4FLeA2bDxmPHgoF" },
+      "properties": {
+        "name": "GUARNICION MILITAR CBA",
+        "id": "wg0jF4FLeA2bDxmPHgoF",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -33821,7 +35826,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA WARCALDE", "id": "hEdnnIkzC1wtsswEZnwe" },
+      "properties": {
+        "name": "VILLA WARCALDE",
+        "id": "hEdnnIkzC1wtsswEZnwe",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34219,7 +36229,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOMAS DE LA CAROLINA", "id": "5yd0FC3Ao4H5QvOOlGA0" },
+      "properties": {
+        "name": "LOMAS DE LA CAROLINA",
+        "id": "5yd0FC3Ao4H5QvOOlGA0",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34365,7 +36380,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS DELICIAS", "id": "axzff645N1a8uZIuKMlc" },
+      "properties": {
+        "name": "LAS DELICIAS",
+        "id": "axzff645N1a8uZIuKMlc",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34454,7 +36474,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE DON BOSCO", "id": "UKoSvDYS8a5B0u7XzmLO" },
+      "properties": {
+        "name": "PARQUE DON BOSCO",
+        "id": "UKoSvDYS8a5B0u7XzmLO",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34532,7 +36557,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA TOMA", "id": "CCrE1P7ZBP8dGMPk3LpN" },
+      "properties": {
+        "name": "LA TOMA",
+        "id": "CCrE1P7ZBP8dGMPk3LpN",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34583,7 +36613,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL PUEBLITO", "id": "bMJTuw3sXJmmJy1b4cC6" },
+      "properties": {
+        "name": "EL PUEBLITO",
+        "id": "bMJTuw3sXJmmJy1b4cC6",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34639,7 +36674,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LAS VIOLETAS", "id": "6l6LpFigv78coV3fb3S8" },
+      "properties": {
+        "name": "LAS VIOLETAS",
+        "id": "6l6LpFigv78coV3fb3S8",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34702,7 +36742,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA AVALOS", "id": "KXpHORQaRj8BIqUSgpBi" },
+      "properties": {
+        "name": "VILLA AVALOS",
+        "id": "KXpHORQaRj8BIqUSgpBi",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34786,7 +36831,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS FILTROS", "id": "RMBXmoLlzzljvwjwaBTd" },
+      "properties": {
+        "name": "LOS FILTROS",
+        "id": "RMBXmoLlzzljvwjwaBTd",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34860,7 +36910,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS PLATANOS", "id": "2IieuLL8MqxYr7E74G4I" },
+      "properties": {
+        "name": "LOS PLATANOS",
+        "id": "2IieuLL8MqxYr7E74G4I",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34948,7 +37003,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION BENJAMIN MATIENZO", "id": "ieqAcg2Qb09eDFRSUYds" },
+      "properties": {
+        "name": "AMPLIACION BENJAMIN MATIENZO",
+        "id": "ieqAcg2Qb09eDFRSUYds",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -34978,7 +37038,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AMPLIACION FARINA", "id": "NBjkMHX3cDr6f1QQg1eT" },
+      "properties": {
+        "name": "AMPLIACION FARINA",
+        "id": "NBjkMHX3cDr6f1QQg1eT",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -35008,7 +37073,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE LATINO", "id": "4zA28mOcpEphMkO1ezd1" },
+      "properties": {
+        "name": "PARQUE LATINO",
+        "id": "4zA28mOcpEphMkO1ezd1",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -35063,7 +37133,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA EL LIBERTADOR", "id": "HBSBOMXDrjRB45zus4xO" },
+      "properties": {
+        "name": "VILLA EL LIBERTADOR",
+        "id": "HBSBOMXDrjRB45zus4xO",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -35220,7 +37295,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MIRIZI", "id": "cdwoUOwXZoydCgtOi4Cg" },
+      "properties": {
+        "name": "MIRIZI",
+        "id": "cdwoUOwXZoydCgtOi4Cg",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -35290,7 +37370,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "OBISPO ANGELELLI", "id": "Augw0NhS4HojZNHyLARq" },
+      "properties": {
+        "name": "OBISPO ANGELELLI",
+        "id": "Augw0NhS4HojZNHyLARq",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -35320,7 +37405,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RIVERA INDARTE", "id": "w8f5gwvxQ7Q3MlU4DA7f" },
+      "properties": {
+        "name": "RIVERA INDARTE",
+        "id": "w8f5gwvxQ7Q3MlU4DA7f",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -35868,7 +37958,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA SALDAN", "id": "plPBGEGhvrFyEdieoBzd" },
+      "properties": {
+        "name": "VILLA SALDAN",
+        "id": "plPBGEGhvrFyEdieoBzd",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -36151,7 +38246,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA SERRANA", "id": "OCeAQfkRjOqkee1bug20" },
+      "properties": {
+        "name": "VILLA SERRANA",
+        "id": "OCeAQfkRjOqkee1bug20",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -36198,7 +38298,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA QUISQUIZACATE", "id": "eoftdi2q3MSmVBlhHi1G" },
+      "properties": {
+        "name": "VILLA QUISQUIZACATE",
+        "id": "eoftdi2q3MSmVBlhHi1G",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -36279,7 +38384,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA 9 DE JULIO", "id": "D1p22yOArjchiJ8yzOsE" },
+      "properties": {
+        "name": "VILLA 9 DE JULIO",
+        "id": "D1p22yOArjchiJ8yzOsE",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -36503,7 +38613,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA SILVANO FUNES", "id": "CysymGfXx6w50WQ24VFL" },
+      "properties": {
+        "name": "VILLA SILVANO FUNES",
+        "id": "CysymGfXx6w50WQ24VFL",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -36611,7 +38726,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS BOULEVARES", "id": "jPW4Lac4G2yVU21pyZUq" },
+      "properties": {
+        "name": "LOS BOULEVARES",
+        "id": "jPW4Lac4G2yVU21pyZUq",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -36981,7 +39101,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AEROPUERTO", "id": "3kmZKZk9bX2Uc2CBjCdJ" },
+      "properties": {
+        "name": "AEROPUERTO",
+        "id": "3kmZKZk9bX2Uc2CBjCdJ",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37079,7 +39204,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTO HERMOSO", "id": "zm8szrRgITEeDANEgPjK" },
+      "properties": {
+        "name": "ALTO HERMOSO",
+        "id": "zm8szrRgITEeDANEgPjK",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37268,7 +39398,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "RENE FAVALORO SUD", "id": "GjQ5Whnn8X62SbVLkNtf" },
+      "properties": {
+        "name": "RENE FAVALORO SUD",
+        "id": "GjQ5Whnn8X62SbVLkNtf",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37311,7 +39446,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA ESPERANZA", "id": "Nmaqu4SbMwn9R8oPsBlh" },
+      "properties": {
+        "name": "LA ESPERANZA",
+        "id": "Nmaqu4SbMwn9R8oPsBlh",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37343,7 +39483,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MANANTIALES", "id": "iMBzQRNu0kMGUOGMh30f" },
+      "properties": {
+        "name": "MANANTIALES",
+        "id": "iMBzQRNu0kMGUOGMh30f",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37464,7 +39609,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE LICEO 3A SECCION", "id": "lOBgj2ufwqeAY9fXmXc9" },
+      "properties": {
+        "name": "PARQUE LICEO 3A SECCION",
+        "id": "lOBgj2ufwqeAY9fXmXc9",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37511,7 +39661,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CAMINO A 60 CUADRAS", "id": "o9XPPsJ0UXEPByBgeDFl" },
+      "properties": {
+        "name": "CAMINO A 60 CUADRAS",
+        "id": "o9XPPsJ0UXEPByBgeDFl",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37759,7 +39914,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CLAROS DEL BOSQUE", "id": "deB1BptXYszWUzuXiFK7" },
+      "properties": {
+        "name": "CLAROS DEL BOSQUE",
+        "id": "deB1BptXYszWUzuXiFK7",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37810,7 +39970,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VALLE CERCANO", "id": "mAiTBvSAC3XvqM6jubYI" },
+      "properties": {
+        "name": "VALLE CERCANO",
+        "id": "mAiTBvSAC3XvqM6jubYI",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37885,7 +40050,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LOS ANGELES", "id": "vFfteyHTbedPjUoPaeju" },
+      "properties": {
+        "name": "LOS ANGELES",
+        "id": "vFfteyHTbedPjUoPaeju",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37928,7 +40098,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SAN MARCELO", "id": "r6MG23kj2oUItOY0QSzR" },
+      "properties": {
+        "name": "SAN MARCELO",
+        "id": "r6MG23kj2oUItOY0QSzR",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -37976,7 +40151,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "BETANIA", "id": "Q6Zd52QW34exZrM7Z7IT" },
+      "properties": {
+        "name": "BETANIA",
+        "id": "Q6Zd52QW34exZrM7Z7IT",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -38096,7 +40276,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALMIRANTE BROWN", "id": "MMP9aTx4mmRktqJTUfXL" },
+      "properties": {
+        "name": "ALMIRANTE BROWN",
+        "id": "MMP9aTx4mmRktqJTUfXL",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -38178,7 +40363,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA CAROLINA", "id": "EF0TJRtKagHbm4iDKMDi" },
+      "properties": {
+        "name": "LA CAROLINA",
+        "id": "EF0TJRtKagHbm4iDKMDi",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -38478,7 +40668,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VALLE ESCONDIDO", "id": "JuooFHswDzkpgoD8OY7r" },
+      "properties": {
+        "name": "VALLE ESCONDIDO",
+        "id": "JuooFHswDzkpgoD8OY7r",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -38647,7 +40842,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ARGUELLO", "id": "U8WpDrlyk9vwx6psoif5" },
+      "properties": {
+        "name": "ARGUELLO",
+        "id": "U8WpDrlyk9vwx6psoif5",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -39297,7 +41497,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CIUDAD DE JUAN PABLO II", "id": "ZilaJZh11k53HqyyPGOL" },
+      "properties": {
+        "name": "CIUDAD DE JUAN PABLO II",
+        "id": "ZilaJZh11k53HqyyPGOL",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -39347,7 +41552,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "GENERAL SAVIO", "id": "TOLYkJ4mJiqeyCuJAPaK" },
+      "properties": {
+        "name": "GENERAL SAVIO",
+        "id": "TOLYkJ4mJiqeyCuJAPaK",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -39386,7 +41596,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CIUDAD UNIVERSITARIA", "id": "OOe9ukUW0iubVnMOdhUB" },
+      "properties": {
+        "name": "CIUDAD UNIVERSITARIA",
+        "id": "OOe9ukUW0iubVnMOdhUB",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -39456,7 +41671,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "PARQUE SARMIENTO", "id": "NQyEBTnr2mANS8YVAQk7" },
+      "properties": {
+        "name": "PARQUE SARMIENTO",
+        "id": "NQyEBTnr2mANS8YVAQk7",
+        "zoneName": "Zona Centro",
+        "zoneColor": "#FFA500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -39545,7 +41765,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "DOCTA", "id": "M7vWUqYbn0TaQ1zVw0Rg" },
+      "properties": {
+        "name": "DOCTA",
+        "id": "M7vWUqYbn0TaQ1zVw0Rg",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -39668,7 +41893,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "MANANTIALES II", "id": "cDekK1FSTDZhJ4vnYOIQ" },
+      "properties": {
+        "name": "MANANTIALES II",
+        "id": "cDekK1FSTDZhJ4vnYOIQ",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -39839,7 +42069,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SIETE SOLES", "id": "hDF1IGarJWYsb29mVPZr" },
+      "properties": {
+        "name": "SIETE SOLES",
+        "id": "hDF1IGarJWYsb29mVPZr",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -39864,7 +42099,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "NUESTRO HOGAR III", "id": "iR8PoeILwkrB2I8yeUce" },
+      "properties": {
+        "name": "NUESTRO HOGAR III",
+        "id": "iR8PoeILwkrB2I8yeUce",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -39916,7 +42156,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "LA CARBONADA", "id": "SV0IAHfj2ZTjJNLmf7li" },
+      "properties": {
+        "name": "LA CARBONADA",
+        "id": "SV0IAHfj2ZTjJNLmf7li",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40019,7 +42264,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL CARMELO", "id": "eh4XCfremshAYT5uZWQz" },
+      "properties": {
+        "name": "EL CARMELO",
+        "id": "eh4XCfremshAYT5uZWQz",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40083,7 +42333,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ESTACION FERREYRA", "id": "ao9PdwQrx6krwI58iKy1" },
+      "properties": {
+        "name": "ESTACION FERREYRA",
+        "id": "ao9PdwQrx6krwI58iKy1",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40325,7 +42580,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "QUINTAS DE FERREYRA", "id": "Ao6n4MDWPG6ujbSf8hPs" },
+      "properties": {
+        "name": "QUINTAS DE FERREYRA",
+        "id": "Ao6n4MDWPG6ujbSf8hPs",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40410,7 +42670,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CARRARA DE HORIZONTE", "id": "jLNfpUfJjkuj8uGn1K0C" },
+      "properties": {
+        "name": "CARRARA DE HORIZONTE",
+        "id": "jLNfpUfJjkuj8uGn1K0C",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40475,7 +42740,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "UNIVERSITARIO DE HORIZONTE", "id": "ML7OAaPTpVpfrcWVGOqu" },
+      "properties": {
+        "name": "UNIVERSITARIO DE HORIZONTE",
+        "id": "ML7OAaPTpVpfrcWVGOqu",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40520,7 +42790,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40542,7 +42817,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40560,7 +42840,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40604,7 +42889,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40657,7 +42947,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "FINCA LA DOROTEA", "id": "raX3SyfUtETpiYhtGjky" },
+      "properties": {
+        "name": "FINCA LA DOROTEA",
+        "id": "raX3SyfUtETpiYhtGjky",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40693,7 +42988,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40719,7 +43019,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "1 DE JULIO", "id": "FATdJgBnoDh1iF4nY8sG" },
+      "properties": {
+        "name": "1 DE JULIO",
+        "id": "FATdJgBnoDh1iF4nY8sG",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40756,7 +43061,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA RETIRO DE HORIZONTE", "id": "WGA2bX0WW97iMMy3sI6x" },
+      "properties": {
+        "name": "VILLA RETIRO DE HORIZONTE",
+        "id": "WGA2bX0WW97iMMy3sI6x",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40780,7 +43090,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40868,7 +43183,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40906,7 +43226,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40933,7 +43258,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -40989,7 +43319,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41013,7 +43348,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41048,7 +43388,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41065,7 +43410,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41091,7 +43441,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41109,7 +43464,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41135,7 +43495,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41175,7 +43540,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41217,7 +43587,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "NUESTRO HOGAR II", "id": "Sfzl1ydXC9ENgiMvhKwF" },
+      "properties": {
+        "name": "NUESTRO HOGAR II",
+        "id": "Sfzl1ydXC9ENgiMvhKwF",
+        "zoneName": "Zona Noreste",
+        "zoneColor": "#32CD32"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41251,7 +43626,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "VILLA BELGRANO", "id": "UsrNtiFPF7yHIOX3yr3l" },
+      "properties": {
+        "name": "VILLA BELGRANO",
+        "id": "UsrNtiFPF7yHIOX3yr3l",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41356,7 +43736,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "EL TROPEZON", "id": "9LRtKlA0yM3NPsZXxdXp" },
+      "properties": {
+        "name": "EL TROPEZON",
+        "id": "9LRtKlA0yM3NPsZXxdXp",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41382,7 +43767,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "NUEVO URCA", "id": "S5ArGwYCTjgZMbNFxR4Y" },
+      "properties": {
+        "name": "NUEVO URCA",
+        "id": "S5ArGwYCTjgZMbNFxR4Y",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41417,7 +43807,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ALTOS DEL CHATEAU", "id": "hRRSmMEh44NLY1fWUbjn" },
+      "properties": {
+        "name": "ALTOS DEL CHATEAU",
+        "id": "hRRSmMEh44NLY1fWUbjn",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41481,7 +43876,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "AUTODROMO", "id": "3LaRPa2FCOIlu9n7A5s7" },
+      "properties": {
+        "name": "AUTODROMO",
+        "id": "3LaRPa2FCOIlu9n7A5s7",
+        "zoneName": "Zona Noroeste",
+        "zoneColor": "#800080"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41536,7 +43936,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "TEJAS DEL SUR", "id": "Fv3fc92Hf35S1mb4Gp8h" },
+      "properties": {
+        "name": "TEJAS DEL SUR",
+        "id": "Fv3fc92Hf35S1mb4Gp8h",
+        "zoneName": "Zona Sudoeste",
+        "zoneColor": "#FF4500"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41579,7 +43984,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "CAMINO A SAN CARLOS", "id": "7uzhHwX52KW3BTdl4rfh" },
+      "properties": {
+        "name": "CAMINO A SAN CARLOS",
+        "id": "7uzhHwX52KW3BTdl4rfh",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41647,7 +44057,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "QUINTAS DEL SUR", "id": "LMe81L0aF9ZGrIadfwGr" },
+      "properties": {
+        "name": "QUINTAS DEL SUR",
+        "id": "LMe81L0aF9ZGrIadfwGr",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41721,7 +44136,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "SD", "id": "FfhFf3ZRMgjean0XixPF" },
+      "properties": {
+        "name": "SD",
+        "id": "FfhFf3ZRMgjean0XixPF",
+        "zoneName": "N/A",
+        "zoneColor": "#AAAAAA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -41780,7 +44200,12 @@
     },
     {
       "type": "Feature",
-      "properties": { "name": "ITUZAINGO II", "id": "fA1HTXRCnoHYFV6aEwoi" },
+      "properties": {
+        "name": "ITUZAINGO II",
+        "id": "fA1HTXRCnoHYFV6aEwoi",
+        "zoneName": "Zona Sudeste",
+        "zoneColor": "#1E00AA"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [

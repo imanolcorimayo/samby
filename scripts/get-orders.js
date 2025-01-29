@@ -29,7 +29,10 @@ async function fetchAndSaveOrders() {
       return {
         ...order,
         id: doc.id,
-        createdAt: order.createdAt.toDate().toISOString(),
+        createdAt:
+          order.createdAt && order.createdAt.toDate
+            ? order.createdAt.toDate().toISOString()
+            : order.shippingDate.toDate().toISOString(),
         shippingDate: order.shippingDate.toDate().toISOString()
       };
     });
