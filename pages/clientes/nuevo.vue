@@ -44,6 +44,13 @@
       validation="required"
       v-model="form.address"
     />
+    <div class="flex flex-col gap-2">
+      <div class="flex gap-4 items-center">
+        <span class="font-semibold">Lat: {{ latitude ? latitude.toFixed(5) : "N/A" }}</span>
+        <span class="font-semibold">Lng: {{ longitude ? longitude.toFixed(5) : "N/A" }}</span>
+      </div>
+      <div id="new-map-container" class="w-[30rem] h-[30rem]"></div>
+    </div>
     <div v-show="submitting" class="btn bg-primary text-white text-center">loading...</div>
     <FormKit
       v-show="!submitting"
@@ -76,6 +83,9 @@
 <script setup>
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 
+// ----- Define Useful Properties -----
+const { $leafletHelper } = useNuxtApp();
+
 // ----- Define Pinia Vars -----
 const clientsStore = useClientsStore();
 
@@ -87,6 +97,9 @@ const form = ref({
   phone: "",
   address: ""
 });
+const mapContainer = ref(null);
+const latitude = ref(null);
+const longitude = ref(null);
 
 // ----- Define Methods -------
 async function submitHandler() {
@@ -97,7 +110,7 @@ async function submitHandler() {
   submitting.value = true;
 
   // Add the client to the store
-  await clientsStore.addClient({ ...form.value });
+  await clientsStore.addClient({ ...form.value, lat: latitude.value, lng: longitude.value });
 
   // Clean values
   form.value = {
@@ -109,6 +122,34 @@ async function submitHandler() {
   submitted.value = true;
   submitting.value = false;
 }
+
+function updateLocation(lat, lng) {
+  latitude.value = lat;
+  longitude.value = lng;
+}
+
+async function showMap() {
+  if (mapContainer.value) {
+    mapContainer.value.remove();
+  }
+
+  let center = null;
+  if (latitude.value && longitude.value) {
+    center = [latitude.value, longitude.value];
+  }
+
+  mapContainer.value = await $leafletHelper.selectLocationMap(
+    "new-map-container",
+    { modify: true, updateLocation },
+    center
+  );
+}
+
+// ----- Define Hooks -------
+onMounted(() => {
+  showMap();
+});
+
 useHead({
   title: "Nuevo cliente"
 });

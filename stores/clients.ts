@@ -89,6 +89,14 @@ export const useClientsStore = defineStore("clients", {
         return null;
       }
 
+      // Get all keys and keep only editable ones
+      const keys = Object.keys(client);
+      keys.forEach((key) => {
+        if (!["clientName", "phone", "address", "lat", "lng"].includes(key)) {
+          delete client[key];
+        }
+      });
+
       try {
         // Handle recurrent payments
         const newClient = await addDoc(collection(db, "cliente"), {
@@ -160,7 +168,7 @@ export const useClientsStore = defineStore("clients", {
       // Get all keys and keep only editable ones
       const keys = Object.keys(client);
       keys.forEach((key) => {
-        if (["clientName", "phone", "address", "lat", "lng"].includes(key)) {
+        if (!["clientName", "phone", "address", "lat", "lng"].includes(key)) {
           delete client[key];
         }
       });

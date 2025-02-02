@@ -93,8 +93,6 @@
 <script setup>
 import { ToastEvents } from "~/interfaces";
 import TablerTrash from "~icons/tabler/trash";
-import MynauiLocationXSolid from "~icons/mynaui/location-x-solid?width=24px&height=24px";
-import { update } from "firebase/database";
 
 // ----- Define Useful Properties -----
 const { $leafletHelper } = useNuxtApp();
@@ -324,6 +322,7 @@ async function showMap(modify = false) {
 }
 
 // ----- Define Hooks -----
+
 // ----- Define Expose -----
 defineExpose({ showModal });
 </script>
