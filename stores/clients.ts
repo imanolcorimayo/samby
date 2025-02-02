@@ -157,6 +157,14 @@ export const useClientsStore = defineStore("clients", {
         return false;
       }
 
+      // Get all keys and keep only editable ones
+      const keys = Object.keys(client);
+      keys.forEach((key) => {
+        if (["clientName", "phone", "address", "lat", "lng"].includes(key)) {
+          delete client[key];
+        }
+      });
+
       try {
         // Update doc using paymentRef only if it's not one time payment
         await updateDoc(clientReference, client);

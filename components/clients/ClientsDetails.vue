@@ -11,48 +11,60 @@
       </div>
     </template>
     <template #default>
-      <FormKit
-        type="form"
-        id="client-modify"
-        :form-class="`flex flex-col gap-4 w-full ${submitted ? 'hidden' : ''}`"
-        submit-label="Actualizar Cliente"
-        @submit="updateClient"
-        :actions="false"
-      >
+      <div class="flex flex-col gap-4">
         <FormKit
-          type="text"
-          name="client_name"
-          input-class="w-full"
-          label-class="font-medium"
-          messages-class="text-red-500 text-[0.75rem]"
-          label="Nombre"
-          placeholder="Ingrese nombre del cliente"
-          validation="required"
-          v-model="form.clientName"
-        />
-        <div class="flex flex-col gap-1">
-          <span class="font-medium">Teléfono</span>
-          <input
-            @input="formatPhoneNumber"
-            maxlength="20"
-            v-model="form.phone"
+          type="form"
+          id="client-modify"
+          :form-class="`flex flex-col gap-4 w-full ${submitted ? 'hidden' : ''}`"
+          submit-label="Actualizar Cliente"
+          @submit="updateClient"
+          :actions="false"
+        >
+          <FormKit
             type="text"
-            placeholder="Numero de telefono"
-            required
+            name="client_name"
+            input-class="w-full"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            label="Nombre"
+            placeholder="Ingrese nombre del cliente"
+            validation="required"
+            v-model="form.clientName"
           />
+          <div class="flex flex-col gap-1">
+            <span class="font-medium">Teléfono</span>
+            <input
+              @input="formatPhoneNumber"
+              maxlength="20"
+              v-model="form.phone"
+              type="text"
+              placeholder="Numero de telefono"
+              required
+            />
+          </div>
+          <FormKit
+            type="text"
+            name="address"
+            input-class="w-full"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            label="Dirección"
+            placeholder="Ingrese dirección de reparto"
+            validation="required"
+            v-model="form.address"
+          />
+        </FormKit>
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-4 items-center">
+            <span class="font-semibold">Lat: {{ latitude ? latitude.toFixed(5) : "N/A" }}</span>
+            <span class="font-semibold">Lng: {{ longitude ? longitude.toFixed(5) : "N/A" }}</span>
+            <button v-if="!modifyLocation" @click="showMap(true)" class="btn bg-secondary btn-sm ring-1">
+              Modificar Ubicación
+            </button>
+          </div>
+          <div id="edit-map-container" class="w-[30rem] h-[30rem]"></div>
         </div>
-        <FormKit
-          type="text"
-          name="address"
-          input-class="w-full"
-          label-class="font-medium"
-          messages-class="text-red-500 text-[0.75rem]"
-          label="Dirección"
-          placeholder="Ingrese dirección de reparto"
-          validation="required"
-          v-model="form.address"
-        />
-      </FormKit>
+      </div>
     </template>
     <template #footer>
       <div v-if="submitting" class="btn bg-secondary border text-center">loading...</div>
@@ -81,6 +93,11 @@
 <script setup>
 import { ToastEvents } from "~/interfaces";
 import TablerTrash from "~icons/tabler/trash";
+import MynauiLocationXSolid from "~icons/mynaui/location-x-solid?width=24px&height=24px";
+import { update } from "firebase/database";
+
+// ----- Define Useful Properties -----
+const { $leafletHelper } = useNuxtApp();
 
 // ----- Define Pinia Vars -----
 const clientsStore = useClientsStore();
@@ -94,6 +111,10 @@ const form = ref({
   phone: "",
   address: ""
 });
+const mapContainer = ref(null);
+const latitude = ref(null);
+const longitude = ref(null);
+const modifyLocation = ref(false);
 
 // Refs
 const mainModal = ref(null);
@@ -125,7 +146,9 @@ async function updateClient() {
   if (
     form.value.clientName === currentClient.value.clientName &&
     form.value.phone === currentClient.value.phone &&
-    form.value.address === currentClient.value.address
+    form.value.address === currentClient.value.address &&
+    latitude.value === currentClient.value.lat &&
+    longitude.value === currentClient.value.lng
   ) {
     submitting.value = false;
     useToast("error", "No se han realizado cambios en el cliente.");
@@ -137,7 +160,9 @@ async function updateClient() {
     {
       clientName: form.value.clientName,
       phone: form.value.phone,
-      address: form.value.address
+      address: form.value.address,
+      lat: latitude.value,
+      lng: longitude.value
     },
     currentClient.value.id
   );
@@ -233,7 +258,12 @@ async function deleteClient() {
   useToast("success", "Cliente eliminada correctamente.");
 }
 
-const showModal = (clientId) => {
+function updateLocation(lat, lng) {
+  latitude.value = lat;
+  longitude.value = lng;
+}
+
+const showModal = async (clientId) => {
   // Check clients are fetched
   if (!areClientsFetched.value) {
     useToast("error", "Parece que los clientes no han sido cargados aún, por favor intenta nuevamente.");
@@ -264,6 +294,14 @@ const showModal = (clientId) => {
     address: client.address
   };
 
+  // Clean up variables
+  latitude.value = client.lat ? parseFloat(client.lat) : null;
+  longitude.value = client.lng ? parseFloat(client.lng) : null;
+
+  setTimeout(async () => {
+    showMap(!latitude.value || !longitude.value);
+  }, 500);
+
   // Format phone number
   formatPhoneNumber();
 
@@ -271,8 +309,21 @@ const showModal = (clientId) => {
   mainModal.value.showModal();
 };
 
-// ----- Define Hooks -----
+async function showMap(modify = false) {
+  if (mapContainer.value) {
+    mapContainer.value.remove();
+  }
 
+  let center = null;
+  if (latitude.value && longitude.value) {
+    center = [latitude.value, longitude.value];
+  }
+
+  mapContainer.value = await $leafletHelper.selectLocationMap("edit-map-container", { modify, updateLocation }, center);
+  modifyLocation.value = modify;
+}
+
+// ----- Define Hooks -----
 // ----- Define Expose -----
 defineExpose({ showModal });
 </script>

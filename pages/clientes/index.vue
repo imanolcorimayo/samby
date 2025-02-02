@@ -35,6 +35,9 @@
             <span class="flex items-center gap-1 text-sm text-blue-700 font-medium" v-if="client.fromEmprendeVerde">
               <PhSealCheckDuotone /> Desde app de compras
             </span>
+            <span class="flex items-center gap-1 text-sm text-yellow-700 font-medium" v-if="!client.lat || !client.lng">
+              <MaterialSymbolsWarningRounded class="text-warning text-xs" /> Falta ubicación
+            </span>
             <span class="flex items-center gap-1 text-sm font-medium" v-else> Creado manualmente </span>
             <span class="font-semibold">{{ client.clientName }}</span>
             <span class="text-sm">Dirección: {{ client.address }}</span>
@@ -52,6 +55,7 @@
 import PhSealCheckDuotone from "~icons/ph/seal-check-duotone";
 import AntDesignSearchOutlined from "~icons/ant-design/search-outlined";
 import IcRoundPlus from "~icons/ic/round-plus";
+import MaterialSymbolsWarningRounded from "~icons/material-symbols/warning-rounded?width=24px&height=24px";
 
 // ----- Define Pinia Vars --------
 const clientsStore = useClientsStore();

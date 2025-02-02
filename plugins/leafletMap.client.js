@@ -98,10 +98,54 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     return map;
   }
 
+  /**
+   * Map to load location, it will contain a marker on the center and
+   * a button to save the location.
+   * @param {string} elementId - The DOM element ID where the map will be mounted.
+   */
+  async function selectLocationMap(elementId, { modify, updateLocation }, center = null) {
+    // 1) Load Leaflet CSS + JS
+    loadLeafletCSS();
+    const L = await loadLeafletJS();
+
+    // 2) Create the map
+    const map = L.map(elementId, {
+      zoomDelta: 0.25,
+      zoomSnap: 0
+    });
+
+    map.setView(center ?? [-31.4167, -64.1833], 12);
+
+    // 3) Add a base tile layer (e.g., OpenStreetMap)
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // 4) Add marker on the center of the map
+    var marker = L.marker(center ?? [-31.4167, -64.1833]).addTo(map);
+
+    // Keep marker on the center
+    if (modify) {
+      map.on("move", function () {
+        const center = map.getCenter();
+
+        marker.setLatLng(center);
+
+        // Update the location
+        updateLocation(center.lat, center.lng);
+      });
+    }
+
+    return map;
+  }
+
   // Provide a helper so we can use it in our components
   return {
     provide: {
-      createLeafletMap: createMap
+      leafletHelper: {
+        createMap,
+        selectLocationMap
+      }
     }
   };
 });
