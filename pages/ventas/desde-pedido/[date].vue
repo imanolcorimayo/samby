@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-3 w-full" v-if="areOrdersFetched">
     <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-0">
-        <h1 class="text-start">Nueva venta desde los pedídos</h1>
+        <h1 class="text-start">Nueva venta desde los pedidos</h1>
         <p class="text-gray-600">
           La lista de productos esta conformada en base a la cantidad de productos cargados en cada pedido de la fecha
         </p>
