@@ -264,6 +264,38 @@ export const useProductsStore = defineStore("products", {
         console.error(error);
         return false;
       }
+    },
+    async updateStock(stock: any, current: any) {
+      const db = useFirestore();
+      const productReference = doc(db, "producto", current.id);
+      const productIndex = this.$state.products.findIndex((el: any) => el.id == current.id);
+
+      // Validate sell object. Merge with other properties to validate the whole object just in case
+      const isProductValid = validateProduct({ ...current, ...stock });
+
+      if (!isProductValid) {
+        useToast(ToastEvents.error, "El producto no es válido");
+        return false;
+      }
+
+      // Validate cost and productStock properties
+      if (!stock.cost || isNaN(stock.cost) || !stock.productStock || isNaN(stock.productStock)) {
+        useToast(ToastEvents.error, "El costo y el stock son inválidos. Trate nuevamente o contacte al soporte");
+        return false;
+      }
+
+      try {
+        await updateDoc(productReference, {
+          cost: parseFloat(stock.cost),
+          productStock: parseFloat(stock.productStock)
+        });
+        this.$state.products[productIndex] = Object.assign({}, { ...this.$state.products[productIndex], ...stock });
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
     }
   }
 });

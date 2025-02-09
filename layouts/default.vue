@@ -130,10 +130,10 @@
           <li>
             <NuxtLink
               v-if="indexStore.isOwner"
-              to="/productos"
+              to="/inventario"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
-              <StreamlineShoppingBasket1Solid class="text-gray-500" /> Productos
+              <MingcuteInventoryFill class="text-gray-500" /> Inventario
             </NuxtLink>
           </li>
           <li>
@@ -170,7 +170,7 @@
             <li>
               <NuxtLink
                 v-if="indexStore.isOwner"
-                to="/productos/nuevo"
+                to="/inventario/nuevo"
                 class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
               >
                 <IcRoundPlus class="text-gray-500" /> Nuevo Producto
@@ -215,7 +215,7 @@
 import MageShopFill from "~icons/mage/shop-fill";
 import MaterialSymbolsOrdersRounded from "~icons/material-symbols/orders-rounded";
 import MaterialSymbolsPointOfSaleRounded from "~icons/material-symbols/point-of-sale-rounded";
-import StreamlineShoppingBasket1Solid from "~icons/streamline/shopping-basket-1-solid";
+import MingcuteInventoryFill from "~icons/mingcute/inventory-fill";
 import BiPersonFill from "~icons/bi/person-fill";
 import UilChartLine from "~icons/uil/chart-line";
 import ClarityEmployeeGroupSolid from "~icons/clarity/employee-group-solid";

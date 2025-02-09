@@ -1,10 +1,14 @@
 <template>
   <div class="flex flex-col gap-[2rem] w-full">
     <ProductsDetails ref="productsDetails" />
+    <ProductsEditStock ref="editStock" />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
-        <h1 class="text-start font-semibold">Lista de productos</h1>
-        <NuxtLink to="/productos/nuevo" class="btn bg-primary text-white flex items-center"
+        <div class="flex flex-col">
+          <h1 class="text-start font-semibold">Inventario</h1>
+          <span class="text-gray-600 text-sm">Agrega los productos con su cantidad y costo</span>
+        </div>
+        <NuxtLink to="/inventario/nuevo" class="btn bg-primary text-white flex items-center"
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo Producto
         </NuxtLink>
       </div>
@@ -24,34 +28,45 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-[0.571rem]" v-if="productsCleaned.length">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[0.571rem]" v-if="productsCleaned.length">
         <div
-          class="flex flex-col gap-[0.571rem] p-[0.714rem] bg-secondary rounded-[0.428rem] shadow"
+          class="flex flex-col gap-[0.571rem] bg-secondary rounded-[0.428rem] shadow cursor-pointer hover:show-stock-options"
           v-for="(product, index) in productsCleaned"
           :key="index"
           @click="showProductsDetails(product.id)"
         >
-          <div class="flex justify-between gap-3">
+          <div class="flex justify-between gap-3 m-[0.714rem]">
             <div class="rounded-lg overflow-hidden w-fit">
               <img class="w-[100px]" v-if="product.imageUrl" :src="product.imageUrl" alt="Imagen del producto" />
               <img class="w-[100px]" v-else src="/img/default-product.webp" alt="Imagen de un producto generico" />
             </div>
-            <div class="flex-1 flex flex-col gap-1">
-              <div class="flex flex-col">
-                <span class="font-semibold">{{ product.productName }}</span>
-                <span class="text-sm">{{ product.description }}</span>
-              </div>
-              <div class="flex flex-col">
-                <span class="text-sm">Unidad: {{ product.unit }}</span>
-                <span class="text-sm">Salto: {{ product.step ?? 0.5 }}</span>
-                <span class="text-sm capitalize">Categoría: {{ product.category ?? "Otro" }}</span>
-              </div>
-            </div>
-            <div class="flex flex-col justify-between items-end">
+            <div class="flex flex-col justify-start items-end">
               <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
-              <span v-if="product.isAvailable" class="text-sm font-medium text-success">Disponible</span>
+              <span v-if="product.isAvailable" class="text-xs font-medium text-success">Disponible</span>
+              <span v-if="product.isAvailable" class="text-xs font-medium text-success text-end"
+                >{{ formatQuantity(product.productStock) || 0 }} u. restantes</span
+              >
               <span v-else class="text-sm font-medium text-danger">No disponible</span>
             </div>
+          </div>
+          <div class="flex-1 flex flex-col gap-1 m-[0.714rem]">
+            <div class="flex flex-col mb-2">
+              <span class="font-semibold">{{ product.productName }}</span>
+              <span class="text-xs text-gray-600">{{
+                !product.description ? "No hay descripción para este producto" : product.description
+              }}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm"
+                ><b>Salto Unidad:</b> {{ formatQuantity(product.step ?? 0.5) }} {{ product.unit }}</span
+              >
+              <span class="text-sm capitalize"><b>Categoría:</b> {{ product.category ?? "Otro" }}</span>
+            </div>
+          </div>
+          <div class="stock-options w-full text-center">
+            <button @click.stop="showEditStock(product.id)" class="btn bg-primary text-white w-full !rounded-[0]">
+              Editar Stock
+            </button>
           </div>
         </div>
       </div>
@@ -73,6 +88,7 @@ const { products, areProductsFetched } = storeToRefs(productsStore);
 const search = ref("");
 // Refs
 const productsDetails = ref(null);
+const editStock = ref(null);
 
 // ----- Define Computed -----
 const productsCleaned = computed(() => {
@@ -108,6 +124,13 @@ function showProductsDetails(id) {
   productsDetails.value.showModal(id);
 }
 
+function showEditStock(id) {
+  // Check productsDetails is defined
+  if (!editStock.value) return;
+
+  editStock.value.showModal(id);
+}
+
 // Function will manage if the data is already fetched
 productsStore.fetchData();
 
@@ -115,3 +138,5 @@ useHead({
   title: "Lista de productos"
 });
 </script>
+
+<style scoped></style>

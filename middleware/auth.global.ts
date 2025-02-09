@@ -7,6 +7,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   // process.server should never be activated since ssr was set to false
   if (to.path.includes("/welcome") || to.path.includes("/blocked") || process.server) return;
 
+  // If going to the home page, always redirect to /pedidos
+  if (to.path === "/") return navigateTo("/pedidos");
+
   const user = await getCurrentUser();
   const indexStore = useIndexStore();
 

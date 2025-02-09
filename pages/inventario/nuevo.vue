@@ -142,7 +142,7 @@
           >Nueva venta</NuxtLink
         >
         <NuxtLink to="/" class="btn bg-secondary w-full text-center ring-1 ring-gray-300">Menu</NuxtLink>
-        <NuxtLink to="/productos" class="btn bg-secondary w-full text-center ring-1 ring-gray-300"
+        <NuxtLink to="/inventario" class="btn bg-secondary w-full text-center ring-1 ring-gray-300"
           >Ver productos</NuxtLink
         >
       </div>
