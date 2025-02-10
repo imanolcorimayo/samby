@@ -2,7 +2,7 @@
   <FormKit
     type="form"
     id="productos-nuevo"
-    :form-class="`flex flex-col gap-4 w-full ${submitted ? 'hidden' : ''}`"
+    :form-class="`flex flex-col gap-4 w-full mb-8 ${submitted ? 'hidden' : ''}`"
     submit-label="Nuevo Producto"
     @submit="submitHandler"
     :actions="false"
@@ -72,6 +72,32 @@
         placeholder="Ej: 0.5"
         validation="required"
         v-model="form.step"
+      />
+    </div>
+    <div class="flex items-start justify-start gap-4">
+      <FormKit
+        type="number"
+        name="finalProductStock"
+        label-class="font-medium"
+        messages-class="text-red-500 text-[0.75rem]"
+        input-class="w-full"
+        outer-class="w-full flex-1"
+        label="Cantidad de stock (opcional)"
+        placeholder="Ej: 7500"
+        validation="numeric"
+        v-model="form.productStock"
+      />
+      <FormKit
+        type="number"
+        name="finalCost"
+        label-class="font-medium"
+        messages-class="text-red-500 text-[0.75rem]"
+        input-class="w-full"
+        outer-class="w-full flex-1"
+        label="Costo por unidad (opcional)"
+        placeholder="Costo al que compraste el producto por unidad"
+        validation="numeric"
+        v-model="form.cost"
       />
     </div>
     <FormKit
@@ -170,7 +196,9 @@ const form = ref({
   step: 0.5,
   price: 0,
   category: "otro",
-  isAvailable: true
+  isAvailable: true,
+  productStock: 0,
+  cost: 0
 });
 const imageUrl = ref("");
 

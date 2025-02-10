@@ -12,6 +12,17 @@
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo Producto
         </NuxtLink>
       </div>
+
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex flex-1 justify-center bg-secondary p-4 rounded-lg shadow gap-4">
+          <span>Total Productos:</span>
+          <span class="font-semibold">{{ totalProducts }}</span>
+        </div>
+        <div class="flex flex-1 justify-center bg-secondary p-4 rounded-lg shadow gap-4">
+          <span>Costo total:</span>
+          <span class="font-semibold">{{ formatPrice(costTotal) }}</span>
+        </div>
+      </div>
       <div class="flex flex-row gap-2 w-full sticky top-0">
         <div class="w-full">
           <div class="absolute p-[0.714rem]">
@@ -114,6 +125,20 @@ const productsCleaned = computed(() => {
   }
 
   return searchProducts;
+});
+const totalProducts = computed(() => {
+  return products.value.filter((el) => el.isAvailable).length;
+});
+const costTotal = computed(() => {
+  return products.value.reduce((acc, el) => {
+    if (el.isAvailable) {
+      el.cost = parseFloat(el.cost ?? 0);
+      el.productStock = parseFloat(el.productStock ?? 0);
+
+      return acc + el.cost * el.productStock;
+    }
+    return acc;
+  }, 0);
 });
 
 // ----- Define Methods -----

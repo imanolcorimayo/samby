@@ -154,6 +154,28 @@ export const useProductsStore = defineStore("products", {
         return null;
       }
 
+      // Keep only valid keys on product object
+      const validKeys = [
+        "productName",
+        "unit",
+        "step",
+        "price",
+        "category",
+        "description",
+        "isAvailable",
+        // Image related
+        "productImageId",
+        "imageUrl",
+        // Stock related
+        "productStock",
+        "cost"
+      ];
+      Object.keys(product).forEach((key) => {
+        if (!validKeys.includes(key)) {
+          delete product[key];
+        }
+      });
+
       try {
         // Handle recurrent payments
         const newProduct = await addDoc(collection(db, "producto"), {

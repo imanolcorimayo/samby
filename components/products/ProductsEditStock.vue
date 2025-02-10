@@ -21,72 +21,6 @@
         @submit="editProductStock"
         :actions="false"
       >
-        <!-- Adding or removing stock radio checkbox -->
-        <div>
-          <label class="font-medium">Agregar o quitar stock</label>
-          <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-              <input type="radio" id="add-stock" name="stock" value="add" v-model="addingOrRemoving" class="hidden" />
-              <label
-                for="add-stock"
-                class="btn hover:bg-primary hover:text-white"
-                :class="{
-                  ['bg-primary text-white']: addingOrRemoving == 'add',
-                  'bg-secondary': addingOrRemoving != 'add'
-                }"
-                >Agregar</label
-              >
-
-              <input
-                type="radio"
-                id="remove-stock"
-                name="stock"
-                value="remove"
-                v-model="addingOrRemoving"
-                class="hidden"
-              />
-              <label
-                for="remove-stock"
-                class="btn hover:bg-primary hover:text-white"
-                :class="{
-                  ['bg-primary text-white']: addingOrRemoving == 'remove',
-                  'bg-secondary': addingOrRemoving != 'remove'
-                }"
-                >Quitar</label
-              >
-            </div>
-          </div>
-        </div>
-
-        <!-- Quantity -->
-        <FormKit
-          type="number"
-          name="productStock"
-          label-class="font-medium"
-          messages-class="text-red-500 text-[0.75rem]"
-          input-class="w-full"
-          outer-class="w-full"
-          label="Stock"
-          placeholder="Ej: 100"
-          validation="numeric"
-          v-model="form.productStock"
-        />
-
-        <!-- Cost per unit -->
-        <FormKit
-          type="number"
-          name="costPerUnit"
-          label-class="font-medium"
-          messages-class="text-red-500 text-[0.75rem]"
-          input-class="w-full"
-          outer-class="w-full"
-          :disabled="addingOrRemoving == 'remove'"
-          label="Costo por unidad"
-          placeholder="Ej: 100"
-          validation="numeric"
-          v-model="form.cost"
-        />
-
         <div class="flex items-start justify-start gap-4">
           <FormKit
             type="number"
@@ -95,11 +29,10 @@
             messages-class="text-red-500 text-[0.75rem]"
             input-class="w-full"
             outer-class="w-full flex-1"
-            label="Cantidad de stock final"
-            disabled
+            label="Cantidad de stock"
             placeholder="Ej: 7500"
             validation="numeric"
-            v-model="finalProductStock"
+            v-model="form.productStock"
           />
           <FormKit
             type="number"
@@ -108,13 +41,10 @@
             messages-class="text-red-500 text-[0.75rem]"
             input-class="w-full"
             outer-class="w-full flex-1"
-            label="Costo por unidad final"
-            help="Se actualiza si el costo de compra a cargar es diferente al actual, calculandose el promedio."
-            help-class="text-xs"
-            disabled
+            label="Costo por unidad"
             placeholder="Costo al que compraste el producto por unidad"
             validation="numeric"
-            v-model="finalCost"
+            v-model="form.cost"
           />
         </div>
       </FormKit>
@@ -125,18 +55,9 @@
         v-else
         type="submit"
         form="product-modify"
-        :label="`${addingOrRemoving == 'add' ? 'Agregar' : 'Sacar'} stock`"
+        label="Modificar stock"
         input-class="btn bg-secondary border text-center hover:bg-gray-200 hover:ring-2 hover:ring-gray-500 w-full"
       />
-
-      <div v-if="submitting" class="btn bg-danger text-white text-nowrap">loading...</div>
-      <button
-        v-else
-        @click="deleteProduct()"
-        class="flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
-      >
-        <TablerTrash /> Pasar todo a perdida
-      </button>
     </template>
   </ModalStructure>
   <Loader v-if="submitting" />
@@ -145,7 +66,6 @@
 
 <script setup>
 import { ToastEvents } from "~/interfaces";
-import TablerTrash from "~icons/tabler/trash";
 
 // ----- Define Pinia Vars -----
 const productsStore = useProductsStore();
@@ -156,58 +76,12 @@ const submitting = ref(false);
 const currentProduct = ref(null);
 const form = ref({
   productStock: null,
-  price: null, // Selling price
   cost: null // cost price
 });
-const addingOrRemoving = ref("add");
 
 // Refs
 const mainModal = ref(null);
 const confirmDialogue = ref(null);
-
-// ----- Define Computed -----
-const finalProductStock = computed(() => {
-  const safeParseFloat = (value) => (isNaN(parseFloat(value)) ? 0 : parseFloat(value));
-  const currentStock = safeParseFloat(currentProduct.value.productStock);
-  const formStock = safeParseFloat(form.value.productStock);
-
-  if (addingOrRemoving.value === "add") {
-    return currentStock + formStock;
-  }
-
-  return currentStock - formStock;
-});
-
-const finalCost = computed(() => {
-  const safeParseFloat = (value) => (isNaN(parseFloat(value)) ? 0 : parseFloat(value));
-  const currentStock = safeParseFloat(currentProduct.value.productStock);
-  const currentCost = safeParseFloat(currentProduct.value.cost);
-  const formStock = safeParseFloat(form.value.productStock);
-  const formCost = safeParseFloat(form.value.cost);
-
-  console.log("currentCost: ", currentCost, formCost);
-
-  if (addingOrRemoving.value === "add" && currentCost === formCost) {
-    console.log("1: ", currentCost);
-    return currentCost;
-  }
-
-  if (addingOrRemoving.value === "remove") {
-    console.log("2: ", currentCost);
-    return currentCost;
-  }
-
-  if (formCost === 0) {
-    console.log("3: ", formCost);
-    console.log("3: ", currentCost);
-    return currentCost;
-  }
-
-  const totalCost = currentCost * currentStock + formCost * formStock;
-  const totalQuantity = finalProductStock.value;
-
-  return totalQuantity === 0 ? 0 : totalCost / totalQuantity;
-});
 
 // ----- Define Methods -----
 async function editProductStock() {
@@ -232,7 +106,7 @@ async function editProductStock() {
   }
 
   // Verify the sell isn't the same as before
-  if (finalProductStock.value === currentProduct.value.productStock && finalCost.value === currentProduct.value.cost) {
+  if (form.value.productStock === currentProduct.value.productStock && form.value.cost === currentProduct.value.cost) {
     submitting.value = false;
     useToast("error", "No se han realizado cambios en el stock.");
     return;
@@ -241,8 +115,8 @@ async function editProductStock() {
   // Update
   const updated = await productsStore.updateStock(
     {
-      productStock: finalProductStock.value,
-      cost: finalCost.value
+      productStock: form.value.productStock,
+      cost: form.value.cost
     },
     currentProduct.value // Send full product to validate
   );
@@ -289,8 +163,8 @@ const showModal = (productId) => {
   currentProduct.value.productStock = product.productStock ?? 0;
   currentProduct.value.cost = product.cost ?? 0;
   form.value = {
-    productStock: null,
-    cost: null // cost price
+    productStock: product.productStock ?? 0,
+    cost: product.cost ?? 0 // cost price
   };
 
   // Show modal
