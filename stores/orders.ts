@@ -17,7 +17,6 @@ import {
   onSnapshot
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
-import { update } from "firebase/database";
 
 export const useOrdersStore = defineStore("orders", {
   state: (): any => {

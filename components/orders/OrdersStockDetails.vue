@@ -17,13 +17,14 @@
               <tr class="text-gray-400 border-b">
                 <th class="font-medium text-start">Producto</th>
                 <th class="font-medium">Cantidad Total</th>
+                <th class="font-medium">Total Descontando Stock</th>
               </tr>
             </thead>
             <tbody>
               <tr class="text-center border-b" v-for="product in finalList" :key="product.id">
                 <td class="py-3 text-start">{{ `${product.productName} (${product.unit})` }}</td>
                 <td class="py-3">{{ product.finalQuantity }}</td>
-                <td class="py-3"></td>
+                <td class="py-3">{{ Math.max(product.finalQuantity - product.stockUsed, 0) }}</td>
                 <td class="py-3"></td>
               </tr>
             </tbody>
@@ -72,9 +73,14 @@ const finalList = computed(() => {
       const index = list.findIndex((item) => item.productId === product.productId);
 
       if (index === -1) {
-        list.push({ ...product, finalQuantity: product.quantity });
+        list.push({
+          ...product,
+          finalQuantity: product.quantity,
+          stockUsed: Math.max(product.currentProductStock - product.quantity, 0)
+        });
       } else {
         list[index].finalQuantity += product.quantity;
+        list[index].stockUsed += Math.max(product.currentProductStock - product.quantity, 0);
       }
     });
   });
@@ -95,7 +101,6 @@ function sendListMessage() {
     );
     return;
   }
-
   const cleanPhone = phone.replace(/\D/g, "");
 
   // Message creation
@@ -105,6 +110,15 @@ function sendListMessage() {
 
   finalList.value.forEach((product) => {
     message += `- ${product.productName} (${product.unit}) - ${product.finalQuantity}\n`;
+  });
+
+  // Message with the total w/o stock
+  message += `\nTotal sin stock: \n\n`;
+  finalList.value.forEach((product) => {
+    message += `- ${product.productName} (${product.unit}) - ${Math.max(
+      product.finalQuantity - product.stockUsed,
+      0
+    )}\n`;
   });
 
   // Send message to wsp

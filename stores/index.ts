@@ -498,22 +498,12 @@ export const useIndexStore = defineStore("index", {
         // Are only the ones belonging to the employee or the owner's
         const index = this.getBusinesses.findIndex((b: any) => b.id === current.id);
         if (index > -1) {
-          this.$state.businesses[index] = JSON.parse(
-            JSON.stringify({
-              id: current.id,
-              name: businessNewInfo.name,
-              phone: businessNewInfo.phone,
-              description: businessNewInfo.description || null,
-              address: businessNewInfo.address || null,
-              imageUrl: businessNewInfo.imageUrl || null,
-              userBusinessImageId: businessNewInfo.userBusinessImageId || null,
-              shippingPrice: businessNewInfo.shippingPrice || null,
-              shippingType: businessNewInfo.shippingType || null,
-              type: "propietario", // Only owner can create a business
-              userUid: user.value.uid,
-              createdAt: $dayjs().format("DD/MM/YYYY")
-            })
-          );
+          console.log(businessNewInfo);
+          console.log(this.$state.businesses[index]);
+          this.$state.businesses[index] = {
+            ...this.$state.businesses[index],
+            ...businessNewInfo
+          };
         }
 
         // Check if the current business is the one being updated
