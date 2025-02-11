@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-[2rem] w-full mt-[1.429rem]" v-if="doesOrderExist && !orderCreated">
+  <div class="flex flex-col gap-[2rem] w-full mt-[1.429rem] mb-8" v-if="doesOrderExist && !orderCreated">
     <div class="flex items-center gap-2">
       <NuxtLink
         to="/pedidos/nuevo"
@@ -15,6 +15,7 @@
           <div class="flex flex-col">
             <span class="text-sm">Cantidad: {{ formatQuantity(p.quantity) }}</span>
             <span class="text-sm">Precio Unitario: {{ formatPrice(p.price) }}</span>
+            <span class="text-sm">Stock restante: {{ formatQuantity(p.currentProductStock - p.quantity) }}</span>
           </div>
           <div class="flex justify-between items-center">
             <span class="font-bold">{{ formatPrice(p.total) }}</span>

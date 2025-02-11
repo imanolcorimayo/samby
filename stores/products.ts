@@ -301,7 +301,7 @@ export const useProductsStore = defineStore("products", {
       }
 
       // Validate cost and productStock properties
-      if (!stock.cost || isNaN(stock.cost) || !stock.productStock || isNaN(stock.productStock)) {
+      if (isNaN(stock.cost) || isNaN(stock.productStock)) {
         useToast(ToastEvents.error, "El costo y el stock son inválidos. Trate nuevamente o contacte al soporte");
         return false;
       }

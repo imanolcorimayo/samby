@@ -17,6 +17,7 @@ import {
   onSnapshot
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
+import { update } from "firebase/database";
 
 export const useOrdersStore = defineStore("orders", {
   state: (): any => {
@@ -69,7 +70,9 @@ export const useOrdersStore = defineStore("orders", {
           productName: product.productName,
           price: product.price,
           unit: product.unit,
-          total: productsQuantity[pId] * product.price
+          total: productsQuantity[pId] * product.price,
+          currentProductStock: product.productStock ?? 0,
+          currentCost: product.cost ?? 0
         });
       }
 
@@ -152,6 +155,25 @@ export const useOrdersStore = defineStore("orders", {
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
+
+        // Update each product stock
+        for (const product of order.products) {
+          const productsStore = useProductsStore();
+          const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
+
+          if (!productInStore) {
+            continue;
+          }
+
+          const productStock = product.currentProductStock - product.quantity;
+          await productsStore.updateStock(
+            {
+              productStock: productStock > 0 ? productStock : 0, // 0 or more
+              cost: productInStore.cost // Not changing
+            },
+            productInStore
+          );
+        }
 
         // Update last inserted order to be shown in the confirmation page
         this.$state.lastInsertedOrder = {

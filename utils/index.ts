@@ -75,21 +75,27 @@ export const validateProduct = (product: any) => {
 };
 
 export const formatQuantity = (quantity: number) => {
-  const wholePart = Math.floor(quantity); // Get the whole number part
-  const decimalPart = quantity - wholePart; // Get the decimal/fractional part
+  const wholePart = Math.trunc(quantity); // Get the whole number part (handles negatives correctly)
+  const decimalPart = Math.abs(quantity - wholePart); // Get the absolute decimal/fractional part
 
   // Handle different fractional parts
   let fractionText = "";
   if (decimalPart === 0.25) {
-    fractionText = " + 1/4";
+    fractionText = "1/4";
   } else if (decimalPart === 0.5) {
-    fractionText = " + 1/2";
+    fractionText = "1/2";
   } else if (decimalPart === 0.75) {
-    fractionText = " + 3/4";
+    fractionText = "3/4";
   }
 
-  // Return the formatted quantity
-  return wholePart > 0 ? `${wholePart}${fractionText}` : fractionText.replace(" + ", "");
+  // Construct the formatted string
+  if (fractionText) {
+    return wholePart !== 0
+      ? `${wholePart} ${wholePart < 0 ? "-" : "+"} ${fractionText}`
+      : `${quantity < 0 ? "-" : ""}${fractionText}`;
+  } else {
+    return `${wholePart}`;
+  }
 };
 
 export const validateClient = (client: any) => {

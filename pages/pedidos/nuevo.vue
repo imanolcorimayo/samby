@@ -67,9 +67,15 @@
               <span class="font-semibold">{{ product.productName }}</span>
               <span class="text-gray-500">Unidad: {{ product.unit }}</span>
             </div>
-            <div class="flex flex-col items-end gap-3">
+            <div class="flex flex-col items-end gap-1">
               <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
-              <div v-if="!selectedProduct[product.id]">
+              <span class="text-sm"
+                >Disponible:
+                {{
+                  formatQuantity(parseFloat(product.productStock ?? 0) - parseFloat(productsQuantity[product.id] ?? 0))
+                }}</span
+              >
+              <div class="mt-2" v-if="!selectedProduct[product.id]">
                 <button
                   @click="selectProduct(product.id, product.step ?? 0.5)"
                   class="p-[0.428rem] text-white rounded-full bg-gray-200"
@@ -77,7 +83,7 @@
                   <TablerPlus class="text-black text-[0.857rem]" />
                 </button>
               </div>
-              <div v-else class="flex items-center gap-2">
+              <div v-else class="flex items-center gap-2 mt-2">
                 <button
                   @click="manageProduct(product.id, 'remove', product.step ?? 0.5)"
                   class="btn-sm bg-secondary ring-1 ring-gray-500 max-h-[2rem]"
@@ -177,13 +183,14 @@ function manageProduct(productId, action, productStep = 0.5) {
   }
 
   // If it's the last product, remove it and unselect it
+  console.log(productsQuantity.value[productId], productStep);
   if (productsQuantity.value[productId] <= productStep) {
     productsQuantity.value[productId] = 0;
     selectedProduct.value[productId] = false;
+  } else {
+    // Manage remove action
+    productsQuantity.value[productId] = productsQuantity.value[productId] - productStep;
   }
-
-  // Manage remove action
-  productsQuantity.value[productId] = productsQuantity.value[productId] - productStep;
 
   // Start the timer to save the shopping cart
   startTimerToSaveShoppingCart();
