@@ -498,8 +498,6 @@ export const useIndexStore = defineStore("index", {
         // Are only the ones belonging to the employee or the owner's
         const index = this.getBusinesses.findIndex((b: any) => b.id === current.id);
         if (index > -1) {
-          console.log(businessNewInfo);
-          console.log(this.$state.businesses[index]);
           this.$state.businesses[index] = {
             ...this.$state.businesses[index],
             ...businessNewInfo

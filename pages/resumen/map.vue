@@ -82,8 +82,6 @@ onMounted(() => {
 
 // ----- Define Methods -----
 function addZone() {
-  console.log(zoneName, zoneColor);
-
   window.zoneToUpdate = {};
   window.zoneToUpdate.name = zoneName.value;
   window.zoneToUpdate.color = zoneColor.value;
@@ -92,8 +90,6 @@ function addZone() {
 }
 
 function updateGeoJsonZone(feature) {
-  console.log("Updating GeoJSON Zone", feature);
-
   // Check if name is already in the neighborhoodZones ref
   const zoneIndex = neighborhoodZones.value.findIndex((zone) => zone.name === feature.properties.name);
 

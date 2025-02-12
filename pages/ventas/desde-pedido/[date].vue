@@ -132,6 +132,11 @@
             </div>
           </div>
         </div>
+        <div class="flex justify-between p-[0.714rem] bg-gray-200" v-else>
+          <span class="font-medium text-green-800"
+            >Este producto ya fue agregado a las ventas debido al manejo de inventario!</span
+          >
+        </div>
       </div>
       <button @click="uploadAllSales" class="w-full btn bg-primary text-white max-w-[30rem]">
         Cargar todas las ventas
@@ -182,9 +187,15 @@ const productsSold = computed(() => {
     order.products.forEach((product) => {
       const index = list.findIndex((item) => item.productId === product.productId);
       if (index === -1) {
-        list.push({ ...product, finalQuantity: product.quantity });
+        list.push({
+          ...product,
+          totalQuantity: product.quantity,
+          stockUsed: product.currentProductStock > product.quantity ? product.quantity : product.currentProductStock
+        });
       } else {
-        list[index].finalQuantity += product.quantity;
+        list[index].totalQuantity += product.quantity;
+        list[index].stockUsed +=
+          product.currentProductStock > product.quantity ? product.quantity : product.currentProductStock;
       }
     });
   });
@@ -195,12 +206,19 @@ const productsSold = computed(() => {
 // -------- Define Methods --------
 function createProductForm() {
   productsSold.value.forEach((el) => {
+    // Check if it has not been added to sales already
+    const finalQuantity = Math.max(el.totalQuantity - el.stockUsed, 0);
+    if (finalQuantity === 0) {
+      delete productForm.value[el.productId];
+      return;
+    }
+
     productForm.value[el.productId] = {
       quality: "buena",
       buyingPrice: "",
       sellingPrice: el.price,
       date: route.params.date,
-      quantity: el.finalQuantity
+      quantity: finalQuantity
     };
   });
 }

@@ -76,11 +76,12 @@ const finalList = computed(() => {
         list.push({
           ...product,
           finalQuantity: product.quantity,
-          stockUsed: Math.max(product.currentProductStock - product.quantity, 0)
+          stockUsed: product.currentProductStock > product.quantity ? product.quantity : product.currentProductStock
         });
       } else {
         list[index].finalQuantity += product.quantity;
-        list[index].stockUsed += Math.max(product.currentProductStock - product.quantity, 0);
+        list[index].stockUsed +=
+          product.currentProductStock > product.quantity ? product.quantity : product.currentProductStock;
       }
     });
   });

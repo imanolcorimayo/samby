@@ -84,32 +84,18 @@
             v-model="form.step"
           />
         </div>
-        <div class="flex items-center justify-between gap-4">
-          <FormKit
-            type="number"
-            name="price"
-            label-class="font-medium"
-            messages-class="text-red-500 text-[0.75rem]"
-            input-class="w-full"
-            outer-class="w-full flex-1"
-            label="Precio de venta por unidad"
-            placeholder="Ej: 7500"
-            validation="required|numeric|min:1"
-            v-model="form.price"
-          />
-          <FormKit
-            type="number"
-            name="price"
-            label-class="font-medium"
-            messages-class="text-red-500 text-[0.75rem]"
-            input-class="w-full"
-            outer-class="w-full flex-1"
-            label="Costo por unidad"
-            placeholder="Costo al que compraste el producto por unidad"
-            validation="required|numeric|min:1"
-            v-model="form.price"
-          />
-        </div>
+        <FormKit
+          type="number"
+          name="price"
+          label-class="font-medium"
+          messages-class="text-red-500 text-[0.75rem]"
+          input-class="w-full"
+          outer-class="w-full flex-1"
+          label="Precio de venta por unidad"
+          placeholder="Ej: 7500"
+          validation="required|numeric|min:1"
+          v-model="form.price"
+        />
         <FormKit
           type="select"
           name="category"

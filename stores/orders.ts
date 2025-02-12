@@ -17,6 +17,7 @@ import {
   onSnapshot
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
+import { quadratAnalysis } from "@turf/turf";
 
 export const useOrdersStore = defineStore("orders", {
   state: (): any => {
@@ -164,11 +165,11 @@ export const useOrdersStore = defineStore("orders", {
             continue;
           }
 
-          const productStock = product.currentProductStock - product.quantity;
+          const productStock = parseFloat(product.currentProductStock ?? 0) - product.quantity;
           await productsStore.updateStock(
             {
               productStock: productStock > 0 ? productStock : 0, // 0 or more
-              cost: productInStore.cost // Not changing
+              cost: productInStore.cost ?? 0 // Not changing
             },
             productInStore
           );
@@ -364,6 +365,11 @@ export const useOrdersStore = defineStore("orders", {
       }
 
       try {
+        // Check if it's in the pending orders
+        // This needs to be before updating in firestore because it will update reactively with the db
+        const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
+        const order = this.$state.pendingOrders[orderIndex];
+
         await updateDoc(doc(db, "pedido", orderId), {
           orderStatus: status
         });
@@ -376,16 +382,39 @@ export const useOrdersStore = defineStore("orders", {
           userUid: user.value.uid
         });
 
-        // Check if it's in the pending orders
-        const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
+        // If pending order and status moved to "completed", then add the sales using the stock used and the cost of the product
+        // Do this before removing the order from the pending orders
+        if (orderIndex > -1 && status === "entregado") {
+          for (const product of order.products) {
+            const sellsStore = useSellsStore();
+            const productsStore = useProductsStore();
+            const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
 
-        if (orderIndex > -1 && ["rechazado", "cancelado", "entregado"].includes(status)) {
-          // Move from pending orders to the corresponding status
-          const order = this.$state.pendingOrders[orderIndex];
-          this.$state.pendingOrders.splice(orderIndex, 1);
+            if (!productInStore) {
+              continue;
+            }
 
-          if (order && typeof order === "object") {
-            this.$state.orders.push({ ...order, orderStatus: status });
+            const stock = parseFloat(product.currentProductStock ?? 0); // Stock quantity at the moment of the order
+            const quantity = parseFloat(product.quantity ?? 0);
+            const productCost = parseFloat(product.currentCost ?? 0);
+
+            if (stock === 0 || productCost === 0 || quantity === 0) {
+              continue;
+            }
+
+            // Make sure we don't sell more than we have. In case quantity > stock, we sell all stock we have
+            // And the rest will be managed manually by the user
+            const productStockSold = stock > quantity ? Math.max(quantity, 0) : Math.max(stock, 0);
+
+            const sale = {
+              quantity: productStockSold,
+              quality: "buena",
+              buyingPrice: productCost,
+              sellingPrice: product.price,
+              date: order.shippingDate
+            };
+
+            await sellsStore.addSell(sale, { id: product.productId, name: product.productName });
           }
         }
 

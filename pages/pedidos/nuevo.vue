@@ -183,7 +183,6 @@ function manageProduct(productId, action, productStep = 0.5) {
   }
 
   // If it's the last product, remove it and unselect it
-  console.log(productsQuantity.value[productId], productStep);
   if (productsQuantity.value[productId] <= productStep) {
     productsQuantity.value[productId] = 0;
     selectedProduct.value[productId] = false;
