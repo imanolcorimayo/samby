@@ -443,7 +443,8 @@ export const useIndexStore = defineStore("index", {
         businessNewInfo.phone === current.phone &&
         businessNewInfo.imageUrl === current.imageUrl &&
         businessNewInfo.shippingPrice === current.shippingPrice &&
-        businessNewInfo.shippingType === current.shippingType
+        businessNewInfo.shippingType === current.shippingType &&
+        businessNewInfo.businessUrl === current.businessUrl
       ) {
         useToast(ToastEvents.info, "No se ha realizado ningún cambio");
         return false;
@@ -459,6 +460,7 @@ export const useIndexStore = defineStore("index", {
           address: businessNewInfo.address || null,
           shippingPrice: businessNewInfo.shippingPrice || null,
           shippingType: businessNewInfo.shippingType || null,
+          businessUrl: businessNewInfo.businessUrl || null,
           ...(imageChanged
             ? { imageUrl: businessNewInfo.imageUrl, userBusinessImageId: businessNewInfo.userBusinessImageId }
             : {})
@@ -942,6 +944,31 @@ export const useIndexStore = defineStore("index", {
       } catch (error) {
         console.error(error);
         useToast(ToastEvents.error, "Hubo un error al guardar la información, por favor intenta nuevamente");
+        return false;
+      }
+    },
+    async isBusinessUrlAvailable(businessUrl: string) {
+      if (!businessUrl || typeof businessUrl !== "string") {
+        return false;
+      }
+
+      try {
+        const db = useFirestore();
+        const user = useCurrentUser();
+
+        // Get business with this code
+        const userBusiness = await getDocs(
+          query(collection(db, "userBusiness"), where("businessUrl", "==", businessUrl))
+        );
+
+        if (userBusiness.docs.length === 0) {
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        console.error(error);
+        useToast(ToastEvents.error, "Hubo un error al validar la información, por favor intenta nuevamente");
         return false;
       }
     }

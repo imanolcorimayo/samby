@@ -207,6 +207,24 @@ export const formatPhoneNumber = function (phone = "") {
   return mobPhoneAux + cleanNumber.substring(0, 14);
 };
 
+export const slugify = (text: string) => {
+  return (
+    text
+      .toString()
+      .toLowerCase()
+      // Normalize Unicode characters
+      // Breaks down accented characters into their base letter and separate diacritical marks (e.g., é becomes e + ´).
+      .normalize("NFD")
+      .trim()
+      // Remove diacritical marks
+      .replace(/[\u0300-\u036f]/g, "")
+      // Remove non alphanumeric characters except spaces
+      .replace(/[^a-z0-9 \-]/g, "")
+      // Replace spaces with dashes
+      .replace(/\s+/g, "-")
+  );
+};
+
 // For business configuration
 export const BUSINESS_SHIPPING_TYPES = ["Solo Envío", "Envío y Retiro en Local", "Solo Retiro en Local"];
 export const BUSINESS_SHIPPING_TYPES_UTILS = {

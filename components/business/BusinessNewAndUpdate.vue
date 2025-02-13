@@ -104,6 +104,33 @@
             v-model="form.shippingPrice"
           />
         </div>
+        <div class="flex justify-between items-end gap-4">
+          <FormKit
+            type="text"
+            name="business_url"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            :input-class="`w-full ${urlAvailable === false ? 'border-red-500' : 'border-green-600'}`"
+            outer-class="w-full flex-1"
+            label="Url del negocio (opcional)"
+            :placeholder="slugify(form.name ?? 'tu-negocio')"
+            v-model="form.businessUrl"
+            required
+          />
+          <button
+            type="button"
+            @click.prevent="validateBusinessUrl"
+            class="btn bg-secondary border border-gray-600 h-fit hover:bg-gray-200 hover:border-2"
+          >
+            Validar
+          </button>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-semibold">Url final</span>
+          <pre class="bg-gray-300 p-2 text-sm text-wrap rounded">
+https://emprendeverde.wiseutils.com/proveedores/{{ slugify(form.businessUrl) }}</pre
+          >
+        </div>
       </FormKit>
     </template>
     <template #footer>
@@ -150,8 +177,10 @@ const form = ref({
   address: "",
   phone: "",
   shippingType: "",
-  shippingPrice: ""
+  shippingPrice: "",
+  businessUrl: ""
 });
+const urlAvailable = ref(null);
 
 // Refs
 const mainModal = ref(null);
@@ -162,6 +191,16 @@ async function updateOrCreateBusiness() {
   // If submitting, return
   if (submitting.value) return;
   submitting.value = true;
+
+  // Check if the business URL is available
+  // Only check when it's not the same as the current business URL
+  if (!currentBusiness.value || form.value.businessUrl !== currentBusiness.value.businessUrl) {
+    await validateBusinessUrl();
+    if (urlAvailable.value === false) {
+      submitting.value = false;
+      return;
+    }
+  }
 
   let informationSaved = false;
   if (newBusiness.value) {
@@ -174,7 +213,8 @@ async function updateOrCreateBusiness() {
       userBusinessImageId: getBusinessImage.value?.id || null,
       phone: form.value.phone,
       shippingType: form.value.shippingType,
-      shippingPrice: form.value.shippingPrice
+      shippingPrice: form.value.shippingPrice,
+      businessUrl: form.value.businessUrl
     });
   } else {
     // Manipulate business id when is an employee who is editing
@@ -194,7 +234,8 @@ async function updateOrCreateBusiness() {
         userBusinessImageId: getBusinessImage.value?.id || form.value.userBusinessImageId || null,
         phone: form.value.phone,
         shippingType: form.value.shippingType,
-        shippingPrice: form.value.shippingPrice
+        shippingPrice: form.value.shippingPrice,
+        businessUrl: form.value.businessUrl
       },
       currentBusiness.value // Used to properly manage the image update and update in the employees case
     );
@@ -294,7 +335,8 @@ const showModal = (businessId = false) => {
     name: "",
     description: "",
     address: "",
-    phone: ""
+    phone: "",
+    businessUrl: ""
   };
   imageUrl.value = null;
   imageInfo.value = null;
@@ -317,6 +359,7 @@ const showModal = (businessId = false) => {
     form.value.address = currentBusiness.value.address || "";
     form.value.shippingType = currentBusiness.value.shippingType || "";
     form.value.shippingPrice = currentBusiness.value.shippingPrice || "";
+    form.value.businessUrl = currentBusiness.value.businessUrl || "";
 
     // Update image URL
     imageUrl.value = currentBusiness.value.imageUrl || null;
@@ -332,6 +375,23 @@ const showModal = (businessId = false) => {
   mainModal.value.showModal();
   newBusiness.value = true;
 };
+
+async function validateBusinessUrl() {
+  if (!form.value.businessUrl) {
+    useToast(ToastEvents.error, "Debes ingresar algun valor para la url");
+    return;
+  }
+
+  form.value.businessUrl = slugify(form.value.businessUrl);
+  urlAvailable.value = await indexStore.isBusinessUrlAvailable(form.value.businessUrl);
+
+  if (!urlAvailable.value) {
+    useToast(ToastEvents.error, "Esta url ya esta en uso, por favor intenta con otra");
+    return;
+  }
+
+  useToast(ToastEvents.success, "Esta url esta disponible!");
+}
 
 // ----- Define Hooks -----
 
