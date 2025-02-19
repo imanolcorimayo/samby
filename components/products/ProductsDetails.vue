@@ -376,6 +376,9 @@ const showModal = (productId) => {
 
   // Set current sell
   currentProduct.value = product;
+  currentProduct.value.productImageId = product.productImageId || null;
+  currentProduct.value.imageUrl = product.imageUrl || null;
+
   imageUrl.value = product.imageUrl || null;
   form.value = {
     productName: product.productName,
