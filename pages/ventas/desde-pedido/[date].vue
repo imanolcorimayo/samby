@@ -204,8 +204,6 @@ const productsSold = computed(() => {
     });
   });
 
-  console.log(list);
-
   return list;
 });
 
