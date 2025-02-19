@@ -186,6 +186,10 @@ const productsSold = computed(() => {
   deliveredOrders.forEach((order) => {
     order.products.forEach((product) => {
       const index = list.findIndex((item) => item.productId === product.productId);
+
+      // In case product stock is not in the order
+      product.currentProductStock = product.currentProductStock ? product.currentProductStock : 0;
+
       if (index === -1) {
         list.push({
           ...product,
@@ -199,6 +203,8 @@ const productsSold = computed(() => {
       }
     });
   });
+
+  console.log(list);
 
   return list;
 });
