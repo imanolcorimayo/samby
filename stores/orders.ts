@@ -168,7 +168,7 @@ export const useOrdersStore = defineStore("orders", {
           const productStock = parseFloat(product.currentProductStock ?? 0) - product.quantity;
           await productsStore.updateStock(
             {
-              productStock: productStock > 0 ? productStock : 0, // 0 or more
+              productStock: Math.max(productStock, 0), // 0 or more
               cost: productInStore.cost ?? 0 // Not changing
             },
             productInStore
@@ -415,6 +415,46 @@ export const useOrdersStore = defineStore("orders", {
             };
 
             await sellsStore.addSell(sale, { id: product.productId, name: product.productName });
+          }
+        }
+
+        // If "pendiente-de-confirmacion" and status moved to "rechazado",
+        // then add the stock back to the products
+        if (orderIndex > -1 && status === "rechazado") {
+          for (const product of order.products) {
+            const productsStore = useProductsStore();
+            const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
+
+            // Fail-safe check
+            if (!productInStore) {
+              continue;
+            }
+
+            // Get product current stock from firebase in order to have up to date information
+            const productSnapshot = await getDoc(doc(db, "producto", product.productId));
+            const productInFirebase = productSnapshot.data();
+
+            // Fail-safe check
+            if (!productInFirebase) {
+              continue;
+            }
+
+            productInFirebase.productStock = parseFloat(productInFirebase.productStock ?? 0);
+            const stock = parseFloat(product.currentProductStock ?? 0); // Stock quantity at the moment of the order
+            const quantity = parseFloat(product.quantity ?? 0);
+
+            // Only add back when the stock is not 0
+            if (stock <= 0 || quantity === 0) {
+              continue;
+            }
+
+            // Make sure we don't add back more than what was used
+            const productStockUsed = stock > quantity ? Math.max(quantity, 0) : Math.max(stock, 0);
+
+            // Finally: Add back the stock in firebase
+            await updateDoc(doc(db, "producto", product.productId), {
+              productStock: Math.max(productStockUsed + productInFirebase.productStock, 0) // Ensure stock is not negative
+            });
           }
         }
 
