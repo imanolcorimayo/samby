@@ -76,12 +76,11 @@ const finalList = computed(() => {
         list.push({
           ...product,
           finalQuantity: product.quantity,
-          stockUsed: product.currentProductStock > product.quantity ? product.quantity : product.currentProductStock
+          stockUsed: product.stockUsed ?? 0
         });
       } else {
         list[index].finalQuantity += product.quantity;
-        list[index].stockUsed +=
-          product.currentProductStock > product.quantity ? product.quantity : product.currentProductStock;
+        list[index].stockUsed += product.stockUsed ?? 0;
       }
     });
   });

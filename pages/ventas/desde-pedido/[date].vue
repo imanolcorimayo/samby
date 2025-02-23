@@ -187,19 +187,15 @@ const productsSold = computed(() => {
     order.products.forEach((product) => {
       const index = list.findIndex((item) => item.productId === product.productId);
 
-      // In case product stock is not in the order
-      product.currentProductStock = product.currentProductStock ? product.currentProductStock : 0;
-
       if (index === -1) {
         list.push({
           ...product,
           totalQuantity: product.quantity,
-          stockUsed: product.currentProductStock > product.quantity ? product.quantity : product.currentProductStock
+          stockUsed: product.stockUsed ?? 0
         });
       } else {
         list[index].totalQuantity += product.quantity;
-        list[index].stockUsed +=
-          product.currentProductStock > product.quantity ? product.quantity : product.currentProductStock;
+        list[index].stockUsed += product.stockUsed ?? 0;
       }
     });
   });
