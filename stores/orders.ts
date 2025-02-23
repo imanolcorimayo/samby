@@ -133,6 +133,28 @@ export const useOrdersStore = defineStore("orders", {
       const shippingTime = $dayjs(order.shippingDate).toDate();
 
       try {
+        // Update each product stock. We do it previously to place the order
+        // To save the product stock used in the order
+        for (const product of order.products) {
+          const productsStore = useProductsStore();
+          const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
+
+          if (!productInStore) {
+            continue;
+          }
+
+          // We use either the quantity or the current stock, whichever is lower
+          product.stockUsed = Math.min(product.quantity, product.currentProductStock);
+          const productStock = parseFloat(product.currentProductStock ?? 0) - product.quantity;
+          await productsStore.updateStock(
+            {
+              productStock: Math.max(productStock, 0), // 0 or more
+              cost: productInStore.cost ?? 0 // Not changing
+            },
+            productInStore
+          );
+        }
+
         // Create object to be inserted
         const orderObject = {
           ...order,
@@ -155,25 +177,6 @@ export const useOrdersStore = defineStore("orders", {
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
-
-        // Update each product stock
-        for (const product of order.products) {
-          const productsStore = useProductsStore();
-          const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
-
-          if (!productInStore) {
-            continue;
-          }
-
-          const productStock = parseFloat(product.currentProductStock ?? 0) - product.quantity;
-          await productsStore.updateStock(
-            {
-              productStock: Math.max(productStock, 0), // 0 or more
-              cost: productInStore.cost ?? 0 // Not changing
-            },
-            productInStore
-          );
-        }
 
         // Update last inserted order to be shown in the confirmation page
         this.$state.lastInsertedOrder = {
@@ -306,7 +309,7 @@ export const useOrdersStore = defineStore("orders", {
         return null;
       }
     },
-    async updatePendingOrder(order: any) {
+    async updatePendingOrder(newOrder: any, currentOrder: any) {
       const db = useFirestore();
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
@@ -316,8 +319,8 @@ export const useOrdersStore = defineStore("orders", {
       }
 
       // Get id and remove it from the object
-      const orderId = order.id;
-      delete order.id;
+      const orderId = newOrder.id;
+      delete newOrder.id;
 
       // Get order from orders
       const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
@@ -328,15 +331,100 @@ export const useOrdersStore = defineStore("orders", {
       }
 
       // Double check the new order is not identical to the old one
-      if (JSON.stringify(this.$state.pendingOrders[orderIndex]) === JSON.stringify(order)) {
+      if (JSON.stringify(this.$state.pendingOrders[orderIndex]) === JSON.stringify(newOrder)) {
         useToast(ToastEvents.error, "La orden no ha sido modificada.");
         return false;
       }
 
       try {
+        /* Update Firebase Database */
+
+        // Update stock in products first to we can also update the "stockUsed" property in the order
+        for (const product of newOrder.products) {
+          const productsStore = useProductsStore();
+          const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
+
+          if (!productInStore) {
+            continue;
+          }
+
+          // Get currentQuantity from the current order
+          // It's possible the product is not present in the previous order
+          const currentProduct = currentOrder.products.find((p: any) => p.productId === product.productId);
+          const currentQuantity = currentProduct ? parseFloat(currentProduct.quantity ?? 0) : 0;
+          const stockUsed = currentProduct ? parseFloat(currentProduct.stockUsed ?? 0) : null;
+
+          const newQuantity = parseFloat(product.quantity ?? 0);
+          const quantityDiff = currentQuantity - newQuantity;
+          // Get stock now in case the difference is negative
+          const stockNow = parseFloat(productInStore.productStock ?? 0);
+
+          // This scenario should not be possible
+          if (quantityDiff > 0 && stockUsed === null) {
+            continue;
+          }
+
+          // If quantityDiff is 0, then we don't need to update anything
+          let auxStockBack = 0;
+          if (quantityDiff === 0) {
+            continue;
+          } else if (quantityDiff > 0) {
+            // If quantityDiff > 0 -> Adds stock back.
+            // If stock used was less than the new stock difference
+            // Then the max to be returned is the stock used, so we always need the minimum
+            auxStockBack = Math.min(stockUsed as number, quantityDiff);
+          } else {
+            // If quantityDiff < 0 -> Removes stock. We make sure it does not exceed today's stock
+            auxStockBack = -1 * Math.min(Math.abs(quantityDiff), stockNow);
+          }
+
+          // We need to update the stock used
+          product.stockUsed = Math.max((stockUsed as number) + -1 * auxStockBack, 0);
+
+          // Update product in firebase + store
+          await productsStore.updateStock(
+            {
+              productStock: Math.max(stockNow + auxStockBack, 0), // Ensure stock is not negative
+              cost: productInStore.cost ?? 0
+            },
+            productInStore
+          );
+        }
+
+        // Find any deleted product and add back the stock if it was used
+        for (const product of currentOrder.products) {
+          // if stock used is 0, then we don't need to update anything
+          const stockUsed = parseFloat(product.stockUsed ?? 0);
+          if (stockUsed === 0) {
+            continue;
+          }
+
+          const productInNewOrder = newOrder.products.find((p: any) => p.productId === product.productId);
+
+          if (!productInNewOrder) {
+            const productsStore = useProductsStore();
+            const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
+
+            if (!productInStore) {
+              continue;
+            }
+
+            // Update product in firebase + store
+            await productsStore.updateStock(
+              {
+                productStock: Math.max(stockUsed + productInStore.productStock, 0), // Ensure stock is not negative
+                cost: productInStore.cost ?? 0
+              },
+              productInStore
+            );
+          }
+        }
+
+        // Remove createdAt from the new order. This crashes firebase otherwise
+        delete newOrder.createdAt;
         await updateDoc(doc(db, "pedido", orderId), {
-          ...order,
-          shippingDate: Timestamp.fromDate($dayjs(order.shippingDate).toDate()),
+          ...newOrder,
+          shippingDate: Timestamp.fromDate($dayjs(newOrder.shippingDate).toDate()),
           orderStatus: "pendiente-modificado"
         });
 
@@ -348,7 +436,8 @@ export const useOrdersStore = defineStore("orders", {
           userUid: user.value.uid
         });
 
-        this.$state.pendingOrders[orderIndex] = { ...order, id: orderId, orderStatus: "pendiente-modificado" };
+        /* Update Pinia Store */
+        this.$state.pendingOrders[orderIndex] = { ...newOrder, id: orderId, orderStatus: "pendiente-modificado" };
 
         return true;
       } catch (error) {
@@ -394,20 +483,16 @@ export const useOrdersStore = defineStore("orders", {
               continue;
             }
 
-            const stock = parseFloat(product.currentProductStock ?? 0); // Stock quantity at the moment of the order
-            const quantity = parseFloat(product.quantity ?? 0);
+            const stockUsed = parseFloat(product.stockUsed ?? 0); // Stock used on this order
             const productCost = parseFloat(product.currentCost ?? 0);
 
-            if (stock === 0 || productCost === 0 || quantity === 0) {
+            if (stockUsed === 0 || productCost === 0) {
               continue;
             }
 
-            // Make sure we don't sell more than we have. In case quantity > stock, we sell all stock we have
-            // And the rest will be managed manually by the user
-            const productStockSold = stock > quantity ? Math.max(quantity, 0) : Math.max(stock, 0);
-
+            // We only mark as sale the stock used. The rest will be managed manually by the user
             const sale = {
-              quantity: productStockSold,
+              quantity: stockUsed,
               quality: "buena",
               buyingPrice: productCost,
               sellingPrice: product.price,
@@ -418,9 +503,9 @@ export const useOrdersStore = defineStore("orders", {
           }
         }
 
-        // If "pendiente-de-confirmacion" and status moved to "rechazado",
+        // If "pendiente-de-confirmacion" and status moved to "rechazado", or moverd to "cancelado"
         // then add the stock back to the products
-        if (orderIndex > -1 && status === "rechazado") {
+        if (orderIndex > -1 && (status === "rechazado" || status === "cancelado")) {
           for (const product of order.products) {
             const productsStore = useProductsStore();
             const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
@@ -440,21 +525,21 @@ export const useOrdersStore = defineStore("orders", {
             }
 
             productInFirebase.productStock = parseFloat(productInFirebase.productStock ?? 0);
-            const stock = parseFloat(product.currentProductStock ?? 0); // Stock quantity at the moment of the order
-            const quantity = parseFloat(product.quantity ?? 0);
+            const stockUsed = parseFloat(product.stockUsed ?? 0);
 
             // Only add back when the stock is not 0
-            if (stock <= 0 || quantity === 0) {
+            if (stockUsed <= 0) {
               continue;
             }
 
-            // Make sure we don't add back more than what was used
-            const productStockUsed = stock > quantity ? Math.max(quantity, 0) : Math.max(stock, 0);
-
-            // Finally: Add back the stock in firebase
-            await updateDoc(doc(db, "producto", product.productId), {
-              productStock: Math.max(productStockUsed + productInFirebase.productStock, 0) // Ensure stock is not negative
-            });
+            // Update product in firebase + store
+            await productsStore.updateStock(
+              {
+                productStock: Math.max(stockUsed + productInFirebase.productStock, 0), // Ensure stock is not negative
+                cost: productInStore.cost ?? 0
+              },
+              productInStore
+            );
           }
         }
 

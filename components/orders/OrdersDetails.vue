@@ -432,7 +432,9 @@ function addProduct(productId) {
     price: product.price,
     quantity: product.step ?? 0.5,
     total: product.price * (product.step ?? 0.5),
-    unit: product.unit
+    unit: product.unit,
+    currentProductStock: product.productStock ?? 0,
+    currentCost: product.cost ?? 0
   });
 
   // Update the total amount
@@ -504,7 +506,7 @@ async function modifyOrder() {
   }
 
   // Update the order
-  const orderUpdated = await ordersStore.updatePendingOrder(editableOrder.value);
+  const orderUpdated = await ordersStore.updatePendingOrder(editableOrder.value, currentOrder.value);
 
   if (orderUpdated) {
     useToast(ToastEvents.success, "Pedido modificado correctamente");

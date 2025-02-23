@@ -9,7 +9,9 @@
     "prodDeploy": "cp .env.samby-prod .env && nuxt generate && firebase use samby-prod && firebase deploy",
     "devDeploy": "cp .env.samby-dev .env && nuxt generate && firebase use samby-dev && firebase deploy",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "switchProd": "cp .env.samby-prod .env",
+    "switchDev": "cp .env.samby-dev .env"
   },
   "dependencies": {
     "@formkit/nuxt": "^1.6.5",
