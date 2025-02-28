@@ -32,7 +32,8 @@ export const useOrdersStore = defineStore("orders", {
       pendingOrders: [],
       pendingOrdersFetched: false,
       ordersFetched: false,
-      lastVisible: false
+      lastVisible: false,
+      dailyProductCost: []
     };
   },
   getters: {
@@ -43,7 +44,8 @@ export const useOrdersStore = defineStore("orders", {
     getOrders: (state) => state.orders,
     areOrdersFetched: (state) => state.ordersFetched,
     getPendingOrders: (state) => state.pendingOrders,
-    arePendingOrdersFetched: (state) => state.pendingOrdersFetched
+    arePendingOrdersFetched: (state) => state.pendingOrdersFetched,
+    getDailyProductCost: (state) => state.dailyProductCost
   },
   actions: {
     async saveShoppingCart(productsQuantity: any) {
@@ -540,6 +542,107 @@ export const useOrdersStore = defineStore("orders", {
               },
               productInStore
             );
+          }
+        }
+
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    },
+    async fetchDailyProductCost(date: string) {
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
+
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return [];
+      }
+
+      if (!user || !user.value) {
+        return [];
+      }
+
+      // Validate date is correct
+      if (!date || $dayjs(date).format("YYYY-MM-DD") !== date) {
+        return [];
+      }
+
+      try {
+        const dailyProductCost = await getDocs(
+          query(
+            collection(db, "dailyProductCost"),
+            where("date", "==", Timestamp.fromDate($dayjs(date).toDate())),
+            where("businessId", "==", businessId.value)
+          )
+        );
+
+        this.$state.dailyProductCost = dailyProductCost.docs.map((doc) => {
+          const data = doc.data();
+          return { ...data, id: doc.id };
+        });
+      } catch (error) {
+        console.error(error);
+        return [];
+      }
+    },
+    async updateDailyProductCost(products: Array<any>, date: string) {
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
+
+      // Get current business id from localStorage
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        return null;
+      }
+
+      if (!user || !user.value) {
+        return false;
+      }
+
+      if (products.length === 0) {
+        return false;
+      }
+
+      // Validate date is correct
+      if (!date || $dayjs(date).format("YYYY-MM-DD") !== date) {
+        return false;
+      }
+
+      try {
+        for (const product of products) {
+          if (!product.cost) {
+            product.cost = 0;
+          }
+
+          // Get doc daily product cost
+          const productDocument = await getDocs(
+            query(
+              collection(db, "dailyProductCost"),
+              where("date", "==", Timestamp.fromDate($dayjs(date).toDate())),
+              where("productId", "==", product.productId),
+              where("businessId", "==", businessId.value)
+            )
+          );
+
+          const docExists = productDocument.docs.length > 0;
+          if (docExists) {
+            const docId = productDocument.docs[0].id;
+            await updateDoc(doc(db, "dailyProductCost", docId), {
+              cost: product.cost
+            });
+          } else {
+            await addDoc(collection(db, "dailyProductCost"), {
+              productId: product.productId,
+              cost: product.cost,
+              date: Timestamp.fromDate($dayjs(date).toDate()),
+              userUid: user.value.uid,
+              businessId: businessId.value
+            });
           }
         }
 

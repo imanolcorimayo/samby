@@ -168,7 +168,7 @@ input[type="date"]:disabled,
 select:disabled,
 button:disabled,
 textarea:disabled {
-  background-color: #f0f3f4;
+  background-color: #a8a8a8;
   color: #333;
   cursor: not-allowed;
 }
