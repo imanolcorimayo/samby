@@ -164,9 +164,6 @@
       >
       <div class="flex flex-col gap-3">
         <button @click="submitted = false" class="btn bg-primary text-white">Agregar Otro Producto</button>
-        <NuxtLink to="/ventas/nuevo" class="btn bg-primary text-white w-full text-center ring-1 ring-gray-300"
-          >Nueva venta</NuxtLink
-        >
         <NuxtLink to="/" class="btn bg-secondary w-full text-center ring-1 ring-gray-300">Menu</NuxtLink>
         <NuxtLink to="/inventario" class="btn bg-secondary w-full text-center ring-1 ring-gray-300"
           >Ver productos</NuxtLink

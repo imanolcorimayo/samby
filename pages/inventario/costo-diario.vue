@@ -23,9 +23,12 @@
       <div v-for="(product, index) in products" :key="product.id" class="border-b" style="padding-bottom: 0.5rem">
         <div class="flex justify-between items-center gap-8">
           <!-- Product Name -->
-          <span class="text-gray-800 font-medium flex-1">
-            {{ product.name }}
-          </span>
+          <div class="flex flex-col">
+            <span class="text-gray-800 font-medium flex-1">
+              {{ product.name }}
+            </span>
+            <span class="text-xs">Precio: {{ formatPrice(product.price) }}</span>
+          </div>
           <!-- Product Cost Input -->
           <div class="flex items-center gap-2 w-[15rem]">
             <label for="cost" class="text-sm text-gray-600">Costo:</label>
@@ -122,7 +125,8 @@ function updateProductList(orders, date, currentCost) {
     return {
       productId: product.productId,
       name: product.productName,
-      cost: product.currentCost ?? 0
+      cost: product.currentCost ?? 0,
+      price: product.price
     };
   });
 }

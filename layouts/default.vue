@@ -103,15 +103,6 @@
           <li>
             <NuxtLink
               v-if="indexStore.isOwner"
-              to="/ventas"
-              class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
-            >
-              <MaterialSymbolsPointOfSaleRounded class="text-gray-500" /> Ventas
-            </NuxtLink>
-          </li>
-          <li>
-            <NuxtLink
-              v-if="indexStore.isOwner"
               to="/clientes"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -156,15 +147,6 @@
                 class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
               >
                 <IcRoundPlus class="text-gray-500" /> Nuevo Pedido
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink
-                v-if="indexStore.isOwner"
-                to="/ventas/nuevo"
-                class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
-              >
-                <IcRoundPlus class="text-gray-500" /> Nueva Venta
               </NuxtLink>
             </li>
             <li>
@@ -223,7 +205,6 @@
 <script setup>
 import MageShopFill from "~icons/mage/shop-fill";
 import MaterialSymbolsOrdersRounded from "~icons/material-symbols/orders-rounded";
-import MaterialSymbolsPointOfSaleRounded from "~icons/material-symbols/point-of-sale-rounded";
 import MingcuteInventoryFill from "~icons/mingcute/inventory-fill";
 import BiPersonFill from "~icons/bi/person-fill";
 import UilChartLine from "~icons/uil/chart-line";

@@ -41,14 +41,6 @@
             v-if="orderDates[index] !== orderDates[index - 1]"
           >
             <span class="">Pedidos del: {{ $dayjs(orderDates[index]).format("DD/MM/YYYY") }}</span>
-            <NuxtLink
-              class="flex justify-center items-center gap-1 btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"
-              v-if="!isPendingShown && indexStore.isOwner"
-              :to="`/ventas/desde-pedido/${$dayjs(orderDates[index]).format('YYYY-MM-DD')}`"
-            >
-              <CarbonSalesOps />
-              Cargar ventas
-            </NuxtLink>
             <button
               v-if="isPendingShown"
               class="flex gap-1 items-center btn-sm bg-secondary ring-1 ring-primary text-sm hover:bg-primary hover:text-white"

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex flex-col gap-[2rem] flex-1 min-h-full justify-start" v-if="lastInsertedOrder.orderId">
+  <div class="w-full flex flex-col gap-[2rem] flex-1 min-h-full justify-start mb-8" v-if="lastInsertedOrder.orderId">
     <div class="flex flex-col items-center gap-[1rem]">
       <IconParkOutlineCheckOne class="text-[3rem] text-success" />
       <span class="text-[2rem] font-semibold text-center">¡Pedido Confirmado!</span>

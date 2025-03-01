@@ -582,7 +582,11 @@ export const useOrdersStore = defineStore("orders", {
 
         this.$state.dailyProductCost = dailyProductCost.docs.map((doc) => {
           const data = doc.data();
-          return { ...data, id: doc.id };
+          return {
+            ...data,
+            id: doc.id,
+            date: $dayjs(data.date.toDate()).format("YYYY-MM-DD")
+          };
         });
       } catch (error) {
         console.error(error);
@@ -620,21 +624,26 @@ export const useOrdersStore = defineStore("orders", {
           }
 
           // Get doc daily product cost
-          const productDocument = await getDocs(
-            query(
-              collection(db, "dailyProductCost"),
-              where("date", "==", Timestamp.fromDate($dayjs(date).toDate())),
-              where("productId", "==", product.productId),
-              where("businessId", "==", businessId.value)
-            )
-          );
+          let docExists = false;
+          let docId = null;
+          let currentCost = 0;
 
-          const docExists = productDocument.docs.length > 0;
+          // Use dailyProductCost to validate if doc exists
+          for (const dailyProductCost of this.$state.dailyProductCost) {
+            if (dailyProductCost.productId === product.productId) {
+              docExists = true;
+              docId = dailyProductCost.id;
+              currentCost = dailyProductCost.cost;
+              break;
+            }
+          }
+
           if (docExists) {
-            const docId = productDocument.docs[0].id;
-            await updateDoc(doc(db, "dailyProductCost", docId), {
-              cost: product.cost
-            });
+            if (currentCost !== product.cost) {
+              await updateDoc(doc(db, "dailyProductCost", docId), {
+                cost: product.cost
+              });
+            }
           } else {
             await addDoc(collection(db, "dailyProductCost"), {
               productId: product.productId,
