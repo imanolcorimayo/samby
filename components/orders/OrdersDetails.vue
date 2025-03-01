@@ -452,7 +452,7 @@ function updateOrderFinancial() {
 }
 
 const showModal = (orderId) => {
-  // Check sells are fetched
+  // Check pending orders are fetched
   if (!arePendingOrdersFetched.value) {
     useToast("error", "Parece que los pedidos no han sido cargados aún, por favor intenta nuevamente.");
     return;

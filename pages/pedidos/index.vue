@@ -6,14 +6,18 @@
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de pedidos</h1>
       </div>
-      <div class="flex gap-2 sticky top-0">
-        <input v-model="search" type="text" class="" placeholder="Buscar..." />
-        <NuxtLink
-          v-if="indexStore.isOwner"
-          to="/pedidos/nuevo"
-          class="btn bg-primary text-white flex items-center text-nowrap"
-          ><IcRoundPlus class="text-[1.143rem]" /> Nuevo
-        </NuxtLink>
+      <div v-if="missingProductsCount > 0" class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg">
+        <div class="text-yellow-800 flex flex-col gap-4 sm:flex-row items-center justify-between">
+          <span>
+            Tenes <strong>{{ missingProductsCount }}</strong> producto{{ missingProductsCount == 1 ? "" : "s" }} sin el
+            costo de compra.
+          </span>
+          <NuxtLink
+            to="/inventario/costo-diario"
+            class="btn bg-secondary ring-2 ring-yellow-400 w-full text-center sm:w-auto"
+            >Actualizar ahora</NuxtLink
+          >
+        </div>
       </div>
       <div class="flex gap-2 items-center">
         <div class="flex gap-1 bg-gray-200 rounded-[.714rem] p-1 w-fit">
@@ -33,8 +37,8 @@
           </button>
         </div>
       </div>
-      <div class="flex flex-col mb-3" v-if="filteredOrders.length">
-        <div class="flex flex-col gap-3" v-for="(order, index) in filteredOrders" :key="index">
+      <div class="flex flex-col mb-3" v-if="ordersToShow.length">
+        <div class="flex flex-col gap-3" v-for="(order, index) in ordersToShow" :key="index">
           <div
             class="flex justify-between text-md font-bold"
             :class="{ ['mt-4']: index > 0 }"
@@ -144,18 +148,25 @@ import { ToastEvents } from "~/interfaces";
 import IconParkOutlineTransactionOrder from "~icons/icon-park-outline/transaction-order";
 
 // ----- Define Useful Properties -------
+const { $dayjs } = useNuxtApp();
 
 // ----- Define Pinia Vars --------
 const indexStore = useIndexStore();
 const ordersStore = useOrdersStore();
-const { getPendingOrders: pendingOrders, getOrders: orders, arePendingOrdersFetched } = storeToRefs(ordersStore);
+const {
+  getPendingOrders: pendingOrders,
+  getOrders: orders,
+  arePendingOrdersFetched,
+  getDailyProductCost: dailyProductCost
+} = storeToRefs(ordersStore);
 
 // Function will manage if the data is already fetched
 ordersStore.fetchPendingOrders();
+ordersStore.fetchDailyProductCost($dayjs().format("YYYY-MM-DD"));
 
 // ----- Define Vars -------
 const submitting = ref(null);
-const filteredOrders = ref(pendingOrders.value);
+const ordersToShow = ref(pendingOrders.value);
 const orderStatus = ref("pending");
 const search = ref("");
 const isPendingShown = ref(true);
@@ -174,6 +185,10 @@ const orderDates = computed(() => {
   return orders.value.map((order) => order.shippingDate);
 });
 
+const missingProductsCount = computed(() => {
+  return dailyProductCost.value.filter((product) => !product.cost).length;
+});
+
 // ----- Define Methods -------
 const showDetails = (orderId) => {
   // Check orderDetails is defined
@@ -186,12 +201,12 @@ async function showOrders(status) {
   submitting.value = true;
   orderStatus.value = status;
   if (status === "pending") {
-    filteredOrders.value = pendingOrders.value;
+    ordersToShow.value = pendingOrders.value;
     isPendingShown.value = true;
   } else {
     // Fetch all orders
     await ordersStore.fetchOrders();
-    filteredOrders.value = orders.value;
+    ordersToShow.value = orders.value;
     isPendingShown.value = false;
   }
   submitting.value = false;
@@ -225,7 +240,6 @@ async function markAsDelivered(orderId) {
 }
 
 function stockList(date) {
-  // Check sellsDetails is defined
   if (!ordersStockDetails.value) return;
 
   ordersStockDetails.value.showStockList(pendingOrders.value, date);
@@ -241,12 +255,6 @@ async function loadMoreOrders() {
   // Fetch more orders
   await ordersStore.fetchOrders(true);
 
-  // Update filtered orders
-  filteredOrders.value = orders.value;
-
-  // Clear search in case it was used
-  search.value = "";
-
   // Stop the loader
   submitting.value = false;
 }
@@ -255,28 +263,7 @@ async function loadMoreOrders() {
 
 // ----- Define Watchers -------
 watch(pendingOrders, () => {
-  filteredOrders.value = pendingOrders.value;
-});
-
-watch(search, () => {
-  const ordersToUse = orderStatus.value === "pending" ? pendingOrders.value : orders.value;
-
-  if (search.value) {
-    filteredOrders.value = ordersToUse.filter((order) => {
-      // Check if the client name includes the search value
-      const includesClientName = order.client.clientName.toLowerCase().includes(search.value.toLowerCase());
-
-      // Check if the status includes the search value
-      const includesStatus = order.orderStatus.toLowerCase().includes(search.value.toLowerCase());
-
-      // Check if the address includes the search value
-      const includesAddress = order.client.address.toLowerCase().includes(search.value.toLowerCase());
-
-      return includesClientName || includesStatus || includesAddress;
-    });
-  } else {
-    filteredOrders.value = ordersToUse;
-  }
+  ordersToShow.value = pendingOrders.value;
 });
 
 useHead({

@@ -473,39 +473,7 @@ export const useOrdersStore = defineStore("orders", {
           userUid: user.value.uid
         });
 
-        // If pending order and status moved to "completed", then add the sales using the stock used and the cost of the product
-        // Do this before removing the order from the pending orders
-        if (orderIndex > -1 && status === "entregado") {
-          for (const product of order.products) {
-            const sellsStore = useSellsStore();
-            const productsStore = useProductsStore();
-            const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
-
-            if (!productInStore) {
-              continue;
-            }
-
-            const stockUsed = parseFloat(product.stockUsed ?? 0); // Stock used on this order
-            const productCost = parseFloat(product.currentCost ?? 0);
-
-            if (stockUsed === 0 || productCost === 0) {
-              continue;
-            }
-
-            // We only mark as sale the stock used. The rest will be managed manually by the user
-            const sale = {
-              quantity: stockUsed,
-              quality: "buena",
-              buyingPrice: productCost,
-              sellingPrice: product.price,
-              date: order.shippingDate
-            };
-
-            await sellsStore.addSell(sale, { id: product.productId, name: product.productName });
-          }
-        }
-
-        // If "pendiente-de-confirmacion" and status moved to "rechazado", or moverd to "cancelado"
+        // If "pendiente-de-confirmacion" and status moved to "rechazado", or moved to "cancelado"
         // then add the stock back to the products
         if (orderIndex > -1 && (status === "rechazado" || status === "cancelado")) {
           for (const product of order.products) {
@@ -645,12 +613,21 @@ export const useOrdersStore = defineStore("orders", {
               });
             }
           } else {
-            await addDoc(collection(db, "dailyProductCost"), {
+            const result = await addDoc(collection(db, "dailyProductCost"), {
               productId: product.productId,
               cost: product.cost,
               date: Timestamp.fromDate($dayjs(date).toDate()),
               userUid: user.value.uid,
               businessId: businessId.value
+            });
+
+            // Add recently created doc to the dailyProductCost array
+            // To avoid creating it again if the user tries to update it again
+            this.$state.dailyProductCost.push({
+              productId: product.productId,
+              cost: product.cost,
+              date: $dayjs(date).format("YYYY-MM-DD"),
+              id: result.id
             });
           }
         }
