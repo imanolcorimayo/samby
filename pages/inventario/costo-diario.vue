@@ -64,10 +64,15 @@ const { $dayjs } = useNuxtApp();
 
 // ----- Define Pinia Vars -----
 const ordersStore = useOrdersStore();
-const { getPendingOrders: pendingOrders, getDailyProductCost: dailyProductCost } = storeToRefs(ordersStore);
+const {
+  getPendingOrders: pendingOrders,
+  getOrders: completedOrders,
+  getDailyProductCost: dailyProductCost
+} = storeToRefs(ordersStore);
 
 // It handles if already fetched
 ordersStore.fetchPendingOrders();
+ordersStore.fetchOrders();
 ordersStore.fetchDailyProductCost($dayjs().format("YYYY-MM-DD"));
 
 // ----- Define Vars -----
@@ -115,10 +120,10 @@ function updateProductList(orders, date, currentCost) {
     return productList.find((product) => product.productId === id);
   });
 
-  // Update currentCost based on currentCost
+  // Update currentCost based on daily product cost saved
   uniqueProducts.forEach((product) => {
     const currentProduct = currentCost.find((cost) => cost.productId === product.productId);
-    product.currentCost = currentProduct?.cost;
+    product.currentCost = currentProduct ? currentProduct?.cost : product.currentCost;
   });
 
   products.value = uniqueProducts.map((product) => {
@@ -132,9 +137,12 @@ function updateProductList(orders, date, currentCost) {
 }
 
 // ----- Define Watchers -----
-watch([pendingOrders, dateToFilter, dailyProductCost], async ([orders, date, dailyCost]) => {
-  updateProductList(orders, date, dailyCost);
-});
+watch(
+  [pendingOrders, completedOrders, dateToFilter, dailyProductCost],
+  async ([pendingOrders, completedOrders, date, dailyCost]) => {
+    updateProductList([...pendingOrders, ...completedOrders], date, dailyCost);
+  }
+);
 watch(dateToFilter, async (date) => {
   await ordersStore.fetchDailyProductCost(date);
 });

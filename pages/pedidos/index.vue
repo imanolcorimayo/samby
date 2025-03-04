@@ -5,18 +5,33 @@
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
         <h1 class="text-start font-semibold">Lista de pedidos</h1>
+        <NuxtLink to="/pedidos/nuevo" class="btn bg-primary text-white flex items-center"
+          ><IcRoundPlus class="text-[1.143rem]" /> Nuevo Pedido
+        </NuxtLink>
       </div>
       <div v-if="missingProductsCount > 0" class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg">
         <div class="text-yellow-800 flex flex-col gap-4 sm:flex-row items-center justify-between">
           <span>
-            Tenes <strong>{{ missingProductsCount }}</strong> producto{{ missingProductsCount == 1 ? "" : "s" }} sin el
-            costo de compra.
+            Tenés <strong>{{ missingProductsCount }}</strong> producto{{ missingProductsCount === 1 ? "" : "s" }} sin el
+            costo de compra de hoy. ¿Querés completarlos ahora?
           </span>
           <NuxtLink
             to="/inventario/costo-diario"
             class="btn bg-secondary ring-2 ring-yellow-400 w-full text-center sm:w-auto"
-            >Actualizar ahora</NuxtLink
           >
+            Completar
+          </NuxtLink>
+        </div>
+      </div>
+      <div v-else-if="dailyProductCost.length == 0" class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg">
+        <div class="text-yellow-800 flex flex-col gap-4 sm:flex-row items-center justify-between">
+          <span>Parece que no cargaste los costos de los productos de hoy </span>
+          <NuxtLink
+            to="/inventario/costo-diario"
+            class="btn bg-secondary ring-2 ring-yellow-400 w-full text-center sm:w-auto"
+          >
+            Completar
+          </NuxtLink>
         </div>
       </div>
       <div class="flex gap-2 items-center">

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-[2rem] w-full">
+  <div class="flex flex-col gap-[2rem] w-full mb-8">
     <ProductsDetails ref="productsDetails" />
     <ProductsEditStock ref="editStock" />
     <div class="flex flex-col gap-[1rem]">

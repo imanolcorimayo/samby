@@ -17,7 +17,6 @@ import {
   onSnapshot
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
-import { quadratAnalysis } from "@turf/turf";
 
 export const useOrdersStore = defineStore("orders", {
   state: (): any => {
