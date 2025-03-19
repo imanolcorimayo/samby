@@ -1,8 +1,8 @@
-export const formatPrice = (price: number) => {
+export const formatPrice = (price: number, minimumFractionDigits = 2) => {
   return new Intl.NumberFormat("es-AR", {
     style: "currency",
     currency: "ARS",
-    minimumFractionDigits: 2
+    minimumFractionDigits
   }).format(price);
 };
 

@@ -9,6 +9,51 @@
           ><IcRoundPlus class="text-[1.143rem]" /> Nuevo Pedido
         </NuxtLink>
       </div>
+
+      <!-- KPI Cards for Pending Orders -->
+      <div v-if="pendingOrders.length > 0" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
+        <!-- Total Stock Used Card -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-500 text-sm">Stock a usar</h3>
+            <LucideShoppingCart class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ formatPrice(pendingOrdersStats.totalStockCost, 0) }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>{{ pendingOrdersStats.totalProducts }} productos totales</span>
+          </div>
+        </div>
+
+        <!-- Total Income Card -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-500 text-sm">Ingresos esperados</h3>
+            <FlowbiteDollarOutline class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ formatPrice(pendingOrdersStats.totalIncome, 0) }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>Ganancia: {{ formatPrice(pendingOrdersStats.totalEarnings, 0) }}</span>
+          </div>
+        </div>
+
+        <!-- New Clients Card -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-500 text-sm">Clientes nuevos</h3>
+            <LucideUsers class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ pendingOrdersStats.newClientsCount }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>De {{ pendingOrdersStats.uniqueClientsCount }} clientes totales</span>
+          </div>
+        </div>
+      </div>
       <div v-if="missingProductsCount > 0" class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg">
         <div class="text-yellow-800 flex flex-col gap-4 sm:flex-row items-center justify-between">
           <span>
@@ -162,12 +207,17 @@ import EpArrowRightBold from "~icons/ep/arrow-right-bold";
 import { ToastEvents } from "~/interfaces";
 import IconParkOutlineTransactionOrder from "~icons/icon-park-outline/transaction-order";
 
+import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
+import LucideShoppingCart from "~icons/lucide/shopping-cart";
+import LucideUsers from "~icons/lucide/users";
+
 // ----- Define Useful Properties -------
 const { $dayjs } = useNuxtApp();
 
 // ----- Define Pinia Vars --------
 const indexStore = useIndexStore();
 const ordersStore = useOrdersStore();
+const clientsStore = useClientsStore();
 const {
   getPendingOrders: pendingOrders,
   getOrders: orders,
@@ -178,6 +228,7 @@ const {
 // Function will manage if the data is already fetched
 ordersStore.fetchPendingOrders();
 ordersStore.fetchDailyProductCost($dayjs().format("YYYY-MM-DD"));
+clientsStore.fetchData(); // Load clients data
 
 // ----- Define Vars -------
 const submitting = ref(null);
@@ -202,6 +253,69 @@ const orderDates = computed(() => {
 
 const missingProductsCount = computed(() => {
   return dailyProductCost.value.filter((product) => !product.cost).length;
+});
+
+// KPI Calculations for pending orders
+const pendingOrdersStats = computed(() => {
+  const stats = {
+    totalStockCost: 0,
+    totalIncome: 0,
+    totalEarnings: 0,
+    totalProducts: 0,
+    newClientsCount: 0,
+    uniqueClients: new Set(),
+    uniqueClientsCount: 0
+  };
+
+  // Process each pending order
+  pendingOrders.value.forEach((order) => {
+    // Add to total income
+    stats.totalIncome += order.totalAmount || 0;
+
+    // Track unique clients
+    if (order.clientId) {
+      stats.uniqueClients.add(order.clientId);
+    }
+
+    // Process products in the order
+    if (order.products && Array.isArray(order.products)) {
+      order.products.forEach((product) => {
+        // Stock cost calculation
+        const cost = product.currentCost || 0;
+        const quantity = product.quantity || 1;
+        stats.totalStockCost += cost * quantity;
+        stats.totalProducts += quantity;
+      });
+    }
+  });
+
+  // Calculate earnings (income minus costs)
+  stats.totalEarnings = stats.totalIncome - stats.totalStockCost;
+
+  // Count unique clients
+  stats.uniqueClientsCount = stats.uniqueClients.size;
+
+  // Check which clients are new by comparing with the clients store
+  if (clientsStore.areClientsFetched) {
+    const clients = clientsStore.getClients;
+
+    // Get creation date for each client
+    stats.uniqueClients.forEach((clientId) => {
+      const client = clients.find((c) => c.id === clientId);
+      if (client && client.createdAt) {
+        // Consider new if created in the last 30 days
+        const creationDate = new Date(client.createdAt.seconds * 1000);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        if (creationDate >= thirtyDaysAgo) {
+          stats.newClientsCount++;
+        }
+      }
+    });
+  }
+
+  return stats;
 });
 
 // ----- Define Methods -------

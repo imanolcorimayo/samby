@@ -557,4 +557,14 @@ watch(width, () => {
 onMounted(async () => {
   await dashboardStore.fetchWeeklyRecap(startDate.value, endDate.value);
 });
+
+useHead({
+  title: "Resumen Semanal",
+  meta: [
+    {
+      name: "description",
+      content: "Resumen semanal de ingresos, ganancias y costos de productos."
+    }
+  ]
+});
 </script>
