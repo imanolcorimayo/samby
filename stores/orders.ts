@@ -18,6 +18,22 @@ import {
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
+// Helper function to validate prerequisites
+function validatePrerequisites() {
+  const user = useCurrentUser();
+  const businessId = useLocalStorage("cBId", null);
+
+  if (!businessId.value) {
+    return { valid: false, reason: "Missing business ID" };
+  }
+
+  if (!user || !user.value) {
+    return { valid: false, reason: "User not authenticated" };
+  }
+
+  return { valid: true, user, businessId };
+}
+
 export const useOrdersStore = defineStore("orders", {
   state: (): any => {
     return {
@@ -32,7 +48,11 @@ export const useOrdersStore = defineStore("orders", {
       pendingOrdersFetched: false,
       ordersFetched: false,
       lastVisible: false,
-      dailyProductCost: []
+      dailyProductCost: [],
+
+      // New map implementations
+      dailyProductCostByDate: new Map(), // New Map structure for caching
+      ordersByDate: new Map()
     };
   },
   getters: {
@@ -518,36 +538,42 @@ export const useOrdersStore = defineStore("orders", {
         return false;
       }
     },
+
+    // New structures
     async fetchDailyProductCost(date: string) {
-      const db = useFirestore();
-      const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
 
-      // Get current business id from localStorage
-      const businessId = useLocalStorage("cBId", null);
-      if (!businessId.value) {
-        return [];
-      }
-
-      if (!user || !user.value) {
-        return [];
-      }
-
-      // Validate date is correct
+      // Validate date format
       if (!date || $dayjs(date).format("YYYY-MM-DD") !== date) {
+        useToast(ToastEvents.error, "Formato de fecha inválido");
         return [];
       }
+
+      // Check if we already have this date in cache
+      if (this.$state.dailyProductCostByDate.has(date)) {
+        return this.$state.dailyProductCostByDate.get(date);
+      }
+
+      // Validate prerequisites
+      const prereq = validatePrerequisites();
+      if (!prereq.valid) {
+        return [];
+      }
+
+      const db = useFirestore();
+      const { user, businessId } = prereq;
 
       try {
-        const dailyProductCost = await getDocs(
+        const dailyProductCostQuery = await getDocs(
           query(
             collection(db, "dailyProductCost"),
             where("date", "==", Timestamp.fromDate($dayjs(date).toDate())),
+            // @ts-ignore
             where("businessId", "==", businessId.value)
           )
         );
 
-        this.$state.dailyProductCost = dailyProductCost.docs.map((doc) => {
+        const costs = dailyProductCostQuery.docs.map((doc) => {
           const data = doc.data();
           return {
             ...data,
@@ -555,23 +581,23 @@ export const useOrdersStore = defineStore("orders", {
             date: $dayjs(data.date.toDate()).format("YYYY-MM-DD")
           };
         });
+
+        // Cache the results in both the old array and new Map
+        this.$state.dailyProductCost = costs;
+        this.$state.dailyProductCostByDate.set(date, costs);
+
+        return costs;
       } catch (error) {
         console.error(error);
         return [];
       }
     },
     async updateDailyProductCost(products: Array<any>, date: string) {
-      const db = useFirestore();
-      const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
 
-      // Get current business id from localStorage
-      const businessId = useLocalStorage("cBId", null);
-      if (!businessId.value) {
-        return null;
-      }
-
-      if (!user || !user.value) {
+      // Validate date format
+      if (!date || $dayjs(date).format("YYYY-MM-DD") !== date) {
+        useToast(ToastEvents.error, "Formato de fecha inválido");
         return false;
       }
 
@@ -579,62 +605,134 @@ export const useOrdersStore = defineStore("orders", {
         return false;
       }
 
-      // Validate date is correct
-      if (!date || $dayjs(date).format("YYYY-MM-DD") !== date) {
+      // Validate prerequisites
+      const prereq = validatePrerequisites();
+      if (!prereq.valid) {
         return false;
       }
 
+      const db = useFirestore();
+      const { user, businessId } = prereq;
+
       try {
+        // Ensure we have the latest data first
+        const currentCosts = await this.fetchDailyProductCost(date);
+        const costsMap = new Map(currentCosts.map((item: any) => [item.productId, item]));
+
+        const updatedCosts = [...currentCosts]; // Start with current data
+
         for (const product of products) {
           if (!product.cost) {
             product.cost = 0;
           }
 
-          // Get doc daily product cost
-          let docExists = false;
-          let docId = null;
-          let currentCost = 0;
+          const existingCost: any = costsMap.get(product.productId);
 
-          // Use dailyProductCost to validate if doc exists
-          for (const dailyProductCost of this.$state.dailyProductCost) {
-            if (dailyProductCost.productId === product.productId) {
-              docExists = true;
-              docId = dailyProductCost.id;
-              currentCost = dailyProductCost.cost;
-              break;
-            }
-          }
-
-          if (docExists) {
-            if (currentCost !== product.cost) {
-              await updateDoc(doc(db, "dailyProductCost", docId), {
+          if (existingCost) {
+            if (existingCost.cost !== product.cost) {
+              await updateDoc(doc(db, "dailyProductCost", existingCost.id), {
                 cost: product.cost
               });
+            }
+
+            // Update the cost in our cached data
+            const index = updatedCosts.findIndex((c: any) => c.id === existingCost.id);
+            if (index !== -1) {
+              updatedCosts[index] = {
+                ...updatedCosts[index],
+                cost: product.cost
+              };
             }
           } else {
             const result = await addDoc(collection(db, "dailyProductCost"), {
               productId: product.productId,
               cost: product.cost,
               date: Timestamp.fromDate($dayjs(date).toDate()),
+              // @ts-ignore
               userUid: user.value.uid,
+              // @ts-ignore
               businessId: businessId.value
             });
 
-            // Add recently created doc to the dailyProductCost array
-            // To avoid creating it again if the user tries to update it again
-            this.$state.dailyProductCost.push({
+            // Add to our cached data
+            updatedCosts.push({
               productId: product.productId,
               cost: product.cost,
-              date: $dayjs(date).format("YYYY-MM-DD"),
-              id: result.id
+              date: date,
+              id: result.id,
+              // @ts-ignore
+              userUid: user.value.uid,
+              // @ts-ignore
+              businessId: businessId.value
             });
           }
         }
+
+        // Update both cache locations
+        this.$state.dailyProductCost = updatedCosts;
+        this.$state.dailyProductCostByDate.set(date, updatedCosts);
 
         return true;
       } catch (error) {
         console.error(error);
         return false;
+      }
+    },
+    async fetchOrdersByDate(date: string) {
+      const { $dayjs } = useNuxtApp();
+
+      // Validate date format
+      if (!date || $dayjs(date).format("YYYY-MM-DD") !== date) {
+        useToast(ToastEvents.error, "Formato de fecha inválido");
+        return [];
+      }
+
+      // Check if we already have this date in cache
+      if (this.$state.ordersByDate.has(date)) {
+        return this.$state.ordersByDate.get(date);
+      }
+
+      // Validate prerequisites
+      const prereq = validatePrerequisites();
+      if (!prereq.valid) {
+        return [];
+      }
+
+      const db = useFirestore();
+      const { user, businessId } = prereq;
+
+      try {
+        // Create start and end timestamps for the day
+        const startDate = $dayjs(date).startOf("day").toDate();
+        const endDate = $dayjs(date).endOf("day").toDate();
+
+        const q = query(
+          collection(db, "pedido"),
+          // @ts-ignore
+          where("businessId", "==", businessId.value),
+          where("shippingDate", ">=", Timestamp.fromDate(startDate)),
+          where("shippingDate", "<=", Timestamp.fromDate(endDate)),
+          where("orderStatus", "not-in", [ORDER_STATUS_VALUES.cancelado, ORDER_STATUS_VALUES.rechazado])
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        const orders = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            ...data,
+            id: doc.id,
+            shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD")
+          };
+        });
+
+        // Cache the results
+        this.$state.ordersByDate.set(date, orders);
+
+        return orders;
+      } catch (error) {
+        console.error("Error fetching orders by date:", error);
+        return [];
       }
     }
   }

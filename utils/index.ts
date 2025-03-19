@@ -236,3 +236,11 @@ export const BUSINESS_SHIPPING_TYPES_UTILS = {
 // For orders
 export const ORDER_SHIPPING_TYPES = ["Envío", "Retiro en Local"];
 export const ORDER_SHIPPING_TYPES_UTILS = { delivery: "Envío", pickup: "Retiro en Local" };
+export const ORDER_STATUS_OPTIONS = ["pendiente", "pendiente-modificado", "entregado", "cancelado", "rechazado"];
+export const ORDER_STATUS_VALUES = {
+  pendiente: "pendiente",
+  pendienteModificado: "pendiente-modificado",
+  entregado: "entregado",
+  cancelado: "cancelado",
+  rechazado: "rechazado"
+};

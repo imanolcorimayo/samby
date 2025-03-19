@@ -1,491 +1,560 @@
 <template>
-  <div class="flex flex-col gap-[2rem] w-full mb-4">
-    <div class="flex flex-col gap-4">
-      <div class="flex justify-between items-center">
-        <h1 class="font-semibold text-start">Resumen Financiero</h1>
-        <div class="flex flex-col sm:flex-row gap-2">
-          <button
-            v-if="!showFilters"
-            @click="showFilters = true"
-            class="btn-sm text-sm bg-secondary shadow flex justify-center items-center gap-2 text-nowrap"
-          >
-            <PepiconsPopEye /> Ver filtros
-          </button>
-          <button
-            v-if="showFilters"
-            @click="showFilters = false"
-            class="btn-sm text-sm bg-secondary shadow flex justify-center items-center gap-2 h-fit"
-          >
-            <PhEyeClosedBold /> Esconder
-          </button>
-        </div>
-      </div>
-      <Transition>
-        <div class="flex gap-2" v-if="showFilters">
-          <FormKit
-            type="date"
-            name="start_date"
-            label-class="font-medium"
-            messages-class="text-red-500 text-[0.75rem]"
-            input-class="w-full"
-            label="Desde"
-            placeholder="yyyy-mm-dd"
-            validation="required"
-            v-model="minDate"
-          />
+  <div class="flex flex-col gap-8 w-full mb-8">
+    <!-- Date Selection Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <h1 class="text-xl font-bold">Resumen Semanal</h1>
 
-          <FormKit
-            type="date"
-            name="end_date"
-            label-class="font-medium"
-            messages-class="text-red-500 text-[0.75rem]"
-            input-class="w-full"
-            label="Hasta"
-            placeholder="yyyy-mm-dd"
-            validation="required"
-            v-model="maxDate"
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex gap-2">
+          <DatePicker
+            v-model="startDate"
+            :modelValue="startDate"
+            :max-date="endDate"
+            placeholder="Fecha inicial"
+            class="min-w-40"
+          />
+          <DatePicker
+            v-model="endDate"
+            :modelValue="endDate"
+            :min-date="startDate"
+            placeholder="Fecha final"
+            class="min-w-40"
           />
         </div>
-      </Transition>
-      <div class="flex flex-between gap-[2rem]">
-        <div class="flex-1 ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
-          <div class="flex flex-col justify-between h-full gap-3">
-            <div class="flex justify-between">
-              <div class="flex flex-col gap-1 justify-start items-start md:flex-row md:items-center">
-                <span class="font-medium">Ganancia total</span>
-                <span class="font-medium text-gray-500 text-sm">(este mes)</span>
-              </div>
-              <FlowbiteDollarOutline class="text-gray-500 text-xl" />
-            </div>
-            <div class="flex flex-col">
-              <div class="flex gap-1 items-center">
-                <span class="font-semibold text-[1.143rem]">{{ formatPrice(totalEarningsThisMonth) }}</span>
 
-                <span class="text-sm text-success font-semibold"
-                  >({{ calculateRatio(totalSellingThisMonth, totalEarningsThisMonth).toFixed(1) }}%)</span
-                >
-              </div>
-
-              <span class="text-sm font-medium text-gray-400">Facturado: {{ formatPrice(totalSellingThisMonth) }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="flex-1 ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
-          <div class="flex flex-col justify-between h-full gap-3">
-            <div class="flex justify-between">
-              <div class="flex flex-col gap-1 justify-start items-start md:flex-row md:items-center">
-                <span class="font-medium">Futuro Indicador</span>
-                <span class="font-medium text-sm text-danger">(No disponible)</span>
-              </div>
-              <PhTrendUpBold class="text-gray-500 text-xl" />
-            </div>
-            <div class="flex flex-col">
-              <span class="font-semibold text-[1.143rem]">{{ bestProduct?.name }}</span>
-              <span class="text-sm font-medium text-gray-400">---</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
-        <div class="flex flex-col">
-          <span class="font-semibold text-[1.143rem]">Días de venta</span>
-          <span class="text-gray-500">Comparación de días de venta</span>
-        </div>
-        <div class="w-full overflow-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="text-left border-b text-gray-400 font-normal">
-                <th class="text-sm text-left">Fecha</th>
-                <th class="text-sm text-center">Tot. Facturado</th>
-                <th class="text-sm text-center">G. Total (%)</th>
-                <th class="text-sm text-center">Mej. Prod.</th>
-                <th class="text-sm text-center">G. Mej. Prod. (%)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b" v-for="(d, index) in dailySells" :key="`sell-${index}`">
-                <td class="py-1 font-medium">{{ d.formattedDate }}</td>
-                <td class="py-1 text-center">{{ formatPrice(d.totalSelling) }}</td>
-                <td class="py-1 text-center">
-                  <div class="flex flex-col">
-                    <span>{{ formatPrice(d.totalEarnings) }}</span>
-                    <span class="text-sm text-success">({{ d.percentageEarnings.toFixed(1) }}%)</span>
-                  </div>
-                </td>
-                <td class="py-1 text-center">{{ d.bestProduct.name }}</td>
-                <td class="py-1 text-center">
-                  <div class="flex flex-col">
-                    <span>{{ formatPrice(d.bestProduct.earnings) }}</span>
-                    <span class="text-sm text-success"
-                      >({{ calculateRatio(d.totalEarnings, d.bestProduct.earnings).toFixed(1) }}%)</span
-                    >
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="flex flex-col gap-[2rem]">
-        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow">
-          <div class="flex flex-col">
-            <span class="font-semibold text-[1.143rem]">% de Ganancia</span>
-            <span class="text-gray-500">Porcentaje de ganancia basado en la comparación entre costos y ventas</span>
-          </div>
-          <div>
-            <canvas id="earningsP" width="400" :height="width >= 768 ? '200' : '400'"></canvas>
-          </div>
-        </div>
-        <div class="ring-1 ring-gray-400 rounded flex flex-col justify-between p-[0.714rem] bg-secondary shadow gap-3">
-          <div class="flex justify-between">
-            <div class="flex flex-col">
-              <span class="font-semibold text-[1.143rem]"
-                >Ranking de productos ({{ productsRanking.formattedDate }})</span
-              >
-              <span class="text-gray-500">Comparacion de todos los productos durante los 2 meses</span>
-            </div>
-            <select
-              @change="getRankingDate"
-              v-model="rankingDateAux"
-              name="rankingDate"
-              id="rankingDate"
-              class="w-fit h-fit"
-            >
-              <option v-for="date in datesForRanking" :value="date">{{ date }}</option>
-            </select>
-          </div>
-          <table class="w-full">
-            <thead>
-              <tr class="text-left border-b text-gray-400 font-normal">
-                <th class="text-sm text-center"></th>
-                <th class="text-sm text-left">Nombre</th>
-                <th class="text-sm text-center"># Ventas</th>
-                <th class="text-sm text-center">G. Total</th>
-                <th class="text-sm text-center">% Gan</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b" v-for="(p, index) in productsRanking.products" :key="index">
-                <td class="py-2 font-medium">{{ index + 1 }}</td>
-                <td class="py-2 font-medium">{{ p.name }}</td>
-                <td class="py-2 text-center">{{ p.totalQuantity }}</td>
-                <td class="py-2 text-center font-semibold text-sm">{{ formatPrice(p.totalEarnings) }}</td>
-                <td class="py-2 text-center">{{ p.earningPercentage.toFixed(1) }}%</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="flex gap-2">
+          <button
+            @click="setCurrentWeek"
+            class="px-3 py-1 text-sm bg-secondary hover:bg-secondary-hover text-gray-700 rounded flex items-center gap-1 transition-colors"
+          >
+            <span>Esta semana</span>
+          </button>
+          <button
+            @click="setPreviousWeek"
+            class="px-3 py-1 text-sm bg-secondary hover:bg-secondary-hover text-gray-700 rounded flex items-center gap-1 transition-colors"
+          >
+            <span>Semana anterior</span>
+          </button>
         </div>
       </div>
     </div>
+
+    <!-- Loading State -->
+    <div v-if="isLoading" class="flex justify-center items-center h-64">
+      <div class="flex flex-col items-center gap-4">
+        <div class="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full"></div>
+        <span class="text-gray-500">Cargando datos...</span>
+      </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div v-else-if="dashboardStore.isWeeklyDataFetched" class="flex flex-col gap-8">
+      <!-- Overview Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Total Income Card -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-500 text-sm">Ingresos Totales</h3>
+            <FlowbiteDollarOutline class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ formatPrice(weeklyData.totalIncome) }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>{{ weeklyData.totalOrders }} órdenes • Promedio {{ formatPrice(weeklyData.averageOrderValue) }}</span>
+          </div>
+        </div>
+
+        <!-- Total Earnings Card -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-500 text-sm">Ganancias Totales</h3>
+            <LucideWallet class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ formatPrice(weeklyData.totalEarnings) }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span class="text-sm" :class="earningsPercentClass">
+              {{ calculateEarningsPercentage(weeklyData.totalEarnings, weeklyData.totalIncome) }}% de margen
+            </span>
+          </div>
+        </div>
+
+        <!-- Total Product Costs Card -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-500 text-sm">Costo de Productos</h3>
+            <LucideShoppingCart class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ formatPrice(weeklyData.totalProductCosts) }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span
+              >{{ calculateCostPercentage(weeklyData.totalProductCosts, weeklyData.totalIncome) }}% del ingreso
+              total</span
+            >
+          </div>
+        </div>
+
+        <!-- New Clients Card -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-500 text-sm">Nuevos Clientes</h3>
+            <LucideUsers class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ weeklyData.totalNewClients }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>Período: {{ formatDateRange(weeklyData.startDate, weeklyData.endDate) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Stats Table -->
+      <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+        <h3 class="font-semibold mb-4">Estadísticas Diarias</h3>
+        <div class="overflow-x-auto">
+          <table class="min-w-full border-collapse">
+            <thead>
+              <tr class="border-b border-gray-300">
+                <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">Fecha</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Ingresos</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Ganancias</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">% Ganancia</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Costos</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Órdenes</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Clientes</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Nuevos Clientes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="day in weeklyData.dailyStats"
+                :key="day.date"
+                class="border-b border-gray-200 hover:bg-gray-50"
+              >
+                <td class="py-2 px-3 whitespace-nowrap">
+                  <div class="flex flex-col">
+                    <span class="font-medium">{{ formatDayName(day.dayName) }}</span>
+                    <span class="text-xs text-gray-500">{{ formatDate(day.date) }}</span>
+                  </div>
+                </td>
+                <td class="py-2 px-3 text-right">{{ formatPrice(day.totalIncome) }}</td>
+                <td class="py-2 px-3 text-right">{{ formatPrice(day.totalEarnings) }}</td>
+                <td class="py-2 px-3 text-right">
+                  <span :class="getPercentageClass(day.earningsPercentage)">
+                    {{ day.earningsPercentage.toFixed(1) }}%
+                  </span>
+                </td>
+                <td class="py-2 px-3 text-right">{{ formatPrice(day.productCosts) }}</td>
+                <td class="py-2 px-3 text-right">{{ day.totalOrders }}</td>
+                <td class="py-2 px-3 text-right">{{ day.totalClients }}</td>
+                <td class="py-2 px-3 text-right">{{ day.totalNewClients }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="bg-gray-100">
+                <td class="py-2 px-3 font-medium">Totales</td>
+                <td class="py-2 px-3 text-right font-medium">{{ formatPrice(weeklyData.totalIncome) }}</td>
+                <td class="py-2 px-3 text-right font-medium">{{ formatPrice(weeklyData.totalEarnings) }}</td>
+                <td class="py-2 px-3 text-right font-medium">
+                  <span :class="earningsPercentClass">
+                    {{ calculateEarningsPercentage(weeklyData.totalEarnings, weeklyData.totalIncome) }}%
+                  </span>
+                </td>
+                <td class="py-2 px-3 text-right font-medium">{{ formatPrice(weeklyData.totalProductCosts) }}</td>
+                <td class="py-2 px-3 text-right font-medium">{{ weeklyData.totalOrders }}</td>
+                <td class="py-2 px-3 text-right font-medium">{{ calculateTotalClients() }}</td>
+                <td class="py-2 px-3 text-right font-medium">{{ weeklyData.totalNewClients }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Daily Performance Chart -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <h3 class="font-semibold mb-4">Rendimiento Diario</h3>
+          <div>
+            <canvas ref="dailyPerformanceChart" height="250"></canvas>
+          </div>
+        </div>
+
+        <!-- Product Cost Variation -->
+        <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+          <h3 class="font-semibold mb-4">Variación de Costos de Productos</h3>
+          <div v-if="weeklyData.productCostVariation.length > 0" class="overflow-y-auto max-h-64">
+            <table class="min-w-full border-collapse">
+              <thead>
+                <tr class="border-b border-gray-300">
+                  <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">Producto</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Costo inicial</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Costo final</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Variación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="product in weeklyData.productCostVariation"
+                  :key="product.productId"
+                  class="border-b border-gray-200 hover:bg-gray-50"
+                >
+                  <td class="py-2 px-3">{{ product.productName }}</td>
+                  <td class="py-2 px-3 text-right">{{ formatPrice(product.firstCost) }}</td>
+                  <td class="py-2 px-3 text-right">{{ formatPrice(product.lastCost) }}</td>
+                  <td class="py-2 px-3 text-right">
+                    <span :class="getVariationClass(product.percentageChange)">
+                      {{ formatVariation(product.percentageChange) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else class="flex justify-center items-center h-40 text-gray-500">
+            No hay datos de variación para este período
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Product Cost Trend -->
+      <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+        <h3 class="font-semibold mb-4">Tendencia de Costos Semanales</h3>
+        <div v-if="hasProductVariations">
+          <canvas ref="productCostTrendChart" height="250"></canvas>
+        </div>
+        <div v-else class="flex justify-center items-center h-40 text-gray-500">
+          No hay suficientes datos de variación para mostrar tendencias
+        </div>
+      </div>
+    </div>
+
+    <!-- No Data State -->
+    <div v-else class="flex justify-center items-center h-64 flex-col gap-4">
+      <LucideBarChart2 class="w-16 h-16 text-gray-300" />
+      <div class="text-center">
+        <h3 class="font-medium text-lg">No hay datos disponibles</h3>
+        <p class="text-gray-500">Selecciona un rango de fechas para ver el resumen semanal</p>
+      </div>
+      <button
+        @click="setCurrentWeek"
+        class="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
+      >
+        Ver esta semana
+      </button>
+    </div>
   </div>
-  <Loader v-if="!areStatsFetched" />
 </template>
 
 <script setup>
-import { Chart } from "chart.js/auto";
-import ChartDataLabels from "chartjs-plugin-datalabels";
-import isBetween from "dayjs/plugin/isBetween"; // ES 2015
+import { ref, computed, onMounted, watch } from "vue";
+import { Chart, registerables } from "chart.js";
+import isBetween from "dayjs/plugin/isBetween";
 import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
-import PhTrendUpBold from "~icons/ph/trend-up-bold";
-import PhEyeClosedBold from "~icons/ph/eye-closed-bold";
-import PepiconsPopEye from "~icons/pepicons-pop/eye";
-import MdiUpdate from "~icons/mdi/update";
+import LucideWallet from "~icons/lucide/wallet";
+import LucideShoppingCart from "~icons/lucide/shopping-cart";
+import LucideUsers from "~icons/lucide/users";
+import LucideBarChart2 from "~icons/lucide/bar-chart-2";
 
-// ----- Define Useful Properties --------
+Chart.register(...registerables);
+
+// Initialize dayjs plugins
 const { $dayjs } = useNuxtApp();
 $dayjs.extend(isBetween);
 
-// Use windows size
+// Use window size
 const { width } = useWindowSize();
 
-// ----- Define Pinia Vars --------
+// Dashboard store
 const dashboardStore = useDashboardStore();
-const { getDailySells: dailySells, getProductsRanking: productsRanking, areStatsFetched } = storeToRefs(dashboardStore);
+const weeklyData = computed(() => dashboardStore.getWeeklyData);
+const isLoading = computed(() => dashboardStore.getLoadingState);
 
-// Function will manage if the data is already fetched
-dashboardStore.fetchData();
+// Date selectors
+const startDate = ref($dayjs().startOf("week").format("YYYY-MM-DD"));
+const endDate = ref($dayjs().endOf("week").format("YYYY-MM-DD"));
 
-// ----- Define Vars --------
-const minDate = ref($dayjs().subtract(1, "month").startOf("week").format("YYYY-MM-DD"));
-const maxDate = ref($dayjs().endOf("week").format("YYYY-MM-DD"));
-const showFilters = ref(false);
-const profitChart = ref({});
-const bestProduct = ref({});
-const rankingDateAux = ref("");
+// Chart references
+const dailyPerformanceChart = ref(null);
+const productCostTrendChart = ref(null);
+const dailyChartInstance = ref(null);
+const trendChartInstance = ref(null);
 
-// Define Computed
-const totalEarningsThisMonth = computed(() => {
-  // Create new variable to store daily sells of this month
-  const daySellsThisMonth = dailySells.value.filter((sell) => {
-    const daySell = $dayjs(sell.date, { format: "YYYY-MM-DD" });
-    const localStartDate = $dayjs().startOf("month");
-    const localEndDate = $dayjs().endOf("month");
-
-    return daySell && daySell.isBetween(localStartDate, localEndDate, null, "[]");
-  });
-
-  // Return total earnings of this month
-  return daySellsThisMonth.reduce((acc, daySell) => acc + daySell.totalEarnings, 0);
+// Computed values
+const earningsPercentClass = computed(() => {
+  const percent = calculateEarningsPercentage(weeklyData.value.totalEarnings, weeklyData.value.totalIncome);
+  if (percent < 20) return "text-red-600";
+  if (percent < 30) return "text-yellow-600";
+  return "text-green-600";
 });
 
-const totalSellingThisMonth = computed(() => {
-  // Create new variable to store daily sells of this month
-  const daySellsThisMonth = dailySells.value.filter((sell) => {
-    const daySell = $dayjs(sell.date, { format: "YYYY-MM-DD" });
-    const localStartDate = $dayjs().startOf("month");
-    const localEndDate = $dayjs().endOf("month");
-
-    return daySell && daySell.isBetween(localStartDate, localEndDate, null, "[]");
-  });
-
-  // Return total earnings of this month
-  return daySellsThisMonth.reduce((acc, daySell) => acc + daySell.totalSelling, 0);
-});
-const datesForRanking = computed(() => {
-  return dailySells.value.map((sellDay) => sellDay.formattedDate);
+const hasProductVariations = computed(() => {
+  return weeklyData.value.productCostVariation && weeklyData.value.productCostVariation.length > 1;
 });
 
-// ----- Define Methods ------------
-function createEarningsP() {
-  const totalCosts = [];
-  const totalSells = [];
-  const totalProfit = [];
+// Methods
+function setCurrentWeek() {
+  startDate.value = $dayjs().startOf("week").format("YYYY-MM-DD");
+  endDate.value = $dayjs().endOf("week").format("YYYY-MM-DD");
+}
 
-  // Create weekly labels for the chart starting every Sunday
-  const labels = [];
-  for (let i = 8; i >= 0; i--) {
-    // Create date
-    const dates = getStartAndEndPerWeek(maxDate.value, minDate.value, i);
+function setPreviousWeek() {
+  startDate.value = $dayjs().subtract(1, "week").startOf("week").format("YYYY-MM-DD");
+  endDate.value = $dayjs().subtract(1, "week").endOf("week").format("YYYY-MM-DD");
+}
 
-    // If dates are not valid, continue
-    if (!dates) continue;
+function formatPrice(price) {
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0
+  }).format(price || 0);
+}
 
-    const { localStartDate, localEndDate } = dates;
+function formatDate(dateStr) {
+  return $dayjs(dateStr).format("DD/MM/YYYY");
+}
 
-    // Add labels
-    labels.push(localStartDate.format("DD/MM"));
+function formatDayName(dayName) {
+  // Capitalize first letter
+  return dayName.charAt(0).toUpperCase() + dayName.slice(1);
+}
 
-    // Filter dailySells in week
-    const dailySellsInWeek = dailySells.value.filter((sell) => {
-      const daySellDate = $dayjs(sell.date, { format: "YYYY-MM-DD" });
+function formatDateRange(start, end) {
+  return `${formatDate(start)} al ${formatDate(end)}`;
+}
 
-      return daySellDate && daySellDate.isBetween(localStartDate, localEndDate, null, "[]");
-    });
+function calculateEarningsPercentage(earnings, income) {
+  if (!income || income === 0) return 0;
+  return ((earnings / income) * 100).toFixed(1);
+}
 
-    let costsInWeek = 0;
-    let sellsAmountInWeek = 0;
-    dailySellsInWeek.forEach((daySell) => {
-      // Update costs and sells
-      costsInWeek += daySell.totalBuying;
-      sellsAmountInWeek += daySell.totalSelling - daySell.totalBuying;
-    });
+function calculateCostPercentage(costs, income) {
+  if (!income || income === 0) return 0;
+  return ((costs / income) * 100).toFixed(1);
+}
 
-    const totalProfitInWeek = costsInWeek ? (sellsAmountInWeek * 100) / costsInWeek : 0;
+function getPercentageClass(percent) {
+  if (percent < 20) return "text-red-600";
+  if (percent < 30) return "text-yellow-600";
+  return "text-green-600";
+}
 
-    totalCosts.push(costsInWeek);
-    totalSells.push(sellsAmountInWeek);
-    totalProfit.push(totalProfitInWeek.toFixed(1));
+function formatVariation(variation) {
+  const prefix = variation >= 0 ? "+" : "";
+  return `${prefix}${variation.toFixed(1)}%`;
+}
+
+function getVariationClass(variation) {
+  if (variation > 5) return "text-red-600";
+  if (variation < -5) return "text-green-600";
+  return "text-gray-600";
+}
+
+function calculateTotalClients() {
+  return weeklyData.value.dailyStats.reduce((sum, day) => sum + day.totalClients, 0);
+}
+
+// Initialize and update charts
+function initDailyPerformanceChart() {
+  if (!dailyPerformanceChart.value) return;
+
+  // Destroy previous instance if it exists
+  if (dailyChartInstance.value) {
+    dailyChartInstance.value.destroy();
   }
 
-  // If screen is small, hide Y labels
-  const displayYLabels = width.value >= 768;
+  const ctx = dailyPerformanceChart.value.getContext("2d");
+  const data = weeklyData.value.dailyStats;
 
-  // Data Eagnings percentage
-  const data = {
-    labels: labels,
-    datasets: [
-      {
-        type: "line",
-        label: "% Ganancia",
-        data: totalProfit,
-        fill: false,
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgb(75, 192, 192, 0.2)",
-        tension: 0.1,
-        yAxisID: "percentage"
-      },
-      {
-        label: "Total Costos",
-        data: totalCosts,
-        fill: false,
-        tension: 0.1,
-        yAxisID: "y",
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgb(255, 99, 132)",
-        borderRadius: 5,
-        barThickness: displayYLabels ? 25 : 13 // Fixed width of bars in pixels
-      },
-      {
-        label: "Total en Ventas",
-        data: totalSells,
-        fill: false,
-        tension: 0.1,
-        yAxisID: "y",
-        borderColor: "rgb(54, 162, 235)",
-        backgroundColor: "rgb(54, 162, 235)",
-        borderRadius: 5,
-        barThickness: displayYLabels ? 25 : 13 // Fixed width of bars in pixels
-      }
-    ]
-  };
-
-  const config = {
+  dailyChartInstance.value = new Chart(ctx, {
     type: "bar",
-    data: data,
+    data: {
+      labels: data.map((day) => formatDayName(day.dayName)),
+      datasets: [
+        {
+          label: "Ingresos",
+          data: data.map((day) => day.totalIncome),
+          backgroundColor: "rgba(59, 130, 246, 0.5)",
+          borderColor: "rgb(59, 130, 246)",
+          borderWidth: 1
+        },
+        {
+          label: "Ganancias",
+          data: data.map((day) => day.totalEarnings),
+          backgroundColor: "rgba(16, 185, 129, 0.5)",
+          borderColor: "rgb(16, 185, 129)",
+          borderWidth: 1
+        },
+        {
+          label: "Costos",
+          data: data.map((day) => day.productCosts),
+          backgroundColor: "rgba(239, 68, 68, 0.5)",
+          borderColor: "rgb(239, 68, 68)",
+          borderWidth: 1
+        }
+      ]
+    },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: {
-          type: "linear",
-          position: "left",
-          stacked: true,
+          beginAtZero: true,
           ticks: {
-            // Include a dollar sign in the ticks
-            callback: function (value, index, ticks) {
-              const million = formatToMillion(value);
-
-              return million;
-            },
-            display: displayYLabels
-          },
-          grid: {
-            display: true,
-            drawBorder: false
+            callback: function (value) {
+              return new Intl.NumberFormat("es-AR", {
+                style: "currency",
+                currency: "ARS",
+                maximumFractionDigits: 0
+              }).format(value);
+            }
           }
-        },
-        percentage: {
-          ticks: {
-            // Include a dollar sign in the ticks
-            callback: function (value, index, ticks) {
-              return value.toFixed(1) + "%";
-            },
-            display: displayYLabels
-          },
-          type: "linear",
-          position: "right",
-          min: 0,
-          max: 100,
-          grid: {
-            display: false
-          }
-        },
-        x: {
-          grid: {
-            display: false
-          },
-          stacked: true
         }
       },
-      // Add % to the tooltip
       plugins: {
         tooltip: {
           callbacks: {
             label: function (context) {
-              // Check if label belongs to percentage or y axis
-              if (context.datasetIndex == 0) {
-                return context.dataset.label + ": " + context.parsed.y.toFixed(1) + "%";
-              } else {
-                return context.dataset.label + ": " + formatPrice(context.parsed.y);
-              }
+              return (
+                context.dataset.label +
+                ": " +
+                new Intl.NumberFormat("es-AR", {
+                  style: "currency",
+                  currency: "ARS",
+                  maximumFractionDigits: 0
+                }).format(context.raw)
+              );
             }
-          }
-        },
-        datalabels: {
-          // Configuration for showing values on each point/bar
-          display: true,
-          color: "#333333", // Customize color as needed
-          align: "end", // Position the labels
-          anchor: "end", // Anchor point for labels
-          font: {
-            weight: "bold"
-          },
-          formatter: function (value, context) {
-            if (context.datasetIndex === 0) {
-              return value + "%"; // Format for percentage dataset
-            }
-
-            return formatPrice(value); // Format for other datasets
           }
         }
       }
+    }
+  });
+}
+
+function initProductCostTrendChart() {
+  if (!productCostTrendChart.value || !hasProductVariations.value) return;
+
+  // Destroy previous instance if it exists
+  if (trendChartInstance.value) {
+    trendChartInstance.value.destroy();
+  }
+
+  const ctx = productCostTrendChart.value.getContext("2d");
+  const variations = weeklyData.value.productCostVariation.slice(0, 5); // Top 5 variations
+
+  // Prepare datasets
+  const datasets = variations.map((product, index) => {
+    const colors = [
+      "rgb(59, 130, 246)", // Blue
+      "rgb(16, 185, 129)", // Green
+      "rgb(239, 68, 68)", // Red
+      "rgb(245, 158, 11)", // Amber
+      "rgb(139, 92, 246)" // Purple
+    ];
+
+    return {
+      label: product.productName,
+      data: product.history.map((h) => h.cost),
+      borderColor: colors[index % colors.length],
+      backgroundColor: colors[index % colors.length],
+      tension: 0.4,
+      fill: false
+    };
+  });
+
+  // Get all unique dates from product histories
+  const allDates = new Set();
+  variations.forEach((product) => {
+    product.history.forEach((h) => allDates.add(h.date));
+  });
+
+  // Sort dates
+  const sortedDates = Array.from(allDates).sort((a, b) => $dayjs(a).diff($dayjs(b)));
+
+  trendChartInstance.value = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: sortedDates.map((date) => formatDate(date)),
+      datasets: datasets
     },
-    plugins: [ChartDataLabels] // Register the dataLabels plugin
-  };
-
-  // Create earnings chart
-  createChart("earningsP", config);
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return new Intl.NumberFormat("es-AR", {
+                style: "currency",
+                currency: "ARS",
+                maximumFractionDigits: 0
+              }).format(value);
+            }
+          }
+        }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return (
+                context.dataset.label +
+                ": " +
+                new Intl.NumberFormat("es-AR", {
+                  style: "currency",
+                  currency: "ARS",
+                  maximumFractionDigits: 0
+                }).format(context.raw)
+              );
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
-function createChart(chartId, configData) {
-  // Get element
-  const ctx = document.getElementById(chartId);
+// Watch for data changes to update charts
+watch(
+  () => weeklyData.value,
+  () => {
+    if (dashboardStore.isWeeklyDataFetched) {
+      nextTick(() => {
+        initDailyPerformanceChart();
+        initProductCostTrendChart();
+      });
+    }
+  },
+  { deep: true }
+);
 
-  // Clean canvas if exists
-  if (profitChart.value[chartId]) {
-    profitChart.value[chartId].destroy();
-  }
-
-  profitChart.value[chartId] = new Chart(ctx, configData);
-}
-
-function getStartAndEndPerWeek(maxDate, minDate, nWeeksBack) {
-  // Create date
-  let localStartDate = $dayjs(maxDate, { format: "YYYY-MM-DD" }).subtract(nWeeksBack, "week").startOf("week");
-  const localEndDate = $dayjs(maxDate, { format: "YYYY-MM-DD" }).subtract(nWeeksBack, "week").endOf("week");
-
-  // If local start date is within the week of minDate continue
-  // Get first weekday of minDate
-  const firstWeekDay = $dayjs(minDate, { format: "YYYY-MM-DD" }).startOf("week");
-
-  // If firstWeekDay is after localStartDate, assign firstWeekDay to localStartDate
-  if (
-    localStartDate.isBefore($dayjs(minDate, { format: "YYYY-MM-DD" })) &&
-    localStartDate.isSame(firstWeekDay) &&
-    localStartDate.isBefore($dayjs(maxDate, { format: "YYYY-MM-DD" })) // Safe check
-  ) {
-    localStartDate = $dayjs(minDate, { format: "YYYY-MM-DD" });
-  }
-
-  // If local start date is not within the week of minDate and is still before min date, continue
-  if (localStartDate.isBefore($dayjs(minDate, { format: "YYYY-MM-DD" }))) {
-    return false;
-  }
-
-  return { localStartDate, localEndDate };
-}
-
-function getRankingDate() {
-  // Use js and send time to search in store
-  dashboardStore.getRankingBasedOnDate(rankingDateAux.value);
-}
-
-// ----- Define Hooks ------------
-onMounted(() => {
-  if (areStatsFetched.value) {
-    createEarningsP();
+// Watch for date changes to fetch new data
+watch([startDate, endDate], async ([newStart, newEnd]) => {
+  if (newStart && newEnd) {
+    await dashboardStore.fetchWeeklyRecap(newStart, newEnd);
   }
 });
 
-// ----- Define Watcher ------------
-
-watch(dailySells, () => {
-  createEarningsP();
-});
-
-watch(productsRanking, () => {
-  rankingDateAux.value = productsRanking.value.formattedDate;
-});
-
-watch([minDate, maxDate], (newValues) => {
-  // Check start date is before end date
-  if ($dayjs(newValues[0]).isAfter($dayjs(newValues[1]))) {
-    minDate.value = maxDate.value;
+// Watch window size for responsive charts
+watch(width, () => {
+  if (dashboardStore.isWeeklyDataFetched) {
+    nextTick(() => {
+      initDailyPerformanceChart();
+      initProductCostTrendChart();
+    });
   }
-
-  createEarningsP();
 });
 
-useHead({
-  title: "Resumen"
+// Initialize data on component mount
+onMounted(async () => {
+  await dashboardStore.fetchWeeklyRecap(startDate.value, endDate.value);
 });
 </script>

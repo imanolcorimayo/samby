@@ -79,10 +79,12 @@ ordersStore.fetchDailyProductCost($dayjs().format("YYYY-MM-DD"));
 const products = ref([]);
 const dateToFilter = ref($dayjs().format("YYYY-MM-DD"));
 const loading = ref(false);
+const orders = ref([]);
 
 // ----- Define Hooks -----
 onMounted(() => {
-  updateProductList(pendingOrders.value, dateToFilter.value, dailyProductCost.value);
+  orders.value = [...pendingOrders.value, ...completedOrders.value];
+  updateProductList(orders.value, dailyProductCost.value);
 });
 
 // ----- Define Methods -----
@@ -120,7 +122,8 @@ function updateProductList(orders, date, currentCost) {
     return productList.find((product) => product.productId === id);
   });
 
-  // Update currentCost based on daily product cost saved
+  // Update currentCost based on daily product cost saved.
+  // If not exists, check the currentCost property on the product order
   uniqueProducts.forEach((product) => {
     const currentProduct = currentCost.find((cost) => cost.productId === product.productId);
     product.currentCost = currentProduct ? currentProduct?.cost : product.currentCost;
@@ -137,14 +140,24 @@ function updateProductList(orders, date, currentCost) {
 }
 
 // ----- Define Watchers -----
-watch(
-  [pendingOrders, completedOrders, dateToFilter, dailyProductCost],
-  async ([pendingOrders, completedOrders, date, dailyCost]) => {
-    updateProductList([...pendingOrders, ...completedOrders], date, dailyCost);
-  }
-);
+watch([pendingOrders, completedOrders], async ([pendingOrders, completedOrders]) => {
+  orders.value = [...pendingOrders, ...completedOrders];
+  updateProductList(orders.value, dateToFilter.value, dailyProductCost.value);
+});
 watch(dateToFilter, async (date) => {
+  loading.value = true;
+  // Fetch daily product cost for this date
   await ordersStore.fetchDailyProductCost(date);
+  // Fetch orders for this date
+  const ordersResponse = await ordersStore.fetchOrdersByDate(date);
+  orders.value = ordersResponse;
+  updateProductList(ordersResponse, date, dailyProductCost.value);
+
+  loading.value = false;
+});
+
+watch(dailyProductCost, (dailyCost) => {
+  updateProductList(orders.value, dateToFilter.value, dailyCost);
 });
 
 useHead({

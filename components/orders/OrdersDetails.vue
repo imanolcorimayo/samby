@@ -307,7 +307,7 @@ const isEditable = computed(() => {
 // ----- Define Methods -----
 async function updateStatus(status) {
   // Check the valid status
-  if (!["pendiente", "pendiente-modificado", "entregado", "cancelado", "rechazado"].includes(status)) {
+  if (!ORDER_STATUS_OPTIONS.includes(status)) {
     useToast(ToastEvents.error, "El estado seleccionado no es válido, por favor intenta nuevamente");
     return;
   }

@@ -20,6 +20,8 @@
     "@vueuse/nuxt": "^10.11.1",
     "chart.js": "^4.4.3",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
     "firebase": "^10.12.5",
     "jszip": "^3.10.1",
     "nuxt": "^3.12.4",

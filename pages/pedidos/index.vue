@@ -281,6 +281,10 @@ watch(pendingOrders, () => {
   ordersToShow.value = pendingOrders.value;
 });
 
+watch(orders, () => {
+  ordersToShow.value = orders.value;
+});
+
 useHead({
   title: "Lista de pedidos"
 });
