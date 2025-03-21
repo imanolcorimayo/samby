@@ -39,16 +39,30 @@
         Limpiar
       </button>
     </div>
-    <!-- This element only avoids elements reordering  -->
-    <div v-if="!buttonIsVisible" class="h-[3.071rem]"></div>
-    <div v-if="productsCleaned.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    <!-- Legend for highlighted products -->
+    <div
+      class="flex items-center gap-2 text-sm text-gray-600 mt-8"
+      v-if="productsCleaned?.some((p) => p.highlightProduct)"
+    >
+      <div class="w-4 h-4 border-yellow-300 bg-yellow-300/10 border-2 rounded"></div>
+      <span>Los productos destacados son recomendados para ofrecer al cliente</span>
+    </div>
+    <div v-if="productsCleaned?.length" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
       <div
-        class="flex flex-col bg-secondary shadow overflow-hidden rounded-[0.428rem]"
+        class="flex flex-col bg-secondary shadow overflow-hidden rounded-[0.428rem] relative"
         v-for="(product, index) in productsCleaned"
         :key="index"
+        :class="{ 'border-2 border-yellow-300 bg-yellow-300/10': product.highlightProduct }"
       >
         <div class="flex justify-between items-center p-[0.714rem] gap-4">
-          <div class="rounded-lg overflow-hidden w-fit flex-nowrap min-w-[100px] max-w-[100px] h-[100px]">
+          <!-- Badge for highlighted products -->
+          <div
+            v-if="product.highlightProduct"
+            class="absolute top-0 right-0 bg-yellow-300 text-black px-2 py-1 text-xs rounded-bl-md font-medium"
+          >
+            Destacado
+          </div>
+          <!-- <div class="rounded-lg overflow-hidden w-fit flex-nowrap min-w-[100px] max-w-[100px] h-[100px]">
             <img
               class="min-w-[100px] max-w-[100px] h-[100px]"
               v-if="product.imageUrl"
@@ -61,10 +75,10 @@
               src="/img/default-product.webp"
               alt="Imagen de un producto generico"
             />
-          </div>
+          </div> -->
           <div class="flex flex-col w-full items-end">
             <div class="flex flex-col cursor-pointer w-full">
-              <span class="font-semibold">{{ product.productName }}</span>
+              <span class="font-semibold capitalize">{{ product.productName }}</span>
               <span class="text-gray-500">Unidad: {{ product.unit }}</span>
             </div>
             <div class="flex flex-col items-end gap-1">
@@ -143,9 +157,28 @@ productsStore.fetchData();
 
 // ----- Define Computed -------
 const productsCleaned = computed(() => {
-  return products.value.filter((product) => {
+  let aux = products.value.filter((product) => {
     return product.productName.toLowerCase().includes(search.value.toLowerCase());
   });
+
+  // Order the products by "highlightProduct" and "isAvailable" respectively
+  aux = aux.sort((a, b) => {
+    if (a.highlightProduct && !b.highlightProduct) {
+      return -1;
+    }
+    if (!a.highlightProduct && b.highlightProduct) {
+      return 1;
+    }
+    if (a.isAvailable && !b.isAvailable) {
+      return -1;
+    }
+    if (!a.isAvailable && b.isAvailable) {
+      return 1;
+    }
+    return 0;
+  });
+
+  return aux;
 });
 
 // ----- Define Hooks -------

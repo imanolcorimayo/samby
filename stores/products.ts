@@ -163,6 +163,7 @@ export const useProductsStore = defineStore("products", {
         "category",
         "description",
         "isAvailable",
+        "highlightProduct",
         // Image related
         "productImageId",
         "imageUrl",

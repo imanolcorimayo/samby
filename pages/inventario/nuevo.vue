@@ -124,25 +124,48 @@
       validation="required"
       v-model="form.category"
     />
-    <div class="flex flex-col gap-1">
-      <span class="font-medium">¿Disponible?</span>
-      <div class="flex gap-2">
-        <button
-          @click="form.isAvailable = true"
-          type="button"
-          class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
-          :class="{ ['bg-primary text-white']: form.isAvailable, ['bg-secondary']: !form.isAvailable }"
-        >
-          Sí
-        </button>
-        <button
-          @click="form.isAvailable = false"
-          type="button"
-          class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
-          :class="{ ['bg-primary text-white']: !form.isAvailable, ['bg-secondary']: form.isAvailable }"
-        >
-          No
-        </button>
+    <div class="flex justify-start gap-8">
+      <div class="flex flex-col gap-1">
+        <span class="font-medium">¿Disponible?</span>
+        <div class="flex gap-2">
+          <button
+            @click="form.isAvailable = true"
+            type="button"
+            class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+            :class="{ ['bg-primary text-white']: form.isAvailable, ['bg-secondary']: !form.isAvailable }"
+          >
+            Sí
+          </button>
+          <button
+            @click="form.isAvailable = false"
+            type="button"
+            class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+            :class="{ ['bg-primary text-white']: !form.isAvailable, ['bg-secondary']: form.isAvailable }"
+          >
+            No
+          </button>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1">
+        <span class="font-medium">¿Resaltar?</span>
+        <div class="flex gap-2">
+          <button
+            @click="form.highlightProduct = true"
+            type="button"
+            class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+            :class="{ ['bg-primary text-white']: form.highlightProduct, ['bg-secondary']: !form.highlightProduct }"
+          >
+            Sí
+          </button>
+          <button
+            @click="form.highlightProduct = false"
+            type="button"
+            class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+            :class="{ ['bg-primary text-white']: !form.highlightProduct, ['bg-secondary']: form.highlightProduct }"
+          >
+            No
+          </button>
+        </div>
       </div>
     </div>
     <div v-show="submitting" class="btn bg-primary text-white text-center">loading...</div>
@@ -194,6 +217,7 @@ const form = ref({
   price: 0,
   category: "otro",
   isAvailable: true,
+  highlightProduct: false,
   productStock: 0,
   cost: 0
 });

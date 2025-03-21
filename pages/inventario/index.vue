@@ -124,6 +124,15 @@ const productsCleaned = computed(() => {
     });
   }
 
+  // Order search products by "highlightProduct" and "isAvailable" key respectively
+  searchProducts = searchProducts.sort((a, b) => {
+    if (a.highlightProduct && !b.highlightProduct) return -1;
+    if (!a.highlightProduct && b.highlightProduct) return 1;
+    if (a.isAvailable && !b.isAvailable) return -1;
+    if (!a.isAvailable && b.isAvailable) return 1;
+    return 0;
+  });
+
   return searchProducts;
 });
 const totalProducts = computed(() => {

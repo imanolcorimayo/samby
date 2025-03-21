@@ -31,26 +31,3 @@ function switchMenu() {
   emit("switchMenu");
 }
 </script>
-
-<style scoped>
-.selected {
-  background-color: var(--primary-color);
-  color: white;
-  font-weight: bold;
-  outline: none;
-}
-
-li {
-  cursor: pointer;
-}
-
-li:hover {
-  color: #a0a4d9;
-  font-weight: bold;
-}
-
-.no-hover {
-  background-color: unset !important;
-  border: unset !important;
-}
-</style>

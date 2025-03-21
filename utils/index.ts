@@ -71,6 +71,11 @@ export const validateProduct = (product: any) => {
   // Validate if has "isAvailable" and it's a boolean
   if (typeof product.isAvailable !== "boolean") return false;
 
+  // Validate if has "highlightProduct" and it's a boolean
+  if (typeof product.highlightProduct !== "boolean") {
+    return false;
+  }
+
   return true;
 };
 

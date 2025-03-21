@@ -199,7 +199,6 @@
 
 <script setup>
 import PhSealCheckDuotone from "~icons/ph/seal-check-duotone";
-import CarbonSalesOps from "~icons/carbon/sales-ops";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import IcRoundPlus from "~icons/ic/round-plus";
 import MingcuteUser4Fill from "~icons/mingcute/user-4-fill";
@@ -280,9 +279,12 @@ const pendingOrdersStats = computed(() => {
     // Process products in the order
     if (order.products && Array.isArray(order.products)) {
       order.products.forEach((product) => {
+        // Look for the product in the daily cost list
+        const dailyProduct = dailyProductCost.value.find((p) => p.id === product.id);
+
         // Stock cost calculation
-        const cost = product.currentCost || 0;
-        const quantity = product.quantity || 1;
+        const cost = product.currentCost || dailyProduct.cost || 0;
+        const quantity = product.quantity || 0;
         stats.totalStockCost += cost * quantity;
         stats.totalProducts += quantity;
       });

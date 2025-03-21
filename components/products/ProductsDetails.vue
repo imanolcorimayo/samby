@@ -109,25 +109,48 @@
           validation="required"
           v-model="form.category"
         />
-        <div class="flex flex-col gap-1">
-          <span class="font-medium">¿Disponible?</span>
-          <div class="flex gap-2">
-            <button
-              @click="form.isAvailable = true"
-              type="button"
-              class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
-              :class="{ ['bg-primary text-white']: form.isAvailable, ['bg-secondary']: !form.isAvailable }"
-            >
-              Sí
-            </button>
-            <button
-              @click="form.isAvailable = false"
-              type="button"
-              class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
-              :class="{ ['bg-primary text-white']: !form.isAvailable, ['bg-secondary']: form.isAvailable }"
-            >
-              No
-            </button>
+        <div class="flex justify-start gap-8">
+          <div class="flex flex-col gap-1">
+            <span class="font-medium">¿Disponible?</span>
+            <div class="flex gap-2">
+              <button
+                @click="form.isAvailable = true"
+                type="button"
+                class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+                :class="{ ['bg-primary text-white']: form.isAvailable, ['bg-secondary']: !form.isAvailable }"
+              >
+                Sí
+              </button>
+              <button
+                @click="form.isAvailable = false"
+                type="button"
+                class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+                :class="{ ['bg-primary text-white']: !form.isAvailable, ['bg-secondary']: form.isAvailable }"
+              >
+                No
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="font-medium">¿Resaltar?</span>
+            <div class="flex gap-2">
+              <button
+                @click="form.highlightProduct = true"
+                type="button"
+                class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+                :class="{ ['bg-primary text-white']: form.highlightProduct, ['bg-secondary']: !form.highlightProduct }"
+              >
+                Sí
+              </button>
+              <button
+                @click="form.highlightProduct = false"
+                type="button"
+                class="btn-sm min-w-[5rem] ring-1 ring-primary m-1"
+                :class="{ ['bg-primary text-white']: !form.highlightProduct, ['bg-secondary']: form.highlightProduct }"
+              >
+                No
+              </button>
+            </div>
           </div>
         </div>
       </FormKit>
@@ -176,7 +199,8 @@ const form = ref({
   step: 0.5,
   price: 0,
   category: "otro",
-  isAvailable: false
+  isAvailable: false,
+  highlightProduct: false
 });
 const imageUrl = ref("");
 
@@ -215,6 +239,7 @@ async function updateProduct() {
     form.value.price === currentProduct.value.price &&
     form.value.category === currentProduct.value.category &&
     form.value.isAvailable === currentProduct.value.isAvailable &&
+    form.value.highlightProduct === currentProduct.value.highlightProduct &&
     imageUrl.value === currentProduct.value.imageUrl &&
     form.value.productImageId === currentProduct.value.productImageId
   ) {
@@ -234,12 +259,14 @@ async function updateProduct() {
       step: parseFloat(form.value.step),
       price: parseFloat(form.value.price),
       category: form.value.category,
-      isAvailable: form.value.isAvailable
+      isAvailable: form.value.isAvailable,
+      highlightProduct: form.value.highlightProduct
     },
     currentProduct.value // Send full product to validate
   );
 
   if (!updated) {
+    submitting.value = false;
     useToast("error", "No se ha podido actualizar el producto, por favor intenta nuevamente.");
     return;
   }
@@ -389,7 +416,8 @@ const showModal = (productId) => {
     step: product.step ? product.step : 0.5,
     price: product.price ? product.price : 0,
     category: product.category ? product.category : "otro",
-    isAvailable: Object.hasOwn(product, "isAvailable") ? product.isAvailable : false
+    isAvailable: Object.hasOwn(product, "isAvailable") ? product.isAvailable : false,
+    highlightProduct: Object.hasOwn(product, "highlightProduct") ? product.highlightProduct : false
   };
 
   // Show modal
