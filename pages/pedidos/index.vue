@@ -283,7 +283,7 @@ const pendingOrdersStats = computed(() => {
         const dailyProduct = dailyProductCost.value.find((p) => p.id === product.id);
 
         // Stock cost calculation
-        const cost = product.currentCost || dailyProduct.cost || 0;
+        const cost = product.currentCost || dailyProduct?.cost || 0;
         const quantity = product.quantity || 0;
         stats.totalStockCost += cost * quantity;
         stats.totalProducts += quantity;
