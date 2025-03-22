@@ -175,6 +175,55 @@
         </div>
       </div>
 
+      <!-- Product Weekly Recap Table -->
+      <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+        <h3 class="font-semibold mb-4">Resumen de Productos</h3>
+        <div v-if="weeklyData.productStats && weeklyData.productStats.length > 0" class="overflow-x-auto">
+          <table class="min-w-full border-collapse">
+            <thead>
+              <tr class="border-b border-gray-300">
+                <th class="py-2 px-3 text-left text-sm font-medium text-gray-500">Producto</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Vendidos</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Stock Actual</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Ingresos</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Costos</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Ganancia</th>
+                <th class="py-2 px-3 text-right text-sm font-medium text-gray-500">Frecuencia</th>
+                <th class="py-2 px-3 text-center text-sm font-medium text-gray-500">Sin Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="product in weeklyData.productStats"
+                :key="product.productId"
+                class="border-b border-gray-200 hover:bg-gray-50"
+              >
+                <td class="py-2 px-3 whitespace-nowrap">
+                  <span class="font-medium">{{ product.productName }}</span>
+                </td>
+                <td class="py-2 px-3 text-right">{{ product.totalSold }}</td>
+                <td class="py-2 px-3 text-right">{{ product.currentStock }}</td>
+                <td class="py-2 px-3 text-right">{{ formatPrice(product.revenue) }}</td>
+                <td class="py-2 px-3 text-right">{{ formatPrice(product.cost) }}</td>
+                <td class="py-2 px-3 text-right">
+                  <span :class="getEarningsClass(product.profit)">{{ formatPrice(product.profit) }}</span>
+                </td>
+                <td class="py-2 px-3 text-right">{{ product.orderFrequency }}%</td>
+                <td class="py-2 px-3 text-center">
+                  <span v-if="product.stockOutsCount !== 0" class="text-red-600"
+                    >{{ product.stockOutsFrequency }}%</span
+                  >
+                  <span v-else class="text-green-600">{{ product.stockOutsFrequency }}%</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="flex justify-center items-center h-40 text-gray-500">
+          No hay datos de productos para este período
+        </div>
+      </div>
+
       <!-- Charts Row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Daily Performance Chart -->
@@ -354,6 +403,12 @@ function getVariationClass(variation) {
   if (variation > 5) return "text-red-600";
   if (variation < -5) return "text-green-600";
   return "text-gray-600";
+}
+
+function getEarningsClass(profit) {
+  if (profit <= 0) return "text-red-600";
+  if (profit < 500) return "text-yellow-600";
+  return "text-green-600";
 }
 
 function calculateTotalClients() {

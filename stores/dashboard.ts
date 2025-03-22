@@ -40,7 +40,8 @@ export const useDashboardStore = defineStore("dashboard", {
       dailyStats: [],
       productCostVariation: [],
       startDate: "",
-      endDate: ""
+      endDate: "",
+      productStats: []
     },
     isLoading: false,
     weeklyDataFetched: false,
@@ -56,6 +57,8 @@ export const useDashboardStore = defineStore("dashboard", {
   actions: {
     async fetchWeeklyRecap(startDate: any, endDate: any) {
       const { $dayjs } = useNuxtApp();
+      const productsStore = useProductsStore();
+      await productsStore.fetchData();
       $dayjs.extend(isSameOrBefore);
       $dayjs.extend(isSameOrAfter);
 
@@ -97,7 +100,8 @@ export const useDashboardStore = defineStore("dashboard", {
           dailyStats: [],
           productCostVariation: [],
           startDate: formattedStartDate,
-          endDate: formattedEndDate
+          endDate: formattedEndDate,
+          productsStats: []
         };
 
         // Structure to track daily data
@@ -321,6 +325,70 @@ export const useDashboardStore = defineStore("dashboard", {
 
         // Sort by absolute percentage change (descending)
         productVariations.sort((a, b) => Math.abs(b.percentageChange) - Math.abs(a.percentageChange));
+
+        // 7. Track Product Data Individually
+        const productData = new Map();
+
+        // Process orders to extract product information
+        for (const order of orders) {
+          if (order.products) {
+            for (const product of order.products) {
+              const productId = product.productId;
+
+              if (!productData.has(productId)) {
+                productData.set(productId, {
+                  productId,
+                  productName: product.productName || `Product ${productId.substring(0, 5)}`,
+                  totalSold: 0,
+                  revenue: 0,
+                  cost: 0,
+                  profit: 0,
+                  orderCount: 0,
+                  orderFrequency: 0,
+                  stockOutsCount: 0,
+                  stockOutsFrequency: 0,
+                  currentStock: 0
+                });
+              }
+
+              const productStats = productData.get(productId);
+              productStats.totalSold += product.quantity || 0;
+              productStats.revenue += (product.price || 0) * (product.quantity || 0);
+              productStats.cost += (product.currentCost || 0) * (product.quantity || 0);
+
+              // Track unique orders containing this product
+              productStats.orderCount += 1;
+
+              // Update current stock if available
+              const storeProduct = productsStore.products.find((p: any) => p.id === productId);
+              console.log("storeProduct: ", storeProduct);
+              if (typeof storeProduct.productStock !== "undefined" && productStats.currentStock === 0) {
+                productStats.currentStock = storeProduct.productStock;
+              }
+
+              // Track stock-outs (if stock was 0 or less at the time of order)
+              if (product.currentProductStock === 0 || product.currentProductStock == product.stockUsed) {
+                productStats.stockOutsCount += 1;
+              }
+            }
+          }
+        }
+
+        // Calculate final metrics for each product
+        productData.forEach((product) => {
+          // Calculate profit
+          product.profit = product.revenue - product.cost;
+
+          // Calculate order frequency (percentage of orders that contain this product)
+          product.orderFrequency = orders.length > 0 ? ((product.orderCount / orders.length) * 100).toFixed(1) : 0;
+
+          // Calculate stock-outs frequency (percentage of orders with stock-outs)
+          product.stockOutsFrequency =
+            product.orderCount > 0 ? ((product.stockOutsCount / product.orderCount) * 100).toFixed(1) : 0;
+        });
+
+        // Convert Map to array and sort by profit (descending)
+        weeklyDataInit.productStats = Array.from(productData.values()).sort((a, b) => b.profit - a.profit);
 
         // Convert daily data to array and sort by date
         weeklyDataInit.dailyStats = Object.values(dailyData).sort((a, b) => $dayjs(a.date).diff($dayjs(b.date)));
