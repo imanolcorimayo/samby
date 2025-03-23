@@ -35,3 +35,5 @@ yarn.lock
 /scripts/*.kmz
 /scripts/update-privileges-to-users*.js
 /scripts/export-prod-to-develop.js
+
+/scripts/tests/*
