@@ -167,6 +167,7 @@ async function updateClient() {
 
   if (!updated) {
     useToast("error", "No se ha podido actualizar el cliente, por favor intenta nuevamente.");
+    submitting.value = false;
     return;
   }
 

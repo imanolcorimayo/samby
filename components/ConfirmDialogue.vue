@@ -4,7 +4,7 @@
       v-if="isRevealed"
       id="deleteModal"
       tabindex="-1"
-      class="conf-d overflow-y-auto overflow-x-hidden flex h-full fixed top-0 right-0 left-0 z-[100] justify-center items-center w-full md:inset-0 h-modal md:h-full bg-black/[.5]"
+      class="conf-d overflow-y-auto overflow-x-hidden flex h-full fixed top-0 right-0 left-0 z-[4500] justify-center items-center w-full md:inset-0 h-modal md:h-full bg-black/[.5]"
     >
       <div class="relative p-4 w-full max-w-md md:h-auto">
         <!-- Modal content -->
