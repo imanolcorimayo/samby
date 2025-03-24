@@ -24,6 +24,7 @@
     "csv-writer": "^1.6.0",
     "firebase": "^10.12.5",
     "jszip": "^3.10.1",
+    "marked": "^15.0.7",
     "nuxt": "^3.12.4",
     "nuxt-vuefire": "^1.0.3",
     "pinia": "^2.2.1",
