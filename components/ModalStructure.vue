@@ -3,7 +3,7 @@
     <Transition>
       <div
         v-if="isVisible"
-        class="bg-[#00000080] fixed z-50 bottom-0 left-0 w-full h-full flex justify-center items-center max-h-screen overflow-hidden"
+        class="bg-[#00000080] fixed z-[1500] bottom-0 left-0 w-full h-full flex justify-center items-center max-h-screen overflow-hidden"
       >
         <div
           ref="innerContainer"

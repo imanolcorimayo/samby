@@ -10,99 +10,121 @@
     </div>
 
     <div v-else class="flex flex-col gap-6">
-      <!-- AI Recommendations (Highlighted) -->
-      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg shadow-md border border-blue-200">
-        <div class="flex items-center gap-2 mb-3">
-          <MaterialSymbolsSmartToyRounded class="text-2xl text-blue-600" />
-          <h2 class="text-xl font-semibold text-blue-800">Recomendaciones IA</h2>
+      <!-- AI Recommendations (Highlighted with accordion) -->
+      <div
+        class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md border border-blue-200 overflow-hidden"
+      >
+        <!-- Header (always visible) -->
+        <div class="p-4 flex justify-between items-center cursor-pointer" @click="toggleRecommendations">
+          <div class="flex items-center gap-2">
+            <MaterialSymbolsSmartToyRounded class="text-2xl text-blue-600" />
+            <h2 class="text-xl font-semibold text-blue-800">Recomendaciones IA</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span v-if="recommendationsAge" class="text-xs text-gray-500">
+              Actualizado hace {{ recommendationsAge }} días
+            </span>
+            <span class="text-sm text-blue-700">{{ showRecommendations ? "Ocultar" : "Mostrar" }}</span>
+            <ChevronIcon
+              :class="['transition-transform duration-300 text-blue-600', showRecommendations ? 'rotate-180' : '']"
+            />
+          </div>
         </div>
 
-        <div class="flex flex-col gap-4">
-          <!-- Next Purchase Recommendations -->
-          <div>
-            <h3 class="text-lg font-medium text-blue-700 mb-2">Próxima Compra Recomendada</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div
-                v-for="(item, index) in aiResponse.recomendaciones.siguiente_compra"
-                :key="`purchase-${index}`"
-                class="bg-white p-3 rounded-md shadow-sm border border-blue-100"
-              >
-                <div class="flex justify-between">
-                  <span class="font-semibold">{{ item.producto }}</span>
-                  <span class="text-blue-600 font-medium">{{ item.cantidad }}</span>
+        <!-- Content (toggleable) -->
+        <div v-show="showRecommendations" class="p-4 pt-0 border-t border-blue-200">
+          <!-- Loading state -->
+          <div v-if="recommendationsLoading" class="flex justify-center py-4">
+            <span class="text-blue-700">Cargando recomendaciones...</span>
+          </div>
+
+          <!-- No recommendations available -->
+          <div v-else-if="!aiResponse" class="p-4 text-center">
+            <div class="mb-3 text-gray-600">
+              <MaterialSymbolsSmartToyRounded class="text-4xl text-blue-400 mx-auto mb-2" />
+              <p class="font-medium text-lg">No hay recomendaciones disponibles</p>
+            </div>
+
+            <p v-if="clientOrders.length < 10" class="mb-3 text-gray-600">
+              El cliente necesita tener al menos 10 pedidos para generar recomendaciones personalizadas.
+              <br />Actualmente tiene {{ clientOrders.length }} pedido(s).
+            </p>
+
+            <p v-else class="mb-3 text-gray-600">
+              Aunque el cliente tiene suficientes pedidos, aún no se han generado recomendaciones.
+              <br />Esto podría ser porque las recomendaciones están pendientes de procesamiento.
+            </p>
+
+            <p class="text-sm text-gray-500">
+              Las recomendaciones se generan automáticamente y se actualizan semanalmente.
+            </p>
+          </div>
+
+          <!-- Recommendations available -->
+          <div v-else class="flex flex-col gap-4">
+            <!-- Next Purchase Recommendations -->
+            <div v-if="aiResponse.recomendaciones.siguiente_compra?.length">
+              <h3 class="text-lg font-medium text-blue-700 mb-2">Próxima Compra Recomendada</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div
+                  v-for="(item, index) in aiResponse.recomendaciones.siguiente_compra"
+                  :key="`purchase-${index}`"
+                  class="bg-white p-3 rounded-md shadow-sm border border-blue-100"
+                >
+                  <div class="flex justify-between">
+                    <span class="font-semibold">{{ item.producto }}</span>
+                    <span class="text-blue-600 font-medium">{{ item.cantidad }}</span>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1">{{ item.razon }}</p>
                 </div>
-                <p class="text-sm text-gray-600 mt-1">{{ item.razon }}</p>
               </div>
             </div>
-          </div>
 
-          <!-- New Product Suggestions -->
-          <div>
-            <h3 class="text-lg font-medium text-blue-700 mb-2">Nuevos Productos Sugeridos</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div
-                v-for="(item, index) in aiResponse.recomendaciones.nuevos_productos"
-                :key="`new-${index}`"
-                class="bg-white p-3 rounded-md shadow-sm border border-blue-100"
-              >
-                <div class="font-semibold">{{ item.producto }}</div>
-                <div class="text-xs text-gray-500">Complementa a: {{ item.complementa_a }}</div>
-                <p class="text-sm text-gray-600 mt-1">{{ item.razon }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Frequent Combinations -->
-          <div>
-            <h3 class="text-lg font-medium text-blue-700 mb-2">Combinaciones Frecuentes</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div
-                v-for="(item, index) in aiResponse.recomendaciones.combinaciones_frecuentes"
-                :key="`combo-${index}`"
-                class="bg-white p-3 rounded-md shadow-sm border border-blue-100"
-              >
-                <div class="flex gap-1 flex-wrap mb-1">
-                  <span
-                    v-for="(prod, i) in item.productos"
-                    :key="`combo-prod-${i}`"
-                    class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full"
-                  >
-                    {{ prod }}
-                  </span>
+            <!-- New Product Suggestions -->
+            <div v-if="aiResponse.recomendaciones.nuevos_productos?.length">
+              <h3 class="text-lg font-medium text-blue-700 mb-2">Nuevos Productos Sugeridos</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div
+                  v-for="(item, index) in aiResponse.recomendaciones.nuevos_productos"
+                  :key="`new-${index}`"
+                  class="bg-white p-3 rounded-md shadow-sm border border-blue-100"
+                >
+                  <div class="font-semibold">{{ item.producto }}</div>
+                  <div class="text-xs text-gray-500">Complementa a: {{ item.complementa_a }}</div>
+                  <p class="text-sm text-gray-600 mt-1">{{ item.razon }}</p>
                 </div>
-                <p class="text-sm text-gray-600">{{ item.beneficio }}</p>
               </div>
             </div>
-          </div>
 
-          <!-- Seasonal Products -->
-          <div v-if="aiResponse.recomendaciones.estacionalidad.length">
-            <h3 class="text-lg font-medium text-blue-700 mb-2">Productos de Temporada</h3>
+            <!-- Seasonal Products -->
+            <div v-if="aiResponse.recomendaciones.estacionalidad?.length">
+              <h3 class="text-lg font-medium text-blue-700 mb-2">Productos de Temporada</h3>
+              <div class="bg-white p-3 rounded-md shadow-sm border border-blue-100">
+                <div v-for="(item, index) in aiResponse.recomendaciones.estacionalidad" :key="`seasonal-${index}`">
+                  <div class="font-semibold">
+                    {{ item.producto }} <span class="text-sm font-normal text-gray-500">({{ item.temporada }})</span>
+                  </div>
+                  <p class="text-sm text-gray-600">{{ item.recomendacion }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Analysis Summary -->
             <div class="bg-white p-3 rounded-md shadow-sm border border-blue-100">
-              <div v-for="(item, index) in aiResponse.recomendaciones.estacionalidad" :key="`seasonal-${index}`">
-                <div class="font-semibold">
-                  {{ item.producto }} <span class="text-sm font-normal text-gray-500">({{ item.temporada }})</span>
+              <h3 class="text-lg font-medium text-blue-700 mb-2">Resumen del Análisis</h3>
+              <div class="flex flex-col gap-2">
+                <div>
+                  <div class="text-sm font-medium text-gray-700">Patrón de Compra:</div>
+                  <p class="text-sm text-gray-600">{{ aiResponse.resumen_analisis.patron_compra }}</p>
                 </div>
-                <p class="text-sm text-gray-600">{{ item.recomendacion }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Analysis Summary -->
-          <div class="bg-white p-3 rounded-md shadow-sm border border-blue-100">
-            <h3 class="text-lg font-medium text-blue-700 mb-2">Resumen del Análisis</h3>
-            <div class="flex flex-col gap-2">
-              <div>
-                <div class="text-sm font-medium text-gray-700">Patrón de Compra:</div>
-                <p class="text-sm text-gray-600">{{ aiResponse.resumen_analisis.patron_compra }}</p>
-              </div>
-              <div>
-                <div class="text-sm font-medium text-gray-700">Tendencias:</div>
-                <p class="text-sm text-gray-600">{{ aiResponse.resumen_analisis.tendencias }}</p>
-              </div>
-              <div>
-                <div class="text-sm font-medium text-gray-700">Recomendaciones Generales:</div>
-                <p class="text-sm text-gray-600">{{ aiResponse.resumen_analisis.recomendaciones_generales }}</p>
+                <div>
+                  <div class="text-sm font-medium text-gray-700">Tendencias:</div>
+                  <p class="text-sm text-gray-600">{{ aiResponse.resumen_analisis.tendencias }}</p>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-700">Recomendaciones Generales:</div>
+                  <p class="text-sm text-gray-600">{{ aiResponse.resumen_analisis.recomendaciones_generales }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -161,6 +183,34 @@
           <div class="bg-yellow-50 p-3 rounded-md border border-yellow-100">
             <div class="text-sm text-gray-500">Total Gastado</div>
             <div class="text-xl font-bold">{{ formatPrice(orderStats.totalSpent) }}</div>
+          </div>
+        </div>
+
+        <!-- Order dates information -->
+        <div class="bg-gray-50 p-3 rounded-md border mb-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="flex flex-col">
+              <span class="text-sm text-gray-500">Primer Pedido</span>
+              <div class="flex items-center gap-2">
+                <CalendarIcon class="text-gray-600 text-sm" />
+                <span class="font-medium">{{ orderStats.firstOrderDate || "Sin pedidos" }}</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm text-gray-500">Último Pedido</span>
+              <div class="flex items-center gap-2">
+                <CalendarIcon class="text-gray-600 text-sm" />
+                <span class="font-medium">{{ orderStats.lastOrderDate || "Sin pedidos" }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Client lifetime information -->
+          <div class="mt-2 pt-2 border-t border-gray-200" v-if="orderStats.firstOrderDate">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">Tiempo como cliente</span>
+              <span class="font-medium text-blue-700">{{ orderStats.clientLifetime }}</span>
+            </div>
           </div>
         </div>
 
@@ -245,7 +295,7 @@
 
             <div class="flex justify-between items-center mt-2">
               <span class="text-sm">{{ order.products.length }} productos</span>
-              <span class="font-semibold">${{ getOrderTotal(order).toFixed(2) }}</span>
+              <span class="font-semibold">{{ formatPrice(getOrderTotal(order)) }}</span>
             </div>
 
             <!-- Preview of products -->
@@ -272,7 +322,10 @@ import TablerPhone from "~icons/tabler/phone";
 import TablerMapPin from "~icons/tabler/map-pin";
 import MaterialSymbolsWarningRounded from "~icons/material-symbols/warning-rounded";
 import MaterialSymbolsSmartToyRounded from "~icons/material-symbols/smart-toy-rounded";
-import { collection, doc, getDoc, getDocs, where, query, Timestamp } from "firebase/firestore";
+import CalendarIcon from "~icons/tabler/calendar";
+import ChevronIcon from "~icons/tabler/chevron-down";
+
+import { collection, doc, getDoc, where, query, Timestamp } from "firebase/firestore";
 
 // Nuxt properties
 const { $dayjs } = useNuxtApp();
@@ -291,78 +344,16 @@ const loading = ref(true);
 const client = ref(null);
 const clientOrders = ref([]);
 const activeFilter = ref("all");
+const showRecommendations = ref(true); // Default to open
+
+// Recommendations state
+const aiResponse = ref(null);
+const recommendationsLoading = ref(false);
+const recommendationsAge = ref(null);
 
 // Pinia stores
 const clientsStore = useClientsStore();
 const { getClients: clients, areClientsFetched } = storeToRefs(clientsStore);
-
-// Dummy AI response (in real app this would be fetched dynamically)
-const aiResponse = ref({
-  recomendaciones: {
-    siguiente_compra: [
-      {
-        producto: "Tomate perita ",
-        cantidad: "30 unidades",
-        razon: "Producto más frecuentemente pedido, esencial para mantener stock."
-      },
-      {
-        producto: "Papa Cordoba oferta",
-        cantidad: "20 unidades",
-        razon: "Segundo producto más pedido, base de muchas compras."
-      },
-      {
-        producto: "Cebolla ",
-        cantidad: "12 unidades",
-        razon: "Tercer producto más pedido, componente clave en varios pedidos."
-      },
-      {
-        producto: "papa negra",
-        cantidad: "5 unidades",
-        razon: "Ha sido comprada en varios pedidos recientes."
-      }
-    ],
-    estacionalidad: [
-      {
-        producto: "Mandarina",
-        temporada: "Otoño/Invierno",
-        recomendacion:
-          "Considerando que se compró mandarina en octubre, y es un producto de temporada de otoño/invierno, considere ofrecerla nuevamente."
-      }
-    ],
-    combinaciones_frecuentes: [
-      {
-        productos: ["Tomate perita ", "Lechuga Repollada"],
-        beneficio: "Alta frecuencia de venta conjunta, ofrece una solución completa para ensaladas."
-      },
-      {
-        productos: ["Papa Cordoba oferta", "Tomate perita "],
-        beneficio: "Combinación popular, ideal para comidas básicas y acompañamientos."
-      }
-    ],
-    nuevos_productos: [
-      {
-        producto: "Perejil ",
-        complementa_a: "Tomate perita , Cebolla ",
-        razon:
-          "A pesar de no ser de los productos mas comprados por el cliente, el perejil aparece frecuentemente en las combinaciones de productos mas populares."
-      },
-      {
-        producto: "Acelga",
-        complementa_a: "Tomate perita , Cebolla ",
-        razon:
-          "Producto dentro del top 10 de ventas generales, y con alta frecuencia en pedidos totales, puede ser una buena adición para diversificar."
-      }
-    ]
-  },
-  resumen_analisis: {
-    patron_compra:
-      "El cliente muestra una preferencia por productos básicos como papas, tomates y cebollas, con compras regulares y en cantidades moderadas.",
-    tendencias:
-      "Hay una tendencia clara a combinar 'Tomate perita ' con otros productos. Se observa un interés recurrente en limones (caja y bolsa) y pimientos (rojo y verde).",
-    recomendaciones_generales:
-      "Mantener un stock constante de los productos principales. Considerar promociones de combos que incluyan 'Tomate perita ' con 'Lechuga Repollada' o 'Papa Cordoba oferta'. Ofrecer descuentos por volumen en productos como 'Cebolla ' y 'Papa Cordoba oferta' para incentivar compras mayores."
-  }
-});
 
 // Order statistics
 const orderStats = computed(() => {
@@ -372,7 +363,10 @@ const orderStats = computed(() => {
       completedOrders: 0,
       canceledOrders: 0,
       totalSpent: 0,
-      topProducts: []
+      topProducts: [],
+      firstOrderDate: null,
+      lastOrderDate: null,
+      clientLifetime: null
     };
   }
 
@@ -407,12 +401,49 @@ const orderStats = computed(() => {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
+  // Get order dates (sorted by creation date)
+  const sortedOrders = [...clientOrders.value].sort((a, b) => {
+    return $dayjs(a.createdAt).unix() - $dayjs(b.createdAt).unix();
+  });
+
+  // Get first and last order dates
+  const firstOrder = sortedOrders[0];
+  const lastOrder = sortedOrders[sortedOrders.length - 1];
+
+  const firstOrderDate = firstOrder ? $dayjs(firstOrder.createdAt).format("DD/MM/YYYY") : null;
+  const lastOrderDate = lastOrder ? $dayjs(lastOrder.createdAt).format("DD/MM/YYYY") : null;
+
+  // Calculate client lifetime
+  let clientLifetime = null;
+  if (firstOrderDate) {
+    const firstOrderDay = $dayjs(firstOrder.createdAt);
+    const now = $dayjs();
+    const monthsDiff = now.diff(firstOrderDay, "month");
+
+    if (monthsDiff < 1) {
+      const daysDiff = now.diff(firstOrderDay, "day");
+      clientLifetime = `${daysDiff} ${daysDiff === 1 ? "día" : "días"}`;
+    } else if (monthsDiff < 12) {
+      clientLifetime = `${monthsDiff} ${monthsDiff === 1 ? "mes" : "meses"}`;
+    } else {
+      const yearsDiff = Math.floor(monthsDiff / 12);
+      const remainingMonths = monthsDiff % 12;
+      clientLifetime = `${yearsDiff} ${yearsDiff === 1 ? "año" : "años"}`;
+      if (remainingMonths > 0) {
+        clientLifetime += ` y ${remainingMonths} ${remainingMonths === 1 ? "mes" : "meses"}`;
+      }
+    }
+  }
+
   return {
     totalOrders: clientOrders.value.length,
     completedOrders,
     canceledOrders,
     totalSpent,
-    topProducts
+    topProducts,
+    firstOrderDate,
+    lastOrderDate,
+    clientLifetime
   };
 });
 
@@ -483,6 +514,10 @@ function editClient() {
   }
 }
 
+function toggleRecommendations() {
+  showRecommendations.value = !showRecommendations.value;
+}
+
 // Fetch client data
 async function fetchClient() {
   loading.value = true;
@@ -498,8 +533,11 @@ async function fetchClient() {
       return;
     }
 
-    // Fetch client orders directly from Firestore
+    // Fetch client orders using the store method
     await fetchClientOrders();
+
+    // Fetch client recommendations
+    await fetchClientRecommendations();
 
     // Initialize map if client has coordinates
     if (client.value.lat && client.value.lng) {
@@ -524,44 +562,41 @@ async function initMap() {
   ]);
 }
 
-// Fetch client orders from Firestore
+// Fetch client orders from store
 async function fetchClientOrders() {
   try {
-    const db = useFirestore();
-
-    const snapshot = await getDocs(query(collection(db, "pedido"), where("clientId", "==", clientId)));
-
-    if (snapshot.empty) {
-      console.log("No orders found for this client");
-      clientOrders.value = [];
-      return;
-    }
-
-    const orders = snapshot.docs.map((doc) => {
-      const data = doc.data();
-
-      // Convert Firestore Timestamps to readable dates
-      if (data.shippingDate instanceof Timestamp) {
-        data.shippingDate = $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD");
-      }
-      if (data.createdAt instanceof Timestamp) {
-        data.createdAt = $dayjs(data.createdAt.toDate()).format("YYYY-MM-DD HH:mm:ss");
-      }
-
-      return {
-        id: doc.id,
-        ...data
-      };
-    });
-
-    // Sort orders by creation date (most recent first)
-    orders.sort((a, b) => {
-      return $dayjs(b.createdAt).unix() - $dayjs(a.createdAt).unix();
-    });
-
+    const orders = await clientsStore.fetchClientOrders(clientId);
     clientOrders.value = orders;
   } catch (error) {
     console.error("Error fetching client orders:", error);
+    clientOrders.value = [];
+  }
+}
+
+// Fetch client recommendations from store
+async function fetchClientRecommendations() {
+  try {
+    recommendationsLoading.value = true;
+    const recommendationsData = await clientsStore.fetchClientRecommendations(clientId);
+
+    if (recommendationsData) {
+      aiResponse.value = recommendationsData.recommendations;
+
+      // Calculate age of recommendations
+      const creationDate = recommendationsData.createdAt;
+      const now = new Date();
+      const diffTime = Math.abs(now.getTime() - creationDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      recommendationsAge.value = diffDays;
+    } else {
+      aiResponse.value = null;
+      recommendationsAge.value = null;
+    }
+  } catch (error) {
+    console.error("Error fetching client recommendations:", error);
+    aiResponse.value = null;
+  } finally {
+    recommendationsLoading.value = false;
   }
 }
 
