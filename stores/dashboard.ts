@@ -90,7 +90,7 @@ export const useDashboardStore = defineStore("dashboard", {
         const endDateTime = $dayjs(formattedEndDate).endOf("day").toDate();
 
         // Initialize weekly data structure
-        const weeklyDataInit = {
+        const weeklyDataInit: any = {
           totalIncome: 0,
           totalEarnings: 0,
           totalProductCosts: 0,
@@ -105,7 +105,7 @@ export const useDashboardStore = defineStore("dashboard", {
         };
 
         // Structure to track daily data
-        const dailyData = {};
+        const dailyData: any = {};
 
         // Create a day-by-day list of dates in the range
         const days = [];
@@ -116,7 +116,7 @@ export const useDashboardStore = defineStore("dashboard", {
           const dayStr = currentDay.format("YYYY-MM-DD");
           days.push(dayStr);
 
-          // @ts-ignore: Initialize data structure for each day
+          // Initialize data structure for each day
           dailyData[dayStr] = {
             date: dayStr,
             dayName: currentDay.format("dddd"),
@@ -142,7 +142,7 @@ export const useDashboardStore = defineStore("dashboard", {
         );
 
         const ordersSnapshot = await getDocs(ordersQuery);
-        const orders = ordersSnapshot.docs.map((doc) => {
+        const orders: any = ordersSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             ...data,
@@ -163,7 +163,7 @@ export const useDashboardStore = defineStore("dashboard", {
         );
 
         const productCostsSnapshot = await getDocs(productCostsQuery);
-        const productCosts = productCostsSnapshot.docs.map((doc) => {
+        const productCosts: any = productCostsSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             ...data,
@@ -189,7 +189,7 @@ export const useDashboardStore = defineStore("dashboard", {
             // Track products costs
             if (order.products) {
               for (const product of order.products) {
-                const productCost = productCosts.find((c) => c.productId === product.productId);
+                const productCost: any = productCosts.find((c: any) => c.productId === product.productId);
 
                 dailyData[orderDay].totalCosts = dailyData[orderDay].totalCosts || 0;
                 dailyData[orderDay].totalCosts += (product.currentCost || productCost.cost || 0) * product.quantity;
@@ -199,8 +199,8 @@ export const useDashboardStore = defineStore("dashboard", {
         }
 
         // Group product costs by day and product
-        const costsByDay = {};
-        const productCostHistory = {};
+        const costsByDay: any = {};
+        const productCostHistory: any = {};
 
         for (const cost of productCosts) {
           const costDay = cost.date;
@@ -285,12 +285,12 @@ export const useDashboardStore = defineStore("dashboard", {
         }
 
         // 6. Analyze product cost variations
-        const productVariations = [];
+        const productVariations: Array<any> = [];
 
-        Object.entries(productCostHistory).forEach(([productId, history]) => {
+        Object.entries(productCostHistory).forEach(([productId, history]: any) => {
           if (history.length >= 2) {
             // Sort by date
-            history.sort((a, b) => $dayjs(a.date).diff($dayjs(b.date)));
+            history.sort((a: any, b: any) => $dayjs(a.date).diff($dayjs(b.date)));
 
             const firstCost = history[0].cost;
             const lastCost = history[history.length - 1].cost;
@@ -302,7 +302,7 @@ export const useDashboardStore = defineStore("dashboard", {
 
             // Try to get product name from orders
             for (const order of orders) {
-              const product = order.products?.find((p) => p.productId === productId);
+              const product = order.products?.find((p: any) => p.productId === productId);
               if (product && product.productName) {
                 productName = product.productName;
                 break;
@@ -391,7 +391,9 @@ export const useDashboardStore = defineStore("dashboard", {
         weeklyDataInit.productStats = Array.from(productData.values()).sort((a, b) => b.profit - a.profit);
 
         // Convert daily data to array and sort by date
-        weeklyDataInit.dailyStats = Object.values(dailyData).sort((a, b) => $dayjs(a.date).diff($dayjs(b.date)));
+        weeklyDataInit.dailyStats = Object.values(dailyData).sort((a: any, b: any) =>
+          $dayjs(a.date).diff($dayjs(b.date))
+        );
 
         weeklyDataInit.productCostVariation = productVariations.slice(0, 10); // Top 10 variations
 
@@ -421,7 +423,8 @@ export const useDashboardStore = defineStore("dashboard", {
         dailyStats: [],
         productCostVariation: [],
         startDate: "",
-        endDate: ""
+        endDate: "",
+        productStats: []
       };
     }
   }

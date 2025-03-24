@@ -370,8 +370,25 @@ function formatDate(dateStr) {
 }
 
 function formatDayName(dayName) {
-  // Capitalize first letter
-  return dayName.charAt(0).toUpperCase() + dayName.slice(1);
+  // Convert dayname to spanish
+  switch (dayName) {
+    case "Monday":
+      return "Lunes";
+    case "Tuesday":
+      return "Martes";
+    case "Wednesday":
+      return "Miércoles";
+    case "Thursday":
+      return "Jueves";
+    case "Friday":
+      return "Viernes";
+    case "Saturday":
+      return "Sábado";
+    case "Sunday":
+      return "Domingo";
+    default:
+      return dayName;
+  }
 }
 
 function formatDateRange(start, end) {

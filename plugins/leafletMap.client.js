@@ -1,5 +1,3 @@
-import fs from "fs";
-
 export default defineNuxtPlugin(async (nuxtApp) => {
   /**
    * Dynamically load Leaflet CSS by adding <link> to head
@@ -21,6 +19,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
    * @returns {Promise<any>}
    */
   async function loadLeafletJS() {
+    if (window.L) return window.L;
+
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
       script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -37,8 +37,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   /**
    * Creates a Leaflet map, fetches the GeoJSON file, and adds polygons with popups.
    * @param {string} elementId - The DOM element ID where the map will be mounted.
+   * @param {Function} featureClickCallback - Callback for feature clicks
    */
-  async function createMap(elementId, updateGeoJsonZone) {
+  async function createMap(elementId, featureClickCallback) {
     // 1) Load Leaflet CSS + JS
     loadLeafletCSS();
     const L = await loadLeafletJS();
@@ -58,43 +59,65 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     const response = await fetch("/barrios.json");
     if (!response.ok) {
       console.error("Failed to load barrios.json:", response.statusText);
-      return;
+      return map;
     }
     const geojsonData = await response.json();
 
-    // 5) Add the GeoJSON layer to the map
-    L.geoJSON(geojsonData, {
-      onEachFeature(feature, layer) {
-        // Bind a popup using the "name" property from GeoJSON
-        if (feature.properties && feature.properties.name) {
-          layer.bindPopup(`Nombre: ${feature.properties.name}; ${feature.properties.zoneName}`);
+    // Get zone assignments from store
+    let zoneAssignments = {};
+    try {
+      const zonesStore = nuxtApp.$pinia.state.value.zones?.zoneAssignments;
+      if (zonesStore) {
+        // Convert Map to object for easier lookup
+        zoneAssignments = Object.fromEntries(zonesStore);
+      }
+    } catch (error) {
+      console.error("Error getting zone assignments:", error);
+    }
 
-          // Change style
-          layer.setStyle({
-            color: feature.properties.zoneColor || "#0080ff",
-            weight: 2,
-            fillColor: feature.properties.zoneColor || "#0080ff",
-            fillOpacity: 0.2
-          });
+    // 5) Add the GeoJSON layer to the map
+    const geojsonLayer = L.geoJSON(geojsonData, {
+      onEachFeature(feature, layer) {
+        // Get assignment data if exists
+        const featureName = feature.properties.name;
+        const featureId = feature.properties.id;
+        const assignment = zoneAssignments[featureId];
+
+        // Update feature properties with zone info if assigned
+        if (assignment) {
+          feature.properties.zoneId = assignment.zoneId;
+          feature.properties.zoneName = assignment.zoneName;
+          feature.properties.zoneColor = assignment.zoneColor;
         }
+
+        // Bind a popup showing info
+        let popupContent = `<b>Barrio:</b> ${featureName}`;
+        if (assignment) {
+          popupContent += `<br><b>Zona:</b> ${assignment.zoneName}`;
+        } else {
+          popupContent += `<br><em>No asignado a ninguna zona</em>`;
+        }
+
+        layer.bindPopup(popupContent);
+
+        // Add click handler for zone assignment
+        layer.on("click", function () {
+          if (featureClickCallback && typeof featureClickCallback === "function") {
+            featureClickCallback(feature, layer);
+          }
+        });
+
+        // Set style based on zone assignment
+        const color = assignment ? assignment.zoneColor : "#0080ff";
+        layer.setStyle({
+          color: color,
+          weight: 2,
+          fillColor: color,
+          fillOpacity: 0.2
+        });
       }
     }).addTo(map);
 
-    // 6) Add client markers
-    // L.geoJSON(clientGeoJson, {
-    //   onEachFeature(feature, layer) {
-    //     const { name, address } = feature.properties;
-    //     // Customize your popup content as needed
-    //     layer.bindPopup(`<b>${name}</b><br>${address}`);
-    //   }
-    //   // Optional style or marker options for points
-    //   /* pointToLayer(feature, latlng) {
-    //     // Return a custom marker, circle, or default marker
-    //     return L.marker(latlng);
-    //   } */
-    // }).addTo(map);
-
-    // Return the map instance if needed
     return map;
   }
 
@@ -128,9 +151,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     if (modify) {
       map.on("move", function () {
         const center = map.getCenter();
-
         marker.setLatLng(center);
-
         // Update the location
         updateLocation(center.lat, center.lng);
       });

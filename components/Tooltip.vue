@@ -4,7 +4,7 @@
     <div
       v-if="isOpen"
       ref="tooltipBody"
-      class="absolute z-[25] mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-fit h-fit"
+      class="absolute z-[250] right-[-5rem] mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-fit h-fit"
       :class="{ 'left-0': position === 'left', 'right-0': position === 'right' }"
     >
       <slot name="content"></slot>

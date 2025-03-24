@@ -156,7 +156,7 @@ export const useClientsStore = defineStore("clients", {
         });
 
         // Sort orders by creation date (most recent first)
-        orders.sort((a, b) => {
+        orders.sort((a: any, b: any) => {
           return $dayjs(b.createdAt).unix() - $dayjs(a.createdAt).unix();
         });
 

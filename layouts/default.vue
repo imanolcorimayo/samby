@@ -1,6 +1,6 @@
 <template>
   <div class="w-full min-h-screen flex justify-between">
-    <transition name="slide" class="relative">
+    <Transition name="slide" class="relative">
       <div
         v-if="showSideBar"
         ref="menu"
@@ -27,26 +27,30 @@
               <span class="text-xs font-semibold text-gray-600">Administradores</span>
             </div>
           </div>
-          <!-- Select you business -->
-          <button class="flex flex-col bg-base p-1 py-4 rounded-xl shadow" @click="tooltip.toggleTooltip">
-            <div class="flex items-center gap-2 cursor-pointer">
-              <div class="flex justify-center items-center w-[2.7rem] h-[2.7rem] rounded-full bg-white">
+
+          <!-- Select your business - IMPROVED -->
+          <div class="bg-base rounded-xl shadow">
+            <button class="flex items-center w-full gap-2 p-4 cursor-pointer" @click="tooltip.toggleTooltip">
+              <div class="flex justify-center items-center w-[2.7rem] h-[2.7rem] rounded-full bg-white shrink-0">
                 <MageShopFill
                   v-if="!indexStore.currentBusiness.imageUrlThumbnail"
                   class="text-gray-600 text-[1.4rem]"
                 />
                 <img
                   v-else
-                  class="rounded-full"
+                  class="rounded-full w-full h-full object-cover"
                   :src="indexStore.currentBusiness.imageUrlThumbnail"
                   alt="Business thumbnail"
                 />
               </div>
-              <div class="flex flex-col items-start">
-                <span class="text-md font-medium">{{ indexStore.currentBusiness.name }}</span>
+              <div class="flex flex-col items-start flex-1 min-w-0">
+                <span class="text-md font-medium truncate w-full text-start">{{
+                  indexStore.currentBusiness.name
+                }}</span>
                 <span class="text-xs text-gray-500">{{ indexStore.currentBusiness.type }}</span>
               </div>
-            </div>
+              <MaterialSymbolsKeyboardArrowDown class="text-gray-600" />
+            </button>
             <Tooltip ref="tooltip">
               <template #content>
                 <ul
@@ -61,10 +65,15 @@
                         class="shrink-0 flex justify-center items-center w-[2.7rem] h-[2.7rem] rounded-full bg-white"
                       >
                         <MageShopFill v-if="!business.imageUrlThumbnail" class="text-gray-600 text-[1.4rem]" />
-                        <img v-else class="rounded-full" :src="business.imageUrlThumbnail" alt="Business thumbnail" />
+                        <img
+                          v-else
+                          class="rounded-full object-cover w-full h-full"
+                          :src="business.imageUrlThumbnail"
+                          alt="Business thumbnail"
+                        />
                       </div>
-                      <div class="flex flex-col text-start w-full">
-                        <span class="text-nowrap text-md font-medium">{{ business.name }}</span>
+                      <div class="flex flex-col text-start w-full min-w-0">
+                        <span class="text-nowrap text-md font-medium truncate">{{ business.name }}</span>
                         <span class="text-nowrap text-xs text-gray-500">{{ business.type }}</span>
                       </div>
                       <IconParkOutlineCheckOne
@@ -89,7 +98,7 @@
                 </ul>
               </template>
             </Tooltip>
-          </button>
+          </div>
         </div>
         <ul class="flex flex-col gap-2">
           <li>
@@ -109,15 +118,50 @@
               <BiPersonFill class="text-gray-500" /> Clientes
             </NuxtLink>
           </li>
-          <li>
-            <NuxtLink
-              v-if="indexStore.isOwner"
-              to="/resumen/dashboard"
-              class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
+
+          <!-- Accordion for Resumen -->
+          <li v-if="indexStore.isOwner" class="flex flex-col">
+            <button
+              @click="toggleResumenAccordion"
+              class="flex items-center justify-between w-full text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
-              <UilChartLine class="text-gray-500" /> Resumen
-            </NuxtLink>
+              <div class="flex items-center gap-2"><UilChartLine class="text-gray-500" /> Resumen</div>
+              <div class="transition-transform duration-200" :class="{ 'rotate-180': showResumenAccordion }">
+                <MaterialSymbolsKeyboardArrowDown class="text-gray-600" />
+              </div>
+            </button>
+            <transition name="accordion">
+              <div v-if="showResumenAccordion" class="pl-6 overflow-hidden">
+                <ul class="flex flex-col py-1">
+                  <li>
+                    <NuxtLink
+                      to="/resumen/dashboard"
+                      class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold text-sm"
+                    >
+                      <MaterialSymbolsDashboard class="text-gray-500" /> Dashboard
+                    </NuxtLink>
+                  </li>
+                  <li>
+                    <NuxtLink
+                      to="/resumen/productos"
+                      class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold text-sm"
+                    >
+                      <MingcuteInventoryFill class="text-gray-500" /> Productos Stock
+                    </NuxtLink>
+                  </li>
+                  <li>
+                    <NuxtLink
+                      to="/resumen/map"
+                      class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold text-sm"
+                    >
+                      <MaterialSymbolsMap class="text-gray-500" /> Mapa de clientes
+                    </NuxtLink>
+                  </li>
+                </ul>
+              </div>
+            </transition>
           </li>
+
           <li>
             <NuxtLink
               v-if="indexStore.isOwner"
@@ -178,7 +222,7 @@
           <TheFooter />
         </div>
       </div>
-    </transition>
+    </Transition>
     <div class="flex-1 flex flex-col max-h-screen overflow-y-scroll pt-[1.429rem] relative">
       <TheHeader class="md:hidden" @switchMenu="switchMenu" />
       <main class="flex-1 flex px-2 max-w-[80rem] mx-auto w-full">
@@ -213,6 +257,9 @@ import IcRoundPlus from "~icons/ic/round-plus";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import GravityUiGear from "~icons/gravity-ui/gear";
 import SiSignOutFill from "~icons/si/sign-out-fill";
+import MaterialSymbolsKeyboardArrowDown from "~icons/material-symbols/keyboard-arrow-down";
+import MaterialSymbolsDashboard from "~icons/material-symbols/dashboard";
+import MaterialSymbolsMap from "~icons/material-symbols/map";
 
 // ------ Define Useful Properties --------
 const route = useRoute();
@@ -229,6 +276,7 @@ const { doesOrderExist, productsCount, totalAmount } = storeToRefs(ordersStore);
 // ------ Define Vars --------
 const showSideBar = ref(false);
 const menu = ref(null);
+const showResumenAccordion = ref(false);
 
 // If clicking outside the menu, and screen is smaller than 768px, close it
 onClickOutside(menu, () => {
@@ -246,6 +294,9 @@ onMounted(() => {
 });
 
 // ------ Define Methods --------
+function toggleResumenAccordion() {
+  showResumenAccordion.value = !showResumenAccordion.value;
+}
 async function signOut() {
   if (!auth) return;
 
@@ -304,5 +355,18 @@ watch([width, () => route.path], () => {
 }
 .slide-leave-to {
   transform: translateX(-100%);
+}
+
+/* Accordion animation */
+.accordion-enter-active,
+.accordion-leave-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 300px;
+  overflow: hidden;
+}
+.accordion-enter-from,
+.accordion-leave-to {
+  max-height: 0;
+  opacity: 0;
 }
 </style>
