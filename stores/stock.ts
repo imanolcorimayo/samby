@@ -265,6 +265,7 @@ export const useStockStore = defineStore("stock", {
           status,
           price: parseFloat(product.price) || 0,
           cost: parseFloat(product.cost) || 0,
+          reorderCost: parseFloat(product.cost) * reorderLevel,
           unit: product.unit || "unidad",
           profitContribution: Math.round(profitContribution * 10) / 10, // Round to 1 decimal
           projectedStockouts: currentStock < avgWeeklyUsage ? "Esta semana" : null

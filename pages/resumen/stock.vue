@@ -112,8 +112,8 @@
               <th class="py-3 px-4 text-center font-medium text-gray-500">Uso Semanal</th>
               <th class="py-3 px-4 text-center font-medium text-gray-500">Alcanza</th>
               <th class="py-3 px-4 text-center font-medium text-gray-500">Ganancia</th>
-              <th class="py-3 px-4 text-center font-medium text-gray-500">Precio</th>
               <th class="py-3 px-4 text-center font-medium text-gray-500">Recomendación</th>
+              <th class="py-3 px-4 text-center font-medium text-gray-500">Costo Estimado</th>
               <th class="py-3 px-4 text-center font-medium text-gray-500">Acción</th>
             </tr>
           </thead>
@@ -159,15 +159,15 @@
                 <span class="font-medium">{{ item.profitContribution }}%</span>
               </td>
 
-              <!-- Price -->
-              <td class="py-3 px-4 text-center">
-                <span class="font-medium">{{ formatPrice(item.price) }}</span>
-              </td>
-
               <!-- Recommendation -->
               <td class="py-3 px-4 text-center">
                 <span class="font-medium me-1">{{ item.reorderLevel }}</span>
                 <span class="text-gray-500">({{ item.unit }})</span>
+              </td>
+
+              <!-- Re-order Estimated Cost -->
+              <td class="py-3 px-4 text-center">
+                <span class="font-medium">{{ formatPrice(item.reorderCost) }}</span>
               </td>
 
               <!-- Action -->
@@ -253,7 +253,9 @@ const totalRestockCost = computed(() => {
   let total = 0;
 
   // Get products that need restocking (critical + warning)
-  const productsToRestock = stockData.value.filter((item) => item.status === "critical" || item.status === "warning");
+  const productsToRestock = filteredProducts.value.filter(
+    (item) => item.status === "critical" || item.status === "warning"
+  );
 
   // Calculate the total cost based on reorder level and product cost
   productsToRestock.forEach((item) => {
