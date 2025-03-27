@@ -140,6 +140,9 @@
                   <div class="flex flex-col">
                     <span class="font-medium">{{ formatDayName(day.dayName) }}</span>
                     <span class="text-xs text-gray-500">{{ formatDate(day.date) }}</span>
+                    <span v-if="day.costCeroExists" class="text-xs text-red-600 font-medium mt-1 flex items-center">
+                      <LucideAlertTriangle class="w-3 h-3 mr-1" /> Productos con costo cero
+                    </span>
                   </div>
                 </td>
                 <td class="py-2 px-3 text-right">{{ formatPrice(day.totalIncome) }}</td>
@@ -309,6 +312,7 @@ import LucideWallet from "~icons/lucide/wallet";
 import LucideShoppingCart from "~icons/lucide/shopping-cart";
 import LucideUsers from "~icons/lucide/users";
 import LucideBarChart2 from "~icons/lucide/bar-chart-2";
+import LucideAlertTriangle from "~icons/lucide/alert-triangle";
 
 Chart.register(...registerables);
 

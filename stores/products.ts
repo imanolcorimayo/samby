@@ -11,15 +11,26 @@ import {
   updateDoc,
   deleteDoc,
   orderBy,
-  limit
+  limit,
+  Timestamp,
+  startAfter
 } from "firebase/firestore";
-import { ToastEvents } from "~/interfaces";
+// @ts-ignore
+import { StockMovement, StockMovementType, LossReason, ToastEvents } from "~/interfaces";
 
 const defaultObject = {
   fetched: false,
   products: [],
-  currentProductImage: null
+  currentProductImage: null,
+
+  stockMovements: [],
+  stockMovementsFetched: false,
+  lastVisibleStockMovement: null,
+
+  suppliers: [],
+  suppliersFetched: false
 };
+
 export const useProductsStore = defineStore("products", {
   state: (): any => {
     return Object.assign({}, defaultObject);
@@ -28,7 +39,12 @@ export const useProductsStore = defineStore("products", {
     getState: (state) => state,
     getProducts: (state) => state.products,
     areProductsFetched: (state) => state.fetched,
-    getCurrentProductImage: (state) => state.currentProductImage
+    getCurrentProductImage: (state) => state.currentProductImage,
+    getStockMovements: (state) => state.stockMovements,
+    areStockMovementsFetched: (state) => state.stockMovementsFetched,
+
+    getSuppliers: (state) => state.suppliers,
+    areSuppliersFetched: (state) => state.suppliersFetched
   },
   actions: {
     async fetchData() {
@@ -319,6 +335,367 @@ export const useProductsStore = defineStore("products", {
         console.error(error);
         return false;
       }
+    },
+
+    // ----------- Stock Movements
+    /**
+     * Record a stock movement in the database
+     */
+    async recordStockMovement(movement: StockMovement) {
+      const db = useFirestore();
+      const user = useCurrentUser();
+
+      // Get current business ID
+      const businessId = useLocalStorage("cBId", null);
+      if (!businessId.value) {
+        useToast(ToastEvents.error, "No hay un negocio seleccionado");
+        return false;
+      }
+
+      if (!user || !user.value) {
+        useToast(ToastEvents.error, "No hay un usuario autenticado");
+        return false;
+      }
+
+      try {
+        // Add user details
+        movement.businessId = businessId.value;
+        movement.userUid = user.value.uid;
+        movement.createdByName = user.value.displayName || "Usuario";
+        movement.createdAt = serverTimestamp();
+        movement.date = movement.date || serverTimestamp();
+
+        // Create the stock movement document
+        const docRef = await addDoc(collection(db, "stockMovements"), movement);
+
+        // Add to local state
+        const newMovement = {
+          ...movement,
+          id: docRef.id,
+          createdAt: new Date(), // Local date object for immediate display
+          date: movement.date instanceof Date ? movement.date : new Date()
+        };
+
+        this.$state.stockMovements.unshift(newMovement);
+
+        return true;
+      } catch (error) {
+        console.error("Error recording stock movement:", error);
+        useToast(ToastEvents.error, "Error al registrar el movimiento de stock");
+        return false;
+      }
+    },
+
+    /**
+     * Enhanced version of updateStock that records the movement
+     */
+    async updateStockWithMovement(
+      stockUpdate: any,
+      current: any,
+      movementDetails: {
+        type: StockMovementType;
+        lossReason?: LossReason;
+        supplierId?: string;
+        supplierName?: string;
+        unitBuyingPrice?: number;
+        notes?: string;
+      }
+    ) {
+      const db = useFirestore();
+
+      try {
+        // First calculate quantities
+        const previousStock = parseFloat(current.productStock || 0);
+        const newStock = parseFloat(stockUpdate.productStock || 0);
+        const quantityChange = newStock - previousStock;
+
+        const previousCost = parseFloat(current.cost || 0);
+        const newCost = parseFloat(stockUpdate.cost || 0);
+
+        // Check if we need to add a new supplier
+        if (movementDetails.supplierName && !movementDetails.supplierId) {
+          const supplier = await this.addSupplier(movementDetails.supplierName);
+          if (supplier) {
+            movementDetails.supplierId = supplier.id;
+          }
+        }
+
+        // Create the movement record
+        const movement: StockMovement = {
+          productId: current.id,
+          productName: current.productName,
+          type: movementDetails.type,
+          quantity: quantityChange,
+          previousStock: previousStock,
+          newStock: newStock,
+          previousCost: previousCost,
+          newCost: newCost,
+          // Optional fields
+          lossReason: movementDetails.lossReason || null,
+          supplierId: movementDetails.supplierId || null,
+          supplierName: movementDetails.supplierName || null,
+          unitBuyingPrice: movementDetails.unitBuyingPrice || null,
+          notes: movementDetails.notes || null,
+          businessId: "", // Will be set in recordStockMovement
+          userUid: "", // Will be set in recordStockMovement
+          createdByName: "", // Will be set in recordStockMovement
+          createdAt: null, // Will be set in recordStockMovement
+          date: new Date() // Current date
+        };
+
+        // Update the product's stock
+        const updateResult = await this.updateStock(stockUpdate, current);
+
+        if (!updateResult) {
+          throw new Error("Failed to update product stock");
+        }
+
+        // Record the movement
+        await this.recordStockMovement(movement);
+
+        return true;
+      } catch (error) {
+        console.error("Error updating stock with movement:", error);
+        useToast(ToastEvents.error, "Error al actualizar el stock del producto");
+        return false;
+      }
+    },
+
+    /**
+     * Fetch recent stock movements for reporting
+     */
+    async fetchStockMovements(productId = null, pageLimit = 20, startAfterNum = null) {
+      const db = useFirestore();
+      const businessId = useLocalStorage("cBId", null);
+
+      if (!businessId.value) {
+        return false;
+      }
+
+      try {
+        let q;
+
+        // If we're fetching for a specific product
+        if (productId) {
+          q = query(
+            collection(db, "stockMovements"),
+            where("businessId", "==", businessId.value),
+            where("productId", "==", productId),
+            orderBy("date", "desc"),
+            limit(pageLimit)
+          );
+        } else {
+          // Fetching all movements
+          q = query(
+            collection(db, "stockMovements"),
+            where("businessId", "==", businessId.value),
+            orderBy("date", "desc"),
+            limit(pageLimit)
+          );
+        }
+
+        // Add startAfter if provided (for pagination)
+        if (startAfterNum) {
+          q = query(q, startAfter(startAfterNum));
+        }
+
+        const { $dayjs } = useNuxtApp();
+        const querySnapshot = await getDocs(q);
+
+        // Save the last document for pagination
+        const lastVisible = querySnapshot.docs.length < 20 ? null : querySnapshot.docs[querySnapshot.docs.length - 1];
+        this.$state.lastVisibleStockMovement = lastVisible;
+
+        const movements = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            ...data,
+            id: doc.id,
+            // Format dates for display
+            date: data.date ? $dayjs(data.date.toDate()).format("YYYY-MM-DD HH:mm") : null,
+            createdAt: data.createdAt ? $dayjs(data.createdAt.toDate()).format("YYYY-MM-DD HH:mm") : null
+          };
+        });
+
+        if (startAfterNum) {
+          // Append to existing movements
+          this.$state.stockMovements = [...this.$state.stockMovements, ...movements];
+        } else {
+          // Replace existing movements
+          this.$state.stockMovements = movements;
+        }
+
+        this.$state.stockMovementsFetched = true;
+        return true;
+      } catch (error) {
+        console.error("Error fetching stock movements:", error);
+        return false;
+      }
+    },
+
+    /**
+     * Get statistics for recent movements and losses
+     */
+    async getStockMovementStats(days = 30) {
+      const { $dayjs } = useNuxtApp();
+      const businessId = useLocalStorage("cBId", null);
+
+      if (!businessId.value) {
+        return {
+          recentMovements: 0,
+          recentLosses: 0
+        };
+      }
+
+      try {
+        const db = useFirestore();
+
+        // Calculate date range
+        const endDate = new Date();
+        const startDate = $dayjs().subtract(days, "day").toDate();
+
+        // Get all movements in the date range
+        const movementsQuery = query(
+          collection(db, "stockMovements"),
+          where("businessId", "==", businessId.value),
+          where("date", ">=", Timestamp.fromDate(startDate)),
+          where("date", "<=", Timestamp.fromDate(endDate))
+        );
+
+        const querySnapshot = await getDocs(movementsQuery);
+
+        // Count total movements
+        const totalMovements = querySnapshot.size;
+
+        // Calculate total losses
+        let totalLosses = 0;
+        querySnapshot.forEach((doc) => {
+          const movement = doc.data();
+          if (movement.type === StockMovementType.LOSS) {
+            // Calculate the monetary value of the loss
+            const lossQuantity = Math.abs(movement.quantity);
+            const costPerUnit = movement.previousCost || 0;
+            totalLosses += lossQuantity * costPerUnit;
+          }
+        });
+
+        return {
+          recentMovements: totalMovements,
+          recentLosses: totalLosses
+        };
+      } catch (error) {
+        console.error("Error getting stock movement stats:", error);
+        return {
+          recentMovements: 0,
+          recentLosses: 0
+        };
+      }
+    },
+
+    // ----------- Suppliers Movements
+
+    /**
+     * Fetch all suppliers for the current business
+     */
+    async fetchSuppliers() {
+      // Skip if already fetched
+      if (this.suppliersFetched) {
+        return this.suppliers;
+      }
+
+      const db = useFirestore();
+      const businessId = useLocalStorage("cBId", null);
+
+      if (!businessId.value) {
+        return [];
+      }
+
+      try {
+        const q = query(
+          collection(db, "suppliers"),
+          where("businessId", "==", businessId.value),
+          orderBy("name", "asc")
+        );
+
+        const querySnapshot = await getDocs(q);
+        const suppliers = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        this.$state.suppliers = suppliers;
+        this.$state.suppliersFetched = true;
+
+        return suppliers;
+      } catch (error) {
+        console.error("Error fetching suppliers:", error);
+        return [];
+      }
+    },
+
+    /**
+     * Add a new supplier or return existing one if it exists with the same name
+     */
+    async addSupplier(supplierName: string) {
+      if (!supplierName || supplierName.trim() === "") {
+        return null;
+      }
+
+      const db = useFirestore();
+      const user = useCurrentUser();
+      const businessId = useLocalStorage("cBId", null);
+
+      if (!businessId.value || !user?.value) {
+        return null;
+      }
+
+      // Clean supplier name and check if it already exists (case insensitive)
+      const cleanName = supplierName.trim();
+      const existingSupplier = this.suppliers.find((s: any) => s.name.toLowerCase() === cleanName.toLowerCase());
+
+      // Return existing supplier if found
+      if (existingSupplier) {
+        return existingSupplier;
+      }
+
+      try {
+        // Add new supplier
+        const newSupplierData = {
+          name: cleanName,
+          businessId: businessId.value,
+          userUid: user.value.uid,
+          createdAt: serverTimestamp()
+        };
+
+        const docRef = await addDoc(collection(db, "suppliers"), newSupplierData);
+
+        // Add to local state with ID
+        const newSupplier = {
+          id: docRef.id,
+          ...newSupplierData,
+          createdAt: new Date() // For local display
+        };
+
+        this.$state.suppliers.push(newSupplier);
+
+        // Sort suppliers by name
+        this.$state.suppliers.sort((a: any, b: any) => a.name.localeCompare(b.name));
+
+        return newSupplier;
+      } catch (error) {
+        console.error("Error adding supplier:", error);
+        return null;
+      }
+    },
+
+    /**
+     * Find a supplier by name (case insensitive)
+     */
+    findSupplierByName(name: string) {
+      if (!name) return null;
+
+      const cleanName = name.trim().toLowerCase();
+      return this.suppliers.find((s: any) => s.name.toLowerCase() === cleanName);
     }
   }
 });

@@ -13,17 +13,52 @@
         </NuxtLink>
       </div>
 
-      <div class="flex items-center justify-between gap-4">
-        <div class="flex flex-1 justify-center bg-secondary p-4 rounded-lg shadow gap-4">
-          <span>Total Productos:</span>
-          <span class="font-semibold">{{ totalProducts }}</span>
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <!-- Total Products Card -->
+        <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-600 font-medium">Productos disponibles</h3>
+            <LucidePackage2 class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ totalProducts }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>{{ products.length }} productos totales</span>
+          </div>
         </div>
-        <div class="flex flex-1 justify-center bg-secondary p-4 rounded-lg shadow gap-4">
-          <span>Costo total:</span>
-          <span class="font-semibold">{{ formatPrice(costTotal) }}</span>
+
+        <!-- Inventory Value Card -->
+        <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-600 font-medium">Valor de inventario</h3>
+            <FlowbiteDollarOutline class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ formatPrice(costTotal) }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>Promedio: {{ formatPrice(avgProductCost) }}</span>
+          </div>
+        </div>
+
+        <!-- Stock Movement Card -->
+        <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-600 font-medium">Movimientos recientes</h3>
+            <LucideHistory class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ recentMovements }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>Pérdidas: {{ formatPrice(recentLosses) }}</span>
+          </div>
         </div>
       </div>
-      <div class="flex flex-row gap-2 w-full sticky top-0">
+
+      <div class="flex flex-row gap-2 w-full sticky top-0 z-10 py-2">
         <div class="w-full">
           <div class="absolute p-[0.714rem]">
             <AntDesignSearchOutlined class="text-gray-600 text-[1.428rem]" />
@@ -39,48 +74,93 @@
           />
         </div>
       </div>
+
+      <!-- Products Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[0.571rem]" v-if="productsCleaned.length">
         <div
-          class="flex flex-col gap-[0.571rem] bg-secondary rounded-[0.428rem] shadow cursor-pointer hover:show-stock-options"
+          class="flex flex-col bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
           v-for="(product, index) in productsCleaned"
           :key="index"
-          @click="showProductsDetails(product.id)"
         >
-          <div class="flex justify-between gap-3 m-[0.714rem]">
-            <div class="rounded-lg overflow-hidden w-fit">
-              <img class="w-[100px]" v-if="product.imageUrl" :src="product.imageUrl" alt="Imagen del producto" />
-              <img class="w-[100px]" v-else src="/img/default-product.webp" alt="Imagen de un producto generico" />
-            </div>
-            <div class="flex flex-col justify-start items-end">
-              <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
-              <span v-if="product.isAvailable" class="text-xs font-medium text-success">Disponible</span>
-              <span v-if="product.isAvailable" class="text-xs font-medium text-success text-end"
-                >{{ formatQuantity(product.productStock) || 0 }} u. restantes</span
-              >
-              <span v-else class="text-sm font-medium text-danger">No disponible</span>
+          <!-- Product header with image and price -->
+          <div class="p-3 cursor-pointer" @click="showProductsDetails(product.id)">
+            <div class="flex justify-between items-start">
+              <div class="rounded-lg overflow-hidden w-fit">
+                <img
+                  class="w-[100px] h-[100px] object-cover"
+                  v-if="product.imageUrl"
+                  :src="product.imageUrl"
+                  alt="Imagen del producto"
+                />
+                <img
+                  class="w-[100px] h-[100px] object-cover"
+                  v-else
+                  src="/img/default-product.webp"
+                  alt="Imagen de un producto generico"
+                />
+              </div>
+              <div class="flex flex-col justify-start items-end">
+                <span class="font-semibold">{{ formatPrice(product.price ?? 0) }}</span>
+                <span
+                  class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium mt-1"
+                  :class="{
+                    'bg-green-50 text-green-800 ring-1 ring-green-600/20': product.isAvailable,
+                    'bg-red-50 text-red-800 ring-1 ring-red-600/20': !product.isAvailable
+                  }"
+                >
+                  {{ product.isAvailable ? "Disponible" : "No disponible" }}
+                </span>
+              </div>
             </div>
           </div>
-          <div class="flex-1 flex flex-col gap-1 m-[0.714rem]">
+
+          <!-- Product details -->
+          <div class="p-3 flex-1 cursor-pointer" @click="showProductsDetails(product.id)">
             <div class="flex flex-col mb-2">
               <span class="font-semibold">{{ product.productName }}</span>
               <span class="text-xs text-gray-600">{{
                 !product.description ? "No hay descripción para este producto" : product.description
               }}</span>
             </div>
-            <div class="flex flex-col">
-              <span class="text-sm"
-                ><b>Salto Unidad:</b> {{ formatQuantity(product.step ?? 0.5) }} {{ product.unit }}</span
-              >
-              <span class="text-sm capitalize"><b>Categoría:</b> {{ product.category ?? "Otro" }}</span>
+
+            <div class="flex flex-col text-sm text-gray-700">
+              <div class="flex justify-between">
+                <span><b>Stock:</b></span>
+                <span class="font-medium" :class="{ 'text-danger': product.productStock < 5 }">
+                  {{ formatQuantity(product.productStock) || 0 }} {{ product.unit }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span><b>Salto:</b></span>
+                <span>{{ formatQuantity(product.step ?? 0.5) }} {{ product.unit }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span><b>Categoría:</b></span>
+                <span class="capitalize">{{ product.category ?? "Otro" }}</span>
+              </div>
             </div>
           </div>
-          <div class="stock-options w-full text-center">
-            <button @click.stop="showEditStock(product.id)" class="btn bg-primary text-white w-full !rounded-[0]">
-              Editar Stock
+
+          <!-- Action buttons -->
+          <div class="grid grid-cols-2 border-t border-gray-200">
+            <button
+              @click="showProductsDetails(product.id)"
+              class="py-2 px-3 text-blue-600 font-medium hover:bg-blue-50 transition-colors flex items-center justify-center gap-1"
+            >
+              <LucideFileText class="text-sm" />
+              Detalles
+            </button>
+            <button
+              @click="showEditStock(product.id)"
+              class="py-2 px-3 text-green-600 font-medium hover:bg-green-50 transition-colors border-l border-gray-200 flex items-center justify-center gap-1"
+            >
+              <LucideEdit class="text-sm" />
+              Stock
             </button>
           </div>
         </div>
       </div>
+
       <div class="flex" v-else-if="!areProductsFetched">Cargando productos...</div>
       <div class="flex" v-else="areProductsFetched">No se encontraron productos</div>
     </div>
@@ -90,6 +170,11 @@
 <script setup>
 import IcRoundPlus from "~icons/ic/round-plus";
 import AntDesignSearchOutlined from "~icons/ant-design/search-outlined";
+import LucideFileText from "~icons/lucide/file-text";
+import LucideEdit from "~icons/lucide/edit";
+import LucidePackage2 from "~icons/lucide/package-2";
+import LucideHistory from "~icons/lucide/history";
+import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
 
 // ----- Define Pinia Vars --------
 const productsStore = useProductsStore();
@@ -100,6 +185,10 @@ const search = ref("");
 // Refs
 const productsDetails = ref(null);
 const editStock = ref(null);
+const stockStats = ref({
+  recentMovements: 0,
+  recentLosses: 0
+});
 
 // ----- Define Computed -----
 const productsCleaned = computed(() => {
@@ -148,6 +237,25 @@ const costTotal = computed(() => {
     }
     return acc;
   }, 0);
+});
+const avgProductCost = computed(() => {
+  const availableProducts = products.value.filter((el) => el.isAvailable);
+  if (availableProducts.length === 0) return 0;
+  return costTotal.value / availableProducts.length;
+});
+
+const recentMovements = computed(() => {
+  return stockStats.value.recentMovements;
+});
+
+const recentLosses = computed(() => {
+  return stockStats.value.recentLosses;
+});
+
+// Get stock movement stats
+onMounted(async () => {
+  const stats = await productsStore.getStockMovementStats(30); // Get last 30 days stats
+  stockStats.value = stats;
 });
 
 // ----- Define Methods -----

@@ -126,7 +126,8 @@ export const useDashboardStore = defineStore("dashboard", {
             totalClients: 0,
             totalNewClients: 0,
             totalOrders: 0,
-            productCosts: 0
+            productCosts: 0,
+            costCeroExists: false
           };
 
           currentDay = currentDay.add(1, "day");
@@ -193,6 +194,11 @@ export const useDashboardStore = defineStore("dashboard", {
 
                 dailyData[orderDay].totalCosts = dailyData[orderDay].totalCosts || 0;
                 dailyData[orderDay].totalCosts += (product.currentCost || productCost.cost || 0) * product.quantity;
+
+                // Add if exists a cost of 0 to alarm the user
+                if (product.currentCost === 0) {
+                  dailyData[orderDay].costCeroExists = true;
+                }
               }
             }
           }
