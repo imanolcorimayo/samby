@@ -224,9 +224,6 @@ async function fetchInitialData() {
 async function applyFilters() {
   isLoading.value = true;
 
-  // Reset movements
-  await productsStore.fetchStockMovements();
-
   // Apply filters locally
   const allMovements = [...getStockMovements.value];
 

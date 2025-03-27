@@ -503,7 +503,8 @@ export const useProductsStore = defineStore("products", {
         const querySnapshot = await getDocs(q);
 
         // Save the last document for pagination
-        const lastVisible = querySnapshot.docs.length < 20 ? null : querySnapshot.docs[querySnapshot.docs.length - 1];
+        const lastVisible =
+          querySnapshot.docs.length < pageLimit ? null : querySnapshot.docs[querySnapshot.docs.length - 1];
         this.$state.lastVisibleStockMovement = lastVisible;
 
         const movements = querySnapshot.docs.map((doc) => {
@@ -517,7 +518,9 @@ export const useProductsStore = defineStore("products", {
           };
         });
 
+        console.log("movements", movements, startAfterNum);
         if (startAfterNum) {
+          console.log("Going here");
           // Append to existing movements
           this.$state.stockMovements = [...this.$state.stockMovements, ...movements];
         } else {
