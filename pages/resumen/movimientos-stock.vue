@@ -214,6 +214,9 @@ async function fetchInitialData() {
   if (!productsStore.areProductsFetched) {
     await productsStore.fetchData();
   }
+  if (!productsStore.areSuppliersFetched) {
+    await productsStore.fetchSuppliers();
+  }
 
   await productsStore.fetchStockMovements();
   filteredMovements.value = [...getStockMovements.value];
