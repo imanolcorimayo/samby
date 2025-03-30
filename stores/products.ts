@@ -464,9 +464,14 @@ export const useProductsStore = defineStore("products", {
     },
 
     /**
-     * Fetch recent stock movements for reporting
+     * Fetch recent stock movements for reporting or for pending orders
+     * @param {string|null} productId - Optional specific product ID to fetch movements for
+     * @param {number} pageLimit - Number of movements to fetch per page
+     * @param {any} startAfterNum - Pagination cursor
+     * @param {boolean} forPendingOrders - If true, fetch all movements related to pending orders
+     * @returns {Promise<boolean>} - Success status
      */
-    async fetchStockMovements(productId = null, pageLimit = 20, startAfterNum = null) {
+    async fetchStockMovements(productId = null, pageLimit = 100, startAfterNum = null, forPendingOrders = false) {
       const db = useFirestore();
       const businessId = useLocalStorage("cBId", null);
 
@@ -476,9 +481,37 @@ export const useProductsStore = defineStore("products", {
 
       try {
         let q;
+        const ordersStore = useOrdersStore();
 
+        // If fetching for pending orders specifically
+        if (forPendingOrders) {
+          // Get all pending order IDs (including modified and requiring inventory update)
+          const pendingOrderIds = ordersStore.getPendingOrders
+            .filter((order: any) =>
+              [
+                "pendiente",
+                "pendiente-modificado",
+                "pendiente-de-confirmacion",
+                "requiere-actualizacion-inventario"
+              ].includes(order.orderStatus)
+            )
+            .map((order: any) => order.id);
+
+          if (pendingOrderIds.length === 0) {
+            // No pending orders, nothing to fetch
+            return true;
+          }
+
+          // Query all movements related to these orders
+          q = query(
+            collection(db, "stockMovements"),
+            where("businessId", "==", businessId.value),
+            where("orderId", "in", pendingOrderIds),
+            orderBy("date", "desc")
+          );
+        }
         // If we're fetching for a specific product
-        if (productId) {
+        else if (productId) {
           q = query(
             collection(db, "stockMovements"),
             where("businessId", "==", businessId.value),
@@ -486,8 +519,9 @@ export const useProductsStore = defineStore("products", {
             orderBy("date", "desc"),
             limit(pageLimit)
           );
-        } else {
-          // Fetching all movements
+        }
+        // Fetching all movements (paginated)
+        else {
           q = query(
             collection(db, "stockMovements"),
             where("businessId", "==", businessId.value),
@@ -497,17 +531,19 @@ export const useProductsStore = defineStore("products", {
         }
 
         // Add startAfter if provided (for pagination)
-        if (startAfterNum) {
+        if (startAfterNum && !forPendingOrders) {
           q = query(q, startAfter(startAfterNum));
         }
 
         const { $dayjs } = useNuxtApp();
         const querySnapshot = await getDocs(q);
 
-        // Save the last document for pagination
-        const lastVisible =
-          querySnapshot.docs.length < pageLimit ? null : querySnapshot.docs[querySnapshot.docs.length - 1];
-        this.$state.lastVisibleStockMovement = lastVisible;
+        // Save the last document for pagination (not relevant for pending orders mode)
+        if (!forPendingOrders) {
+          const lastVisible =
+            querySnapshot.docs.length < pageLimit ? null : querySnapshot.docs[querySnapshot.docs.length - 1];
+          this.$state.lastVisibleStockMovement = lastVisible;
+        }
 
         const movements = querySnapshot.docs.map((doc) => {
           const data = doc.data();
@@ -520,14 +556,12 @@ export const useProductsStore = defineStore("products", {
           };
         });
 
-        console.log("movements", movements, startAfterNum);
-        if (startAfterNum) {
-          console.log("Going here");
-          // Append to existing movements
-          this.$state.stockMovements = [...this.$state.stockMovements, ...movements];
-        } else {
+        if (forPendingOrders || !startAfterNum) {
           // Replace existing movements
           this.$state.stockMovements = movements;
+        } else {
+          // Append to existing movements
+          this.$state.stockMovements = [...this.$state.stockMovements, ...movements];
         }
 
         this.$state.stockMovementsFetched = true;

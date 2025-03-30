@@ -11,7 +11,7 @@
       </div>
 
       <!-- KPI Cards for Pending Orders -->
-      <div v-if="pendingOrders.length > 0" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
+      <div v-if="pendingOrders.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
         <!-- Total Stock Used Card -->
         <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
           <div class="flex justify-between mb-2">
@@ -37,6 +37,23 @@
           </div>
           <div class="text-gray-500 text-sm mt-2">
             <span>Ganancia: {{ formatPrice(pendingOrdersStats.totalEarnings, 0) }}</span>
+          </div>
+        </div>
+
+        <!-- Returned Stock Value Card -->
+        <div
+          v-if="pendingOrdersStats.returnedStockValue > 0"
+          class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200"
+        >
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-600 font-medium">Stock devuelto</h3>
+            <LucideArrowLeft class="text-gray-500 text-xl" />
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ formatPrice(pendingOrdersStats.returnedStockValue, 0) }}</span>
+          </div>
+          <div class="text-gray-500 text-sm mt-2">
+            <span>{{ pendingOrdersStats.returnedProducts }} productos devueltos</span>
           </div>
         </div>
 
@@ -255,7 +272,6 @@ import PhSealCheckDuotone from "~icons/ph/seal-check-duotone";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import IcRoundPlus from "~icons/ic/round-plus";
 import MingcuteUser4Fill from "~icons/mingcute/user-4-fill";
-import EpArrowRightBold from "~icons/ep/arrow-right-bold";
 import { ToastEvents } from "~/interfaces";
 import IconParkOutlineTransactionOrder from "~icons/icon-park-outline/transaction-order";
 
@@ -272,12 +288,14 @@ const clientsStore = useClientsStore();
 const { getPendingOrders: pendingOrders, getOrders: orders, arePendingOrdersFetched } = storeToRefs(ordersStore);
 // Get current product from products store for the most up-to-date cost
 const productsStore = useProductsStore();
-// Fetch stock movements
-await productsStore.fetchStockMovements(null, 100);
 
 // Function will manage if the data is already fetched
-ordersStore.fetchPendingOrders();
+await ordersStore.fetchPendingOrders();
 clientsStore.fetchData(); // Load clients data
+
+// Fetch stock movements.We need to call pending orders first
+const forPendingOrders = true;
+await productsStore.fetchStockMovements(null, 20, null, forPendingOrders);
 
 // ----- Define Vars -------
 const submitting = ref(null);
@@ -309,7 +327,9 @@ const pendingOrdersStats = computed(() => {
     totalProducts: 0,
     newClientsCount: 0,
     uniqueClients: new Set(),
-    uniqueClientsCount: 0
+    uniqueClientsCount: 0,
+    returnedStockValue: 0,
+    returnedProducts: 0
   };
 
   // Process each pending order
@@ -346,12 +366,20 @@ const pendingOrdersStats = computed(() => {
               if (movement.type === "sale") {
                 return sum + movement.previousCost * Math.abs(movement.quantity);
               } else if (movement.type === "return") {
-                return sum - movement.previousCost * Math.abs(movement.quantity);
+                // Use unitBuyingPrice for returns when available
+                // Unit buying price means the price at what the stock was returned
+                // It's calculated on the order store when returning back and saved in the stock movements
+                // specifically for this purpose
+                const returnCost = movement.unitBuyingPrice || movement.previousCost;
+                const returnValue = returnCost * Math.abs(movement.quantity);
+
+                stats.returnedStockValue += returnValue;
+                stats.returnedProducts += Math.abs(movement.quantity);
               }
               return sum;
             }, 0);
 
-            // For partially fulfilled orders, calculate the remaining cost at current price
+            // For partially fulfilled orders, calculate the remaining cost
             const remainingQuantity = quantity - stockUsed;
             const remainingCost = remainingQuantity > 0 ? remainingQuantity * currentCost : 0;
 

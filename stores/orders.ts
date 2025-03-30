@@ -16,7 +16,7 @@ import {
   Timestamp,
   onSnapshot
 } from "firebase/firestore";
-import { StockMovementType, ToastEvents } from "~/interfaces";
+import { StockMovementType, ToastEvents, type StockMovement } from "~/interfaces";
 
 // Helper function to validate prerequisites
 function validatePrerequisites() {
@@ -406,17 +406,46 @@ export const useOrdersStore = defineStore("orders", {
             const auxStockBack = Math.min(stockUsed, quantityDiff);
 
             if (auxStockBack > 0) {
+              // Find the original sale movement(s) for this product in this order
+              const saleMovements = productsStore.getStockMovements.filter(
+                (m: StockMovement) =>
+                  m.productId === product.productId && m.orderId === orderId && m.type === StockMovementType.SALE
+              );
+
+              // Calculate weighted average of the original cost
+              let originalCost = productInStore.cost; // Fallback to current cost
+
+              if (saleMovements.length > 0) {
+                // Calculate the weighted average of the original costs
+                const totalQuantity = saleMovements.reduce(
+                  (sum: number, m: StockMovement) => sum + Math.abs(m.quantity),
+                  0
+                );
+                const totalValue = saleMovements.reduce(
+                  (sum: number, m: StockMovement) => sum + Math.abs(m.quantity) * m.previousCost,
+                  0
+                );
+                originalCost = totalValue / totalQuantity;
+              }
+
+              // Calculate new weighted average cost
+              const currentTotalValue = stockNow * productInStore.cost;
+              const returnedValue = auxStockBack * originalCost;
+              const newTotalQuantity = stockNow + auxStockBack;
+              const newWeightedCost = (currentTotalValue + returnedValue) / newTotalQuantity;
+
               await productsStore.updateStockWithMovement(
                 {
-                  productStock: Math.max(stockNow + auxStockBack, 0),
-                  cost: productInStore.cost ?? 0
+                  productStock: newTotalQuantity,
+                  cost: newWeightedCost
                 },
                 productInStore,
                 {
                   type: StockMovementType.RETURN,
                   notes: `Modificación: Pedido #${orderId} - Reducción de cantidad`,
                   quantity: auxStockBack,
-                  orderId: orderId
+                  orderId: orderId,
+                  unitBuyingPrice: originalCost
                 }
               );
             }
@@ -498,18 +527,47 @@ export const useOrdersStore = defineStore("orders", {
             // Get current stock from the store
             const currentStock = parseFloat(productInStore.productStock ?? 0);
 
+            // Find the original sale movement(s) for this product in this order
+            const saleMovements = productsStore.getStockMovements.filter(
+              (m: StockMovement) =>
+                m.productId === product.productId && m.orderId === orderId && m.type === StockMovementType.SALE
+            );
+
+            // Calculate weighted average of the original cost
+            let originalCost = productInStore.cost; // Fallback to current cost
+
+            if (saleMovements.length > 0) {
+              // Calculate the weighted average of the original costs
+              const totalQuantity = saleMovements.reduce(
+                (sum: number, m: StockMovement) => sum + Math.abs(m.quantity),
+                0
+              );
+              const totalValue = saleMovements.reduce(
+                (sum: number, m: StockMovement) => sum + Math.abs(m.quantity) * m.previousCost,
+                0
+              );
+              originalCost = totalValue / totalQuantity;
+            }
+
+            // Calculate new weighted average cost
+            const currentTotalValue = currentStock * productInStore.cost;
+            const returnedValue = stockUsed * originalCost;
+            const newTotalQuantity = currentStock + stockUsed;
+            const newWeightedCost = (currentTotalValue + returnedValue) / newTotalQuantity;
+
             // Update product with movement record
             await productsStore.updateStockWithMovement(
               {
-                productStock: Math.max(stockUsed + currentStock, 0), // Ensure stock is not negative
-                cost: productInStore.cost ?? 0
+                productStock: newTotalQuantity,
+                cost: newWeightedCost
               },
               productInStore,
               {
                 type: StockMovementType.RETURN,
                 notes: `Modificación: Pedido #${orderId} - Producto eliminado (${product.productName})`,
-                quantity: stockUsed, // Positive since it's increasing stock
-                orderId: orderId
+                quantity: stockUsed,
+                orderId: orderId,
+                unitBuyingPrice: originalCost
               }
             );
           }
@@ -688,38 +746,61 @@ export const useOrdersStore = defineStore("orders", {
             const productsStore = useProductsStore();
             const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
 
-            if (!productInStore) {
+            if (!productInStore || !product.stockUsed || product.stockUsed <= 0) {
               continue;
             }
 
-            // Get product current stock from firebase
+            // Find the original sale movement(s) for this product in this order
+            const saleMovements = productsStore.getStockMovements.filter(
+              (m: StockMovement) =>
+                m.productId === product.productId && m.orderId === orderId && m.type === StockMovementType.SALE
+            );
+
+            // Calculate weighted average of the original cost
+            let originalCost = productInStore.cost; // Fallback to current cost
+
+            if (saleMovements.length > 0) {
+              // Calculate the weighted average of the original costs
+              const totalQuantity = saleMovements.reduce(
+                (sum: number, m: StockMovement) => sum + Math.abs(m.quantity),
+                0
+              );
+              const totalValue = saleMovements.reduce(
+                (sum: number, m: StockMovement) => sum + Math.abs(m.quantity) * m.previousCost,
+                0
+              );
+              originalCost = totalValue / totalQuantity;
+            }
+
+            // Get current stock from Firebase
             const productSnapshot = await getDoc(doc(db, "producto", product.productId));
             const productInFirebase = productSnapshot.data();
-
-            if (!productInFirebase) {
-              continue;
-            }
+            if (!productInFirebase) continue;
 
             const currentStock = parseFloat(productInFirebase.productStock ?? 0);
             const stockUsed = parseFloat(product.stockUsed ?? 0);
 
-            // Only add back when the stock is not 0
-            if (stockUsed <= 0) {
-              continue;
-            }
+            // Calculate new weighted average cost
+            const currentTotalValue = currentStock * productInStore.cost;
+            const returnedValue = stockUsed * originalCost;
+            const newTotalQuantity = currentStock + stockUsed;
+            const newWeightedCost = (currentTotalValue + returnedValue) / newTotalQuantity;
 
-            // Update stock with movement record - using RETURN type for clarity
+            // Update stock with movement record using the calculated new weighted average
             await productsStore.updateStockWithMovement(
               {
-                productStock: Math.max(stockUsed + currentStock, 0),
-                cost: productInStore.cost ?? 0
+                productStock: newTotalQuantity,
+                cost: newWeightedCost
               },
               productInStore,
               {
-                type: StockMovementType.RETURN, // This is more accurate than SALE for returns
+                type: StockMovementType.RETURN,
                 notes: `Pedido #${orderId} - ${status === "rechazado" ? "Rechazado" : "Cancelado"}`,
-                quantity: stockUsed, // Positive since it's increasing stock
-                orderId: orderId
+                quantity: stockUsed,
+                orderId: orderId,
+                // Store the original cost for reporting purposes.
+                // Even though it's not buying price, we keep the name for consistency
+                unitBuyingPrice: originalCost
               }
             );
           }

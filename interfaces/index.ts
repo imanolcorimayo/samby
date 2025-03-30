@@ -28,7 +28,7 @@ export interface StockMovement {
   newStock: number; // Stock after the movement
   previousCost: number; // Cost before the movement (if changed)
   newCost: number; // Cost after the movement (if changed)
-  unitBuyingPrice: number | null; // Price paid to supplier (for additions)
+  unitBuyingPrice: number | null; // Price paid to supplier (for additions). Price of the stock currently (For returns)
   supplierId: string | null; // Reference to supplier
   supplierName: string | null; // Name of supplier
   lossReason: LossReason | null; // Reason for loss (if type is loss)

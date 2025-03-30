@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { serverTimestamp, collection, query, where, getDocs, Timestamp } from "firebase/firestore";
-import { StockMovementType, ToastEvents } from "~/interfaces";
+import { StockMovementType, ToastEvents, type StockMovement } from "~/interfaces";
 
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore"; // ES 2015
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // ES 2015
@@ -322,20 +322,18 @@ export const useDashboardStore = defineStore("dashboard", {
 
             // Track daily costs used
             const costDay = movement.date;
-            if (movement.type === StockMovementType.SALE && dailyData[costDay]) {
-              if (!costsByDay[costDay]) {
-                costsByDay[costDay] = 0;
-              }
 
+            if (!costsByDay[costDay]) {
+              costsByDay[costDay] = 0;
+            }
+
+            if (movement.type === StockMovementType.SALE && dailyData[costDay]) {
               // For sales, add the cost to the daily tally
               costsByDay[costDay] += Math.abs(movement.quantity) * movement.previousCost;
             } else if (movement.type === StockMovementType.RETURN && dailyData[costDay]) {
-              if (!costsByDay[costDay]) {
-                costsByDay[costDay] = 0;
-              }
-
-              // For returns, subtract the cost from the daily tally
-              costsByDay[costDay] -= Math.abs(movement.quantity) * movement.previousCost;
+              // For returns, subtract the ORIGINAL cost from the daily tally
+              const returnCost = movement.unitBuyingPrice || movement.previousCost;
+              costsByDay[costDay] -= Math.abs(movement.quantity) * returnCost;
             }
           }
         }
@@ -492,11 +490,13 @@ export const useDashboardStore = defineStore("dashboard", {
 
                 if (productMovements.length > 0) {
                   // Calculate actual cost from movements
-                  const movementCost = productMovements.reduce((sum: number, movement: any) => {
+                  const movementCost = productMovements.reduce((sum: number, movement: StockMovement) => {
                     if (movement.type === StockMovementType.SALE) {
                       return sum + movement.previousCost * Math.abs(movement.quantity);
                     } else if (movement.type === StockMovementType.RETURN) {
-                      return sum - movement.previousCost * Math.abs(movement.quantity);
+                      // Use unitBuyingPrice for returns when available
+                      const returnCost = movement.unitBuyingPrice || movement.previousCost;
+                      return sum - returnCost * Math.abs(movement.quantity);
                     }
                     return sum;
                   }, 0);

@@ -65,6 +65,30 @@
       </div>
 
       <!-- Movements Table -->
+      <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-blue-400"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700">
+              Para las devoluciones, el "Costo Unitario" indica el costo original del producto cuando se vendió, no el
+              costo actual del producto. Esto asegura que la valoración del inventario sea precisa.
+            </p>
+          </div>
+        </div>
+      </div>
       <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
@@ -75,6 +99,9 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Costo Unitario
+                </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalles</th>
               </tr>
             </thead>
@@ -113,6 +140,16 @@
                   <div v-else>{{ formatPrice(movement.newCost) }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div v-if="movement.type === 'return' && movement.unitBuyingPrice">
+                    <span class="font-medium text-purple-600">{{ formatPrice(movement.unitBuyingPrice) }}</span>
+                    <span class="text-xs text-gray-500 block">(Costo original)</span>
+                  </div>
+                  <div v-else-if="movement.type === 'addition' && movement.unitBuyingPrice">
+                    {{ formatPrice(movement.unitBuyingPrice) }}
+                  </div>
+                  <div v-else>{{ formatPrice(movement.previousCost) }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div v-if="movement.type === 'loss'">Razón: {{ formatLossReason(movement.lossReason) }}</div>
                   <div v-if="movement.supplierName">Proveedor: {{ movement.supplierName }}</div>
                   <div v-if="movement.notes">{{ movement.notes }}</div>
@@ -132,7 +169,7 @@
       </div>
 
       <!-- Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
         <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
           <div class="flex justify-between mb-2">
             <h3 class="text-gray-600 font-medium">Total Movimientos</h3>
@@ -172,6 +209,37 @@
           </div>
           <div class="mt-1">
             <span class="font-semibold text-lg">{{ formatPrice(calculateTotalLosses()) }}</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
+          <div class="flex justify-between mb-2">
+            <h3 class="text-gray-600 font-medium">Devoluciones</h3>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-purple-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3"
+              />
+            </svg>
+          </div>
+          <div class="mt-1">
+            <span class="font-semibold text-lg">{{ formatPrice(calculateTotalReturns()) }}</span>
+          </div>
+          <div class="text-sm text-gray-500 mt-1">
+            <span
+              >{{
+                filteredMovements.filter((m) => m.type === "return").reduce((sum, m) => sum + Math.abs(m.quantity), 0)
+              }}
+              productos</span
+            >
           </div>
         </div>
       </div>
@@ -272,6 +340,17 @@ function calculateTotalPurchases() {
         const prevTotalValue = m.previousStock * m.previousCost;
         return sum + (newTotalValue - prevTotalValue);
       }
+    }, 0);
+}
+
+function calculateTotalReturns() {
+  return filteredMovements.value
+    .filter((m) => m.type === "return")
+    .reduce((sum, m) => {
+      const returnQuantity = Math.abs(m.quantity);
+      // Use unitBuyingPrice if available, otherwise use previousCost
+      const costPerUnit = m.unitBuyingPrice || m.previousCost || 0;
+      return sum + returnQuantity * costPerUnit;
     }, 0);
 }
 
