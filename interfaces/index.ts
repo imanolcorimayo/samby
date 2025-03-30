@@ -20,6 +20,7 @@ export interface StockMovement {
   businessId: string;
   productId: string;
   productName: string; // For easier reporting
+  orderId: string | null; // Add this new field to link directly to orders
   date: any; // Timestamp
   type: StockMovementType; // Type of movement
   quantity: number; // Amount changed (positive or negative)

@@ -21,9 +21,9 @@
             <li v-for="product in negativeStockProducts" :key="product.productId">
               <span class="font-medium">{{ product.productName }}</span
               >:
-              <span class="text-red-600"
-                >Necesita {{ formatQuantity(product.quantity - product.currentProductStock) }} adicionales</span
-              >
+              <span class="text-red-600">
+                Necesita {{ formatQuantity(product.quantity - getCurrentProductStock(product.productId)) }} adicionales
+              </span>
             </li>
           </ul>
           <p class="text-sm mt-1">El pedido se creará con estado "Requiere Actualización de Inventario"</p>
@@ -41,7 +41,7 @@
             <span class="text-sm">Cantidad: {{ formatQuantity(p.quantity) }}</span>
             <span class="text-sm">Precio Unitario: {{ formatPrice(p.price) }}</span>
             <span class="text-sm" :class="{ 'text-red-600 font-medium': isNegativeStock(p) }">
-              Stock restante: {{ formatQuantity(p.currentProductStock - p.quantity) }}
+              Stock restante: {{ formatQuantity(getCurrentProductStock(p.productId) - p.quantity) }}
               <span v-if="isNegativeStock(p)">(insuficiente)</span>
             </span>
           </div>
@@ -202,6 +202,9 @@ const { getCurrentBusiness: currentBusiness } = storeToRefs(indexStore);
 const ordersStore = useOrdersStore();
 const { doesOrderExist, getShoppingCart: products, totalAmount } = storeToRefs(ordersStore);
 
+const productsStore = useProductsStore();
+const { products: storeProducts } = storeToRefs(productsStore);
+
 // ------- Define Vars --------
 const client = ref({
   clientName: "",
@@ -252,7 +255,9 @@ const formattedClients = computed(() => {
 });
 
 const negativeStockProducts = computed(() => {
-  return products.value.filter((product) => product.quantity > product.currentProductStock);
+  return products.value.filter((product) => {
+    return product.quantity > getCurrentProductStock(product.productId);
+  });
 });
 
 const hasNegativeStockProducts = computed(() => {
@@ -260,10 +265,18 @@ const hasNegativeStockProducts = computed(() => {
 });
 
 // ------- Define Methods --------
+function getCurrentProductStock(productId) {
+  // Find the product in the products store
+  const storeProduct = storeProducts.value.find((p) => p.id === productId);
+
+  // Return the current stock (or 0 if product not found)
+  return storeProduct ? parseFloat(storeProduct.productStock || 0) : 0;
+}
 
 // Helper function to check if a specific product has negative stock
 function isNegativeStock(product) {
-  return product.quantity > product.currentProductStock;
+  const currentStock = getCurrentProductStock(product.productId);
+  return product.quantity > currentStock;
 }
 
 async function saveClient() {

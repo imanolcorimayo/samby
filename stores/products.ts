@@ -399,6 +399,7 @@ export const useProductsStore = defineStore("products", {
         supplierName?: string;
         unitBuyingPrice?: number;
         notes?: string;
+        orderId?: string;
       }
     ) {
       const db = useFirestore();
@@ -424,6 +425,7 @@ export const useProductsStore = defineStore("products", {
         const movement: StockMovement = {
           productId: current.id,
           productName: current.productName,
+          orderId: movementDetails.orderId || null, // Add this field
           type: movementDetails.type,
           quantity: quantityChange,
           previousStock: previousStock,

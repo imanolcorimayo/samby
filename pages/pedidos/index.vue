@@ -55,36 +55,6 @@
         </div>
       </div>
 
-      <!-- Warning messages for missing product costs -->
-      <div v-if="missingProductsCount > 0" class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg">
-        <div class="text-yellow-800 flex flex-col gap-4 sm:flex-row items-center justify-between">
-          <span>
-            Tenés <strong>{{ missingProductsCount }}</strong> producto{{ missingProductsCount === 1 ? "" : "s" }} sin el
-            costo de compra de hoy. ¿Querés completarlos ahora?
-          </span>
-          <NuxtLink
-            to="/inventario/costo-diario"
-            class="btn bg-secondary ring-2 ring-yellow-400 w-full text-center sm:w-auto"
-          >
-            Completar
-          </NuxtLink>
-        </div>
-      </div>
-      <div
-        v-else-if="dailyProductCost.length == 0 && todaysOrders.length > 0"
-        class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg"
-      >
-        <div class="text-yellow-800 flex flex-col gap-4 sm:flex-row items-center justify-between">
-          <span>Parece que no cargaste los costos de los productos de hoy</span>
-          <NuxtLink
-            to="/inventario/costo-diario"
-            class="btn bg-secondary ring-2 ring-yellow-400 w-full text-center sm:w-auto"
-          >
-            Completar
-          </NuxtLink>
-        </div>
-      </div>
-
       <!-- Order filter tabs -->
       <div class="flex gap-2 items-center">
         <div class="flex gap-1 bg-gray-200 rounded-[.714rem] p-1 w-fit">
@@ -299,16 +269,14 @@ const { $dayjs } = useNuxtApp();
 // ----- Define Pinia Vars --------
 const ordersStore = useOrdersStore();
 const clientsStore = useClientsStore();
-const {
-  getPendingOrders: pendingOrders,
-  getOrders: orders,
-  arePendingOrdersFetched,
-  getDailyProductCost: dailyProductCost
-} = storeToRefs(ordersStore);
+const { getPendingOrders: pendingOrders, getOrders: orders, arePendingOrdersFetched } = storeToRefs(ordersStore);
+// Get current product from products store for the most up-to-date cost
+const productsStore = useProductsStore();
+// Fetch stock movements
+await productsStore.fetchStockMovements(null, 100);
 
 // Function will manage if the data is already fetched
 ordersStore.fetchPendingOrders();
-ordersStore.fetchDailyProductCost($dayjs().format("YYYY-MM-DD"));
 clientsStore.fetchData(); // Load clients data
 
 // ----- Define Vars -------
@@ -330,21 +298,6 @@ const orderDates = computed(() => {
   }
 
   return orders.value.map((order) => order.shippingDate);
-});
-
-const todaysOrders = computed(() => {
-  const today = $dayjs().format("YYYY-MM-DD");
-
-  // Pending orders
-  const pendingTodaysOrders = pendingOrders.value.filter((order) => $dayjs(order.shippingDate).isSame(today, "day"));
-  // Completed orders
-  const completedTodaysOrders = orders.value.filter((order) => $dayjs(order.shippingDate).isSame(today, "day"));
-  // Combine both arrays
-  return [...pendingTodaysOrders, ...completedTodaysOrders];
-});
-
-const missingProductsCount = computed(() => {
-  return dailyProductCost.value.filter((product) => !product.cost).length;
 });
 
 // KPI Calculations for pending orders
@@ -372,14 +325,51 @@ const pendingOrdersStats = computed(() => {
     // Process products in the order
     if (order.products && Array.isArray(order.products)) {
       order.products.forEach((product) => {
-        // Look for the product in the daily cost list
-        const dailyProduct = dailyProductCost.value.find((p) => p.id === product.id);
-
-        // Stock cost calculation
-        const cost = product.currentCost || dailyProduct?.cost || 0;
-        const quantity = product.quantity || 0;
-        stats.totalStockCost += cost * quantity;
+        const quantity = parseFloat(product.quantity || 0);
+        const stockUsed = parseFloat(product.stockUsed || 0);
         stats.totalProducts += quantity;
+        const productInStore = productsStore.getProducts.find((p) => p.id === product.productId);
+        const currentCost = productInStore ? parseFloat(productInStore.cost || 0) : 0;
+
+        // Look for associated stock movements if stockUsed > 0
+        if (stockUsed > 0 && productsStore.getStockMovements) {
+          const stockMovements = productsStore.getStockMovements.filter(
+            (m) =>
+              m.productId === product.productId &&
+              ((m.type === "sale" && m.orderId === order.id) || (m.type === "return" && m.orderId === order.id))
+          );
+
+          if (stockMovements.length > 0) {
+            // Calculate cost from actual movements, considering both sales and returns
+            const movementCost = stockMovements.reduce((sum, movement) => {
+              // For sales, add the cost; for returns, subtract the cost
+              if (movement.type === "sale") {
+                return sum + movement.previousCost * Math.abs(movement.quantity);
+              } else if (movement.type === "return") {
+                return sum - movement.previousCost * Math.abs(movement.quantity);
+              }
+              return sum;
+            }, 0);
+
+            // For partially fulfilled orders, calculate the remaining cost at current price
+            const remainingQuantity = quantity - stockUsed;
+            const remainingCost = remainingQuantity > 0 ? remainingQuantity * currentCost : 0;
+
+            stats.totalStockCost += movementCost + remainingCost;
+          } else {
+            // Fallback: Calculate based on stockUsed and currentCost
+            stats.totalStockCost += stockUsed * currentCost;
+
+            // Add cost for remaining quantity
+            const remainingQuantity = quantity - stockUsed;
+            if (remainingQuantity > 0) {
+              stats.totalStockCost += remainingQuantity * currentCost;
+            }
+          }
+        } else {
+          // For products with no stockUsed yet, use current cost
+          stats.totalStockCost += quantity * currentCost;
+        }
       });
     }
   });

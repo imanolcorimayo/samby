@@ -16,7 +16,7 @@ import {
   Timestamp,
   onSnapshot
 } from "firebase/firestore";
-import { ToastEvents } from "~/interfaces";
+import { StockMovementType, ToastEvents } from "~/interfaces";
 
 // Helper function to validate prerequisites
 function validatePrerequisites() {
@@ -92,8 +92,9 @@ export const useOrdersStore = defineStore("orders", {
           price: product.price,
           unit: product.unit,
           total: productsQuantity[pId] * product.price,
-          currentProductStock: product.productStock ?? 0,
-          currentCost: product.cost ?? 0
+
+          // Keep tracking stockUsed for orders
+          stockUsed: 0 // Will be updated when placing order
         });
       }
 
@@ -154,36 +155,6 @@ export const useOrdersStore = defineStore("orders", {
       const shippingTime = $dayjs(order.shippingDate).toDate();
 
       try {
-        // Update each product stock. We do it previously to place the order
-        // To save the product stock used in the order
-        for (const product of order.products) {
-          const productsStore = useProductsStore();
-          const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
-
-          if (!productInStore) {
-            continue;
-          }
-
-          // If product quantity is major than the current stock, then bypass this product
-          // We will update the stock once there is stock available, not otherwise
-          if (parseFloat(product.quantity) > parseFloat(product.currentProductStock ?? 0)) {
-            product.stockUsed = 0;
-            continue;
-          }
-
-          // We use either the quantity or the current stock, whichever is lower
-          // Always should be the quantity, but just in case
-          product.stockUsed = Math.min(product.quantity, product.currentProductStock);
-          const productStock = parseFloat(product.currentProductStock ?? 0) - product.quantity;
-          await productsStore.updateStock(
-            {
-              productStock: Math.max(productStock, 0), // 0 or more
-              cost: productInStore.cost ?? 0 // Not changing
-            },
-            productInStore
-          );
-        }
-
         // Create object to be inserted
         const orderObject = {
           ...order,
@@ -194,11 +165,39 @@ export const useOrdersStore = defineStore("orders", {
           clientId: clientId
         };
 
-        // Handle recurrent payments
+        // Create order first to get the ID
         const newOrder = await addDoc(collection(db, "pedido"), orderObject);
-
-        // Get the new order id
         const orderId = newOrder.id;
+
+        // Update each product stock with movement tracking
+        for (const product of order.products) {
+          const productsStore = useProductsStore();
+          const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
+
+          if (!productInStore) continue;
+
+          // Get current stock directly from store
+          const currentStock = parseFloat(productInStore.productStock ?? 0);
+
+          // Use available stock
+          const quantityToUse = Math.min(product.quantity, currentStock);
+          product.stockUsed = quantityToUse;
+
+          // Update stock
+          await productsStore.updateStockWithMovement(
+            {
+              productStock: Math.max(currentStock - quantityToUse, 0),
+              cost: productInStore.cost ?? 0
+            },
+            productInStore,
+            {
+              type: StockMovementType.SALE,
+              notes: `Pedido #${order.clientId} - ${order.client.clientName}`,
+              quantity: -quantityToUse,
+              orderId: orderId
+            }
+          );
+        }
 
         // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
         await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {
@@ -372,57 +371,110 @@ export const useOrdersStore = defineStore("orders", {
 
       try {
         /* Update Firebase Database */
+        // Store the original status to check if it was "requiere-actualizacion-inventario"
+        const wasRequiringInventoryUpdate = currentOrder.orderStatus === "requiere-actualizacion-inventario";
 
-        // Update stock in products first to we can also update the "stockUsed" property in the order
+        // Flag to track if any product requires inventory update
+        let requiresInventoryUpdate = false;
+
         for (const product of newOrder.products) {
           const productsStore = useProductsStore();
           const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
 
-          if (!productInStore) {
-            continue;
-          }
+          if (!productInStore) continue;
 
           // Get currentQuantity from the current order
-          // It's possible the product is not present in the previous order
           const currentProduct = currentOrder.products.find((p: any) => p.productId === product.productId);
           const currentQuantity = currentProduct ? parseFloat(currentProduct.quantity ?? 0) : 0;
-          const stockUsed = currentProduct ? parseFloat(currentProduct.stockUsed ?? 0) : null;
+          const stockUsed = currentProduct ? parseFloat(currentProduct.stockUsed ?? 0) : 0;
 
           const newQuantity = parseFloat(product.quantity ?? 0);
           const quantityDiff = currentQuantity - newQuantity;
-          // Get stock now in case the difference is negative
           const stockNow = parseFloat(productInStore.productStock ?? 0);
 
-          // This scenario should not be possible
-          if (quantityDiff > 0 && stockUsed === null) {
-            continue;
-          }
-
-          // If quantityDiff is 0, then we don't need to update anything
-          let auxStockBack = 0;
           if (quantityDiff === 0) {
+            // No change in quantity, keep existing stockUsed
+            product.stockUsed = stockUsed;
+
+            // If stock used is less than quantity, it means it needs inventory updated
+            if (stockUsed < newQuantity) {
+              requiresInventoryUpdate = true;
+            }
             continue;
           } else if (quantityDiff > 0) {
-            // If quantityDiff > 0 -> Adds stock back.
-            // If stock used was less than the new stock difference
-            // Then the max to be returned is the stock used, so we always need the minimum
-            auxStockBack = Math.min(stockUsed as number, quantityDiff);
+            // Quantity decreased - return stock to inventory
+            const auxStockBack = Math.min(stockUsed, quantityDiff);
+
+            if (auxStockBack > 0) {
+              await productsStore.updateStockWithMovement(
+                {
+                  productStock: Math.max(stockNow + auxStockBack, 0),
+                  cost: productInStore.cost ?? 0
+                },
+                productInStore,
+                {
+                  type: StockMovementType.RETURN,
+                  notes: `Modificación: Pedido #${orderId} - Reducción de cantidad`,
+                  quantity: auxStockBack,
+                  orderId: orderId
+                }
+              );
+            }
+
+            // Update stockUsed value
+            product.stockUsed = Math.max(stockUsed - auxStockBack, 0);
           } else {
-            // If quantityDiff < 0 -> Removes stock. We make sure it does not exceed today's stock
-            auxStockBack = -1 * Math.min(Math.abs(quantityDiff), stockNow);
+            // Quantity increased - check if enough stock is available
+            const additionalNeeded = Math.abs(quantityDiff);
+
+            if (stockNow >= additionalNeeded) {
+              // Enough stock available
+              const stockToUse = additionalNeeded;
+
+              await productsStore.updateStockWithMovement(
+                {
+                  productStock: Math.max(stockNow - stockToUse, 0),
+                  cost: productInStore.cost ?? 0
+                },
+                productInStore,
+                {
+                  type: StockMovementType.SALE,
+                  notes: `Modificación: Pedido #${orderId} - Aumento de cantidad`,
+                  quantity: -stockToUse,
+                  orderId: orderId
+                }
+              );
+
+              // Update stockUsed value
+              product.stockUsed = stockUsed + stockToUse;
+            } else {
+              // Not enough stock available - flag for inventory update
+              requiresInventoryUpdate = true;
+
+              // Use whatever stock is available
+              if (stockNow > 0) {
+                await productsStore.updateStockWithMovement(
+                  {
+                    productStock: 0, // Use all available stock
+                    cost: productInStore.cost ?? 0
+                  },
+                  productInStore,
+                  {
+                    type: StockMovementType.SALE,
+                    notes: `Modificación: Pedido #${orderId} - Aumento de cantidad (stock parcial)`,
+                    quantity: -stockNow,
+                    orderId: orderId
+                  }
+                );
+
+                // Update stockUsed to reflect what was actually used
+                product.stockUsed = stockUsed + stockNow;
+              } else {
+                // No stock available
+                product.stockUsed = stockUsed;
+              }
+            }
           }
-
-          // We need to update the stock used
-          product.stockUsed = Math.max((stockUsed as number) + -1 * auxStockBack, 0);
-
-          // Update product in firebase + store
-          await productsStore.updateStock(
-            {
-              productStock: Math.max(stockNow + auxStockBack, 0), // Ensure stock is not negative
-              cost: productInStore.cost ?? 0
-            },
-            productInStore
-          );
         }
 
         // Find any deleted product and add back the stock if it was used
@@ -443,35 +495,76 @@ export const useOrdersStore = defineStore("orders", {
               continue;
             }
 
-            // Update product in firebase + store
-            await productsStore.updateStock(
+            // Get current stock from the store
+            const currentStock = parseFloat(productInStore.productStock ?? 0);
+
+            // Update product with movement record
+            await productsStore.updateStockWithMovement(
               {
-                productStock: Math.max(stockUsed + productInStore.productStock, 0), // Ensure stock is not negative
+                productStock: Math.max(stockUsed + currentStock, 0), // Ensure stock is not negative
                 cost: productInStore.cost ?? 0
               },
-              productInStore
+              productInStore,
+              {
+                type: StockMovementType.RETURN,
+                notes: `Modificación: Pedido #${orderId} - Producto eliminado (${product.productName})`,
+                quantity: stockUsed, // Positive since it's increasing stock
+                orderId: orderId
+              }
             );
           }
         }
 
         // Remove createdAt from the new order. This crashes firebase otherwise
         delete newOrder.createdAt;
+
+        // Determine the appropriate status based on inventory needs and previous status
+        let orderStatus;
+
+        if (requiresInventoryUpdate) {
+          // Still needs inventory update
+          orderStatus = "requiere-actualizacion-inventario";
+        } else if (wasRequiringInventoryUpdate) {
+          // Previously needed inventory update but now resolved
+          orderStatus = "pendiente-modificado";
+        } else {
+          // Regular modification
+          orderStatus = "pendiente-modificado";
+        }
+
+        // Update the order in Firestore
         await updateDoc(doc(db, "pedido", orderId), {
           ...newOrder,
           shippingDate: Timestamp.fromDate($dayjs(newOrder.shippingDate).toDate()),
-          orderStatus: "pendiente-modificado"
+          orderStatus: orderStatus
         });
 
-        // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
+        // Customize the log message based on the status change
+        let logMessage;
+        if (requiresInventoryUpdate) {
+          logMessage = "Orden modificada pero requiere actualización de inventario";
+        } else if (wasRequiringInventoryUpdate) {
+          logMessage = "Orden modificada y actualizada con inventario suficiente";
+        } else {
+          logMessage = "Orden modificada por el usuario " + user.value.displayName;
+        }
+
+        // Save the status log
         await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {
-          orderStatus: "pendiente-modificado",
-          message: "Orden modificada por el usuario " + user.value.displayName,
+          orderStatus: orderStatus,
+          message: logMessage,
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
 
-        /* Update Pinia Store */
-        this.$state.pendingOrders[orderIndex] = { ...newOrder, id: orderId, orderStatus: "pendiente-modificado" };
+        // Provide appropriate feedback
+        if (requiresInventoryUpdate) {
+          useToast(ToastEvents.warning, "La orden ha sido modificada pero requiere actualización de inventario");
+        } else if (wasRequiringInventoryUpdate) {
+          useToast(ToastEvents.success, "La orden ha sido modificada y ahora tiene stock suficiente");
+        } else {
+          useToast(ToastEvents.success, "La orden ha sido modificada correctamente");
+        }
 
         return true;
       } catch (error) {
@@ -519,35 +612,37 @@ export const useOrdersStore = defineStore("orders", {
             if (!productInStore) continue;
 
             const currentStock = parseFloat(productInStore.productStock ?? 0);
-
-            // Calculate how much stock was NOT yet used
-            // stockUsed should be 0 if the stock was not updated
             const stockUsed = parseFloat(product.stockUsed ?? 0);
             const totalNeeded = parseFloat(product.quantity ?? 0);
             const remainingToUse = totalNeeded - stockUsed;
 
             if (remainingToUse > 0 && currentStock < remainingToUse) {
-              // Show the user which product is missing stock
               useToast(
                 ToastEvents.error,
-                `No hay stock suficiente para el producto ${product.productName}. Intenta recargando la página o contactanos si pensas que es un error.`
+                `No hay stock suficiente para el producto ${product.productName}. Intenta recargando la página.`
               );
               return false;
             }
 
             // Only update if we need to use more stock
-            if (remainingToUse > 0 && currentStock >= totalNeeded && stockUsed == 0) {
+            if (remainingToUse > 0 && currentStock >= remainingToUse) {
               // Use as much stock as is available, update the stockUsed field
               const additionalStockToUse = Math.min(currentStock, remainingToUse);
 
               if (additionalStockToUse > 0) {
-                // Update product stock
-                await productsStore.updateStock(
+                // Update stock with movement record
+                await productsStore.updateStockWithMovement(
                   {
                     productStock: Math.max(currentStock - additionalStockToUse, 0),
                     cost: productInStore.cost ?? 0
                   },
-                  productInStore
+                  productInStore,
+                  {
+                    type: StockMovementType.SALE,
+                    notes: `Actualización: Pedido #${orderId} - Cambio a estado "pendiente"`,
+                    quantity: -additionalStockToUse, // Make negative since it's decreasing stock
+                    orderId: orderId
+                  }
                 );
 
                 // Update the stockUsed in the order document
@@ -559,9 +654,7 @@ export const useOrdersStore = defineStore("orders", {
                   areProductsUpdated = true;
                   updatedProducts[productIndex] = {
                     ...updatedProducts[productIndex],
-                    stockUsed: newStockUsed,
-                    currentProductStock: Math.max(currentStock, 0),
-                    currentCost: productInStore.cost ?? 0
+                    stockUsed: newStockUsed
                   };
                 }
               }
@@ -589,28 +682,25 @@ export const useOrdersStore = defineStore("orders", {
           userUid: user.value.uid
         });
 
-        // If "pendiente-de-confirmacion" and status moved to "rechazado", or moved to "cancelado"
-        // then add the stock back to the products
+        // For canceled/rejected orders, return stock to inventory
         if (orderIndex > -1 && (status === "rechazado" || status === "cancelado")) {
           for (const product of order.products) {
             const productsStore = useProductsStore();
             const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
 
-            // Fail-safe check
             if (!productInStore) {
               continue;
             }
 
-            // Get product current stock from firebase in order to have up to date information
+            // Get product current stock from firebase
             const productSnapshot = await getDoc(doc(db, "producto", product.productId));
             const productInFirebase = productSnapshot.data();
 
-            // Fail-safe check
             if (!productInFirebase) {
               continue;
             }
 
-            productInFirebase.productStock = parseFloat(productInFirebase.productStock ?? 0);
+            const currentStock = parseFloat(productInFirebase.productStock ?? 0);
             const stockUsed = parseFloat(product.stockUsed ?? 0);
 
             // Only add back when the stock is not 0
@@ -618,13 +708,19 @@ export const useOrdersStore = defineStore("orders", {
               continue;
             }
 
-            // Update product in firebase + store
-            await productsStore.updateStock(
+            // Update stock with movement record - using RETURN type for clarity
+            await productsStore.updateStockWithMovement(
               {
-                productStock: Math.max(stockUsed + productInFirebase.productStock, 0), // Ensure stock is not negative
+                productStock: Math.max(stockUsed + currentStock, 0),
                 cost: productInStore.cost ?? 0
               },
-              productInStore
+              productInStore,
+              {
+                type: StockMovementType.RETURN, // This is more accurate than SALE for returns
+                notes: `Pedido #${orderId} - ${status === "rechazado" ? "Rechazado" : "Cancelado"}`,
+                quantity: stockUsed, // Positive since it's increasing stock
+                orderId: orderId
+              }
             );
           }
         }

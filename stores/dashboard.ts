@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { serverTimestamp, collection, query, where, getDocs, Timestamp } from "firebase/firestore";
-import { ToastEvents } from "~/interfaces";
+import { StockMovementType, ToastEvents } from "~/interfaces";
 
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore"; // ES 2015
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // ES 2015
@@ -71,6 +71,10 @@ export const useDashboardStore = defineStore("dashboard", {
       // Format dates to ensure consistency
       const formattedStartDate = $dayjs(startDate).format("YYYY-MM-DD");
       const formattedEndDate = $dayjs(endDate).format("YYYY-MM-DD");
+
+      // Determine if we should use legacy logic or new stock movement logic
+      const CUTOFF_DATE = "2025-03-29";
+      const useLegacyLogic = $dayjs(formattedStartDate).isSameOrBefore(CUTOFF_DATE, "day");
 
       // Validate prerequisites
       const prereq: Prerequisites = validatePrerequisites();
@@ -155,23 +159,47 @@ export const useDashboardStore = defineStore("dashboard", {
         // Client tracking sets
         const allClientsInPeriod = new Set();
 
-        // 3. Fetch product costs for the date range
-        const productCostsQuery = query(
-          collection(db, "dailyProductCost"),
-          where("businessId", "==", businessId.value),
-          where("date", ">=", Timestamp.fromDate(startDateTime)),
-          where("date", "<=", Timestamp.fromDate(endDateTime))
-        );
+        // Fetch appropriate cost data based on mode
+        let productCosts: any = [];
+        let stockMovements: any = [];
 
-        const productCostsSnapshot = await getDocs(productCostsQuery);
-        const productCosts: any = productCostsSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            ...data,
-            id: doc.id,
-            date: $dayjs(data.date.toDate()).format("YYYY-MM-DD")
-          };
-        });
+        if (useLegacyLogic) {
+          // 3. Fetch product costs for the date range using legacy method
+          const productCostsQuery = query(
+            collection(db, "dailyProductCost"),
+            where("businessId", "==", businessId.value),
+            where("date", ">=", Timestamp.fromDate(startDateTime)),
+            where("date", "<=", Timestamp.fromDate(endDateTime))
+          );
+
+          const productCostsSnapshot = await getDocs(productCostsQuery);
+          productCosts = productCostsSnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              ...data,
+              id: doc.id,
+              date: $dayjs(data.date.toDate()).format("YYYY-MM-DD")
+            };
+          });
+        } else {
+          // New method: fetch stock movements to calculate costs
+          const stockMovementsQuery = query(
+            collection(db, "stockMovements"),
+            where("businessId", "==", businessId.value),
+            where("date", ">=", Timestamp.fromDate(startDateTime)),
+            where("date", "<=", Timestamp.fromDate(endDateTime))
+          );
+
+          const stockMovementsSnapshot = await getDocs(stockMovementsQuery);
+          stockMovements = stockMovementsSnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              ...data,
+              id: doc.id,
+              date: $dayjs(data.date.toDate()).format("YYYY-MM-DD")
+            };
+          });
+        }
 
         // 2. Process orders to calculate daily stats
         for (const order of orders) {
@@ -187,52 +215,133 @@ export const useDashboardStore = defineStore("dashboard", {
               dailyData[orderDay].totalClients += 1;
             }
 
-            // Track products costs
+            // Track products costs - different approaches based on date range
             if (order.products) {
-              for (const product of order.products) {
-                const productCost: any = productCosts.find((c: any) => c.productId === product.productId);
+              if (useLegacyLogic) {
+                // Legacy logic - use stored costs
+                for (const product of order.products) {
+                  if (product.productId) {
+                    // Find cost for this product on this day
+                    const productCost: any = productCosts.find((c: any) => c.productId === product.productId);
 
-                dailyData[orderDay].totalCosts = dailyData[orderDay].totalCosts || 0;
-                dailyData[orderDay].totalCosts += (product.currentCost || productCost.cost || 0) * product.quantity;
+                    dailyData[orderDay].totalCosts = dailyData[orderDay].totalCosts || 0;
+                    dailyData[orderDay].totalCosts +=
+                      (product.currentCost || productCost?.cost || 0) * product.quantity;
 
-                // Add if exists a cost of 0 to alarm the user
-                if (product.currentCost === 0) {
-                  dailyData[orderDay].costCeroExists = true;
+                    // Add if exists a cost of 0 to alarm the user
+                    if (product.currentCost === 0) {
+                      dailyData[orderDay].costCeroExists = true;
+                    }
+                  }
+                }
+              } else {
+                // New logic - use stock movements
+                for (const product of order.products) {
+                  if (product.productId && product.stockUsed > 0) {
+                    // Find associated stock movements for this order
+                    const productMovements = stockMovements.filter(
+                      (m: any) =>
+                        m.productId === product.productId && m.type === StockMovementType.SALE && m.orderId === order.id
+                    );
+
+                    let productCost = 0;
+
+                    if (productMovements.length > 0) {
+                      // Calculate actual cost from movements
+                      productCost = productMovements.reduce((sum: number, movement: any) => {
+                        // Cost is previousCost * abs(quantity) because quantity is negative for sales
+                        return sum + movement.previousCost * Math.abs(movement.quantity);
+                      }, 0);
+                    } else {
+                      // Fallback if no movements found
+                      const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
+                      productCost = (productInStore?.cost || 0) * product.stockUsed;
+                    }
+
+                    dailyData[orderDay].totalCosts = dailyData[orderDay].totalCosts || 0;
+                    dailyData[orderDay].totalCosts += productCost;
+
+                    // Check if any product has zero cost
+                    if (productCost === 0 && product.stockUsed > 0) {
+                      dailyData[orderDay].costCeroExists = true;
+                    }
+                  }
                 }
               }
             }
           }
         }
 
-        // Group product costs by day and product
+        // Process cost data differently based on approach
         const costsByDay: any = {};
         const productCostHistory: any = {};
 
-        for (const cost of productCosts) {
-          const costDay = cost.date;
+        if (useLegacyLogic) {
+          // Group product costs by day and product - legacy approach
+          for (const cost of productCosts) {
+            const costDay = cost.date;
 
-          // Add to daily tally
-          if (dailyData[costDay]) {
-            if (!costsByDay[costDay]) {
-              costsByDay[costDay] = 0;
+            // Add to daily tally
+            if (dailyData[costDay]) {
+              if (!costsByDay[costDay]) {
+                costsByDay[costDay] = 0;
+              }
+              costsByDay[costDay] = dailyData[costDay].totalCosts || 0;
             }
-            costsByDay[costDay] = dailyData[costDay].totalCosts || 0;
-          }
 
-          // Track product cost history for variation
-          if (!productCostHistory[cost.productId]) {
-            productCostHistory[cost.productId] = [];
-          }
+            // Track product cost history for variation
+            if (!productCostHistory[cost.productId]) {
+              productCostHistory[cost.productId] = [];
+            }
 
-          productCostHistory[cost.productId].push({
-            date: costDay,
-            cost: cost.cost
-          });
+            productCostHistory[cost.productId].push({
+              date: costDay,
+              cost: cost.cost
+            });
+          }
+        } else {
+          // New approach - track cost changes based on stock "addition" movements
+          for (const movement of stockMovements) {
+            if (movement.type === StockMovementType.ADDITION) {
+              const costDay = movement.date;
+              const productId = movement.productId;
+
+              // Only consider addition movements for cost tracking
+              if (!productCostHistory[productId]) {
+                productCostHistory[productId] = [];
+              }
+
+              // Use unitBuyingPrice if available, otherwise use newCost
+              const costValue = movement.unitBuyingPrice || movement.newCost;
+
+              productCostHistory[productId].push({
+                date: costDay,
+                cost: costValue
+              });
+            }
+
+            // Track daily costs used
+            const costDay = movement.date;
+            if (movement.type === StockMovementType.SALE && dailyData[costDay]) {
+              if (!costsByDay[costDay]) {
+                costsByDay[costDay] = 0;
+              }
+
+              // For sales, add the cost to the daily tally
+              costsByDay[costDay] += Math.abs(movement.quantity) * movement.previousCost;
+            } else if (movement.type === StockMovementType.RETURN && dailyData[costDay]) {
+              if (!costsByDay[costDay]) {
+                costsByDay[costDay] = 0;
+              }
+
+              // For returns, subtract the cost from the daily tally
+              costsByDay[costDay] -= Math.abs(movement.quantity) * movement.previousCost;
+            }
+          }
         }
 
         // 4. Fetch clients to identify new clients
         const clientsQuery = query(collection(db, "clientes"), where("businessId", "==", businessId.value));
-
         const clientsSnapshot = await getDocs(clientsQuery);
 
         // Process clients to identify new ones in the period
@@ -315,11 +424,17 @@ export const useDashboardStore = defineStore("dashboard", {
               }
             }
 
+            // Fallback to products store
+            if (productName.startsWith("Producto ")) {
+              const productInStore = productsStore.getProducts.find((p: any) => p.id === productId);
+              if (productInStore) {
+                productName = productInStore.productName;
+              }
+            }
+
             productVariations.push({
               productId,
               productName,
-              firstDate: history[0].date,
-              lastDate: history[history.length - 1].date,
               firstCost,
               lastCost,
               absoluteChange,
@@ -360,21 +475,59 @@ export const useDashboardStore = defineStore("dashboard", {
               const productStats = productData.get(productId);
               productStats.totalSold += product.quantity || 0;
               productStats.revenue += (product.price || 0) * (product.quantity || 0);
-              productStats.cost += (product.currentCost || 0) * (product.quantity || 0);
+
+              // Calculate cost differently based on approach
+              if (useLegacyLogic) {
+                // Legacy approach - use stored cost
+                productStats.cost += (product.currentCost || 0) * (product.quantity || 0);
+              } else {
+                // New approach - use actual cost from stock movements
+                // When calculating product costs from movements
+                const productMovements = stockMovements.filter(
+                  (m: any) =>
+                    m.productId === productId &&
+                    (m.type === StockMovementType.SALE || m.type === StockMovementType.RETURN) &&
+                    m.orderId === order.id
+                );
+
+                if (productMovements.length > 0) {
+                  // Calculate actual cost from movements
+                  const movementCost = productMovements.reduce((sum: number, movement: any) => {
+                    if (movement.type === StockMovementType.SALE) {
+                      return sum + movement.previousCost * Math.abs(movement.quantity);
+                    } else if (movement.type === StockMovementType.RETURN) {
+                      return sum - movement.previousCost * Math.abs(movement.quantity);
+                    }
+                    return sum;
+                  }, 0);
+
+                  productStats.cost += movementCost;
+                } else {
+                  // Fallback
+                  const productInStore = productsStore.getProducts.find((p: any) => p.id === productId);
+                  productStats.cost += (productInStore?.cost || 0) * (product.stockUsed || product.quantity || 0);
+                }
+              }
 
               // Track unique orders containing this product
               productStats.orderCount += 1;
 
               // Update current stock if available
-              const storeProduct = productsStore.products.find((p: any) => p.id === productId);
-              console.log("storeProduct: ", storeProduct);
-              if (typeof storeProduct.productStock !== "undefined" && productStats.currentStock === 0) {
+              const storeProduct = productsStore.getProducts.find((p: any) => p.id === productId);
+              if (storeProduct && typeof storeProduct.productStock !== "undefined" && productStats.currentStock === 0) {
                 productStats.currentStock = storeProduct.productStock;
               }
 
               // Track stock-outs (if stock was 0 or less at the time of order)
-              if (product.currentProductStock === 0 || product.currentProductStock == product.stockUsed) {
-                productStats.stockOutsCount += 1;
+              if (useLegacyLogic) {
+                if (product.currentProductStock === 0 || product.currentProductStock === product.stockUsed) {
+                  productStats.stockOutsCount += 1;
+                }
+              } else {
+                if (product.stockUsed > 0 && product.stockUsed < product.quantity) {
+                  // This means we had to create with "requiere-actualizacion-inventario" status
+                  productStats.stockOutsCount += 1;
+                }
               }
             }
           }
