@@ -112,12 +112,12 @@
 import PhSealCheckDuotone from "~icons/ph/seal-check-duotone";
 import AntDesignSearchOutlined from "~icons/ant-design/search-outlined";
 import IcRoundPlus from "~icons/ic/round-plus";
-import MaterialSymbolsWarningRounded from "~icons/material-symbols/warning-rounded?width=24px&height=24px";
 import TablerEdit from "~icons/tabler/edit";
 import TablerPhone from "~icons/tabler/phone";
 import TablerMapPin from "~icons/tabler/map-pin";
 import TablerPhoneCall from "~icons/tabler/phone-call";
 import TablerMapSearch from "~icons/tabler/map-search";
+import MaterialSymbolsWarningRounded from "~icons/material-symbols/warning-rounded?width=24px&height=24px";
 
 // ----- Define Pinia Vars --------
 const clientsStore = useClientsStore();

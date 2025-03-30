@@ -47,8 +47,8 @@ export const useProductsStore = defineStore("products", {
     areSuppliersFetched: (state) => state.suppliersFetched
   },
   actions: {
-    async fetchData() {
-      if (this.areProductsFetched) {
+    async fetchData(forceUpdate = false) {
+      if (this.areProductsFetched && !forceUpdate) {
         return;
       }
 

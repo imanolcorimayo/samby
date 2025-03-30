@@ -27,6 +27,65 @@
     </template>
     <template #default>
       <div class="flex flex-col gap-4">
+        <div v-if="needsInventoryUpdate" class="bg-orange-50 border-2 border-orange-400 p-4 rounded-lg">
+          <div class="text-orange-800 flex flex-col gap-2">
+            <div class="flex items-start gap-2">
+              <MaterialSymbolsWarningRounded class="text-orange-600 text-xl flex-shrink-0 mt-0.5" />
+              <span class="font-medium">Este pedido requiere actualización de inventario</span>
+            </div>
+            <p>Los siguientes productos exceden el stock disponible:</p>
+            <ul class="ml-6 list-disc">
+              <li v-for="product in productsNeedingStock" :key="product.productId">
+                <span class="font-medium">{{ product.productName }}</span
+                >:
+                <span class="text-red-600">
+                  Stock usado: {{ formatQuantity(product.stockUsed || 0) }}, Necesario:
+                  {{ formatQuantity(product.quantity) }} (Faltan
+                  {{ formatQuantity(product.quantity - (product.stockUsed || 0)) }})
+                </span>
+
+                <!-- Add current inventory status -->
+                <span
+                  v-if="getCurrentInventoryStock(product.productId)"
+                  :class="{
+                    'text-green-600': canCoverProduct(product),
+                    'text-red-600': !canCoverProduct(product)
+                  }"
+                  class="block ml-6 text-sm"
+                >
+                  Inventario actual: {{ formatQuantity(getCurrentInventoryStock(product.productId)) }}
+                  <span v-if="canCoverProduct(product)"> (Suficiente para cubrir) </span>
+                  <span v-else> (Insuficiente) </span>
+                </span>
+              </li>
+            </ul>
+            <div class="flex justify-between items-center mt-2">
+              <span class="text-sm">
+                {{
+                  canUpdateToPending
+                    ? "Hay stock suficiente para actualizar el pedido a Pendiente"
+                    : "No hay stock suficiente para actualizar el pedido"
+                }}
+              </span>
+              <div class="flex gap-2">
+                <button
+                  @click="refreshProductData"
+                  class="btn-sm bg-secondary ring-1 ring-gray-400 text-sm flex items-center gap-1"
+                  title="Actualizar estado de inventario"
+                >
+                  <IconRefresh class="text-black text-xs" /> Actualizar
+                </button>
+                <NuxtLink
+                  to="/inventario"
+                  class="btn-sm bg-secondary ring-1 ring-orange-500 text-sm"
+                  @click="mainModal.closeModal()"
+                >
+                  Ir a Inventario
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="flex flex-col gap-2">
           <span class="font-semibold text-lg">Resumen del pedido</span>
           <table>
@@ -42,8 +101,21 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="text-center border-b" v-for="product in editableOrder.products" :key="product.id">
-                <td class="py-3 text-start">{{ `${product.productName} (${product.unit})` }}</td>
+              <tr
+                class="text-center border-b"
+                v-for="product in editableOrder.products"
+                :key="product.id"
+                :class="{ 'bg-orange-50': needsInventoryUpdate && productNeedsMoreStock(product) }"
+              >
+                <td class="py-3 text-start">
+                  {{ `${product.productName} (${product.unit})` }}
+                  <span
+                    v-if="needsInventoryUpdate && productNeedsMoreStock(product)"
+                    class="text-xs text-orange-700 block"
+                  >
+                    Falta stock: {{ formatQuantity(product.quantity - (product.stockUsed || 0)) }}
+                  </span>
+                </td>
                 <td class="py-3 hidden sm:block">{{ formatPrice(product.price) }}</td>
                 <td class="py-3">
                   <div class="flex justify-between items-center gap-2 w-full" v-if="isEditable">
@@ -178,32 +250,38 @@
       >
         <LucideEdit /> Modificar
       </button>
+      <!-- Pending of confirmation -->
       <div class="flex justify-between gap-1" v-if="currentOrder.orderStatus !== 'pendiente-de-confirmacion'">
-        <div
-          v-if="submitting && !isOrderModified && isEditable"
-          class="flex-1 flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap"
-        >
-          loading...
-        </div>
+        <!-- Cancel button remains unchanged -->
         <button
-          v-else-if="!isOrderModified && isEditable"
+          v-if="!isOrderModified && isEditable"
           @click="updateStatus('cancelado')"
           class="flex-1 flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
         >
           <IcRoundArchive /> Cancelar venta
         </button>
-        <div
-          v-if="submitting && !isOrderModified && isEditable"
-          class="flex-1 flex items-center justify-center gap-1 btn bg-primary text-white text-nowrap"
-        >
-          loading...
-        </div>
+
+        <!-- Mark as delivered or update inventory buttons -->
         <button
-          v-else-if="!isOrderModified && isEditable"
+          v-if="!isOrderModified && isEditable && !needsInventoryUpdate"
           @click="updateStatus('entregado')"
           class="flex-1 flex items-center justify-center gap-1 btn bg-primary text-white text-nowrap"
         >
           <IconParkOutlineCheckOne /> Marcar entregado
+        </button>
+        <button
+          v-else-if="!isOrderModified && isEditable && needsInventoryUpdate && canUpdateToPending"
+          @click="updateStatus('pendiente')"
+          class="flex-1 flex items-center justify-center gap-1 btn bg-primary text-white text-nowrap"
+        >
+          <IconParkOutlineCheckOne /> Actualizar a Pendiente
+        </button>
+        <button
+          v-else-if="!isOrderModified && isEditable && needsInventoryUpdate && !canUpdateToPending"
+          class="flex-1 flex items-center justify-center gap-1 btn bg-gray-400 text-white text-nowrap cursor-not-allowed"
+          disabled
+        >
+          <IconParkOutlineCheckOne /> Actualizar a Pendiente
         </button>
       </div>
       <div class="flex justify-between gap-1" v-else>
@@ -258,13 +336,15 @@
 </template>
 
 <script setup>
-import TablerPlus from "~icons/tabler/plus";
-import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import MiRemove from "~icons/mi/remove";
-import TablerTrash from "~icons/tabler/trash";
-import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
 import LucideEdit from "~icons/lucide/edit";
+import TablerPlus from "~icons/tabler/plus";
+import TablerTrash from "~icons/tabler/trash";
+import IconRefresh from "~icons/tabler/refresh";
 import IcRoundArchive from "~icons/ic/round-archive";
+import MingcuteWhatsappLine from "~icons/mingcute/whatsapp-line";
+import MaterialSymbolsWarningRounded from "~icons/material-symbols/warning-rounded";
+import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import { ToastEvents } from "~/interfaces";
 
 // ----- Define Pinia Vars -----
@@ -304,7 +384,94 @@ const isEditable = computed(() => {
   return !["entregado", "cancelado", "rechazado"].includes(currentOrder.value.orderStatus);
 });
 
+const needsInventoryUpdate = computed(() => {
+  return currentOrder.value && currentOrder.value.orderStatus === "requiere-actualizacion-inventario";
+});
+
+const productsNeedingStock = computed(() => {
+  if (!currentOrder.value || !currentOrder.value.products) return [];
+
+  return currentOrder.value.products.filter((product) => {
+    const quantity = parseFloat(product.quantity || 0);
+    const stockUsed = parseFloat(product.stockUsed || 0);
+    return quantity > stockUsed;
+  });
+});
+
+// Update the canUpdateToPending computed property
+const canUpdateToPending = computed(() => {
+  if (!needsInventoryUpdate.value || !currentOrder.value || !currentOrder.value.products) return false;
+
+  // Make sure we have the latest product data
+  const upToDateProducts = products.value;
+
+  // Check if all products have enough stock now
+  return currentOrder.value.products.every((product) => {
+    // Get the quantity ordered and how much stock we've already allocated
+    const quantity = parseFloat(product.quantity || 0);
+    const stockUsed = parseFloat(product.stockUsed || 0);
+
+    // Find the product in the products store to get current stock
+    const productInStore = upToDateProducts.find((p) => p.id === product.productId);
+
+    // If product not found in store, it can't be updated
+    if (!productInStore) return false;
+
+    // Get the current available stock
+    const currentStockAvailable = parseFloat(productInStore.productStock || 0);
+
+    // For products already fully accounted for
+    if (quantity <= stockUsed) return true;
+
+    // For products needing more stock
+    const additionalNeeded = quantity - stockUsed;
+
+    // Log for debugging if needed
+    console.debug(
+      `Product ${product.productName}: needs ${additionalNeeded} more, current stock ${currentStockAvailable}`
+    );
+
+    return currentStockAvailable >= additionalNeeded;
+  });
+});
+
 // ----- Define Methods -----
+
+// Add a method to refresh product data
+async function refreshProductData() {
+  try {
+    // This will update the store with fresh data from the database
+    const forceUpdate = true;
+    await productsStore.fetchData(forceUpdate);
+
+    // Check if we can now update to pending status
+    if (needsInventoryUpdate.value && canUpdateToPending.value) {
+      useToast(ToastEvents.success, "¡Hay stock suficiente para actualizar el pedido!");
+    }
+  } catch (error) {
+    console.error("Error refreshing product data:", error);
+    useToast(ToastEvents.error, "Error al actualizar la información de inventario");
+  }
+}
+
+// Helper function to determine if a specific product needs more stock
+function productNeedsMoreStock(product) {
+  const quantity = parseFloat(product.quantity || 0);
+  const stockUsed = parseFloat(product.stockUsed || 0);
+  return quantity > stockUsed;
+}
+// Add these helper methods to your script setup
+function getCurrentInventoryStock(productId) {
+  const productInStore = products.value.find((p) => p.id === productId);
+  return productInStore ? parseFloat(productInStore.productStock || 0) : 0;
+}
+
+function canCoverProduct(product) {
+  const currentStock = getCurrentInventoryStock(product.productId);
+  const stockNeeded = parseFloat(product.quantity || 0) - parseFloat(product.stockUsed || 0);
+  return currentStock >= stockNeeded;
+}
+
 async function updateStatus(status) {
   // Check the valid status
   if (!ORDER_STATUS_OPTIONS.includes(status)) {

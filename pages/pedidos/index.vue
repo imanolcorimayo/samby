@@ -70,7 +70,10 @@
           </NuxtLink>
         </div>
       </div>
-      <div v-else-if="dailyProductCost.length == 0" class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg">
+      <div
+        v-else-if="dailyProductCost.length == 0 && todaysOrders.length > 0"
+        class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg"
+      >
         <div class="text-yellow-800 flex flex-col gap-4 sm:flex-row items-center justify-between">
           <span>Parece que no cargaste los costos de los productos de hoy</span>
           <NuxtLink
@@ -171,7 +174,9 @@
                     'bg-yellow-50 text-yellow-800 ring-1 ring-yellow-600/20': [
                       'pendiente',
                       'pendiente-modificado'
-                    ].includes(order.orderStatus)
+                    ].includes(order.orderStatus),
+                    'bg-orange-50 text-orange-800 ring-1 ring-orange-600/20':
+                      order.orderStatus == 'requiere-actualizacion-inventario'
                   }"
                 >
                   {{ formatStatus(order.orderStatus) }}
@@ -292,7 +297,6 @@ import LucideUsers from "~icons/lucide/users";
 const { $dayjs } = useNuxtApp();
 
 // ----- Define Pinia Vars --------
-const indexStore = useIndexStore();
 const ordersStore = useOrdersStore();
 const clientsStore = useClientsStore();
 const {
@@ -326,6 +330,17 @@ const orderDates = computed(() => {
   }
 
   return orders.value.map((order) => order.shippingDate);
+});
+
+const todaysOrders = computed(() => {
+  const today = $dayjs().format("YYYY-MM-DD");
+
+  // Pending orders
+  const pendingTodaysOrders = pendingOrders.value.filter((order) => $dayjs(order.shippingDate).isSame(today, "day"));
+  // Completed orders
+  const completedTodaysOrders = orders.value.filter((order) => $dayjs(order.shippingDate).isSame(today, "day"));
+  // Combine both arrays
+  return [...pendingTodaysOrders, ...completedTodaysOrders];
 });
 
 const missingProductsCount = computed(() => {
@@ -482,6 +497,8 @@ function formatStatus(status) {
       return "Pendiente (modificado)";
     case "pendiente-de-confirmacion":
       return "Pendiente de confirmación";
+    case "requiere-actualizacion-inventario":
+      return "Requiere Actualización de Inventario";
     default:
       return status;
   }

@@ -39,6 +39,35 @@
         Limpiar
       </button>
     </div>
+    <!-- Negative status banner -->
+    <div
+      class="flex flex-col gap-2 bg-yellow-50 border-2 border-yellow-400 p-4 rounded-lg"
+      v-if="hasNegativeStockItems"
+    >
+      <div class="flex items-start gap-2">
+        <MaterialSymbolsWarningRounded class="text-yellow-600 text-xl flex-shrink-0 mt-0.5" />
+        <div class="flex flex-col">
+          <span class="font-medium">Productos con stock insuficiente</span>
+          <p class="text-sm">
+            Los siguientes productos exceden el stock disponible. El pedido se creará con estado "Requiere Actualización
+            de Inventario":
+          </p>
+        </div>
+      </div>
+      <ul class="ml-6 list-disc">
+        <li v-for="product in negativeStockItems" :key="product.id" class="text-sm">
+          <span class="font-medium">{{ product.productName }}</span
+          >:
+          <span class="text-red-600">
+            Pedido: {{ formatQuantity(productsQuantity[product.id]) }}, Disponible:
+            {{ formatQuantity(product.productStock || 0) }}
+          </span>
+        </li>
+      </ul>
+      <NuxtLink to="/pedidos/carrito" class="btn bg-primary text-white text-sm w-fit mt-2">
+        Ver detalles en el carrito
+      </NuxtLink>
+    </div>
     <!-- Legend for highlighted products -->
     <div
       class="flex items-center gap-2 text-sm text-gray-600 mt-8"
@@ -136,6 +165,7 @@ import IcTwotoneClear from "~icons/ic/twotone-clear";
 import TablerPlus from "~icons/tabler/plus";
 import MiRemove from "~icons/mi/remove";
 import TablerTrash from "~icons/tabler/trash";
+import MaterialSymbolsWarningRounded from "~icons/material-symbols/warning-rounded";
 
 // ----- Define Useful Properties -------
 
@@ -179,6 +209,18 @@ const productsCleaned = computed(() => {
   });
 
   return aux;
+});
+
+const negativeStockItems = computed(() => {
+  return products.value.filter((product) => {
+    const quantity = parseFloat(productsQuantity.value[product.id] || 0);
+    const stock = parseFloat(product.productStock || 0);
+    return quantity > 0 && quantity > stock;
+  });
+});
+
+const hasNegativeStockItems = computed(() => {
+  return negativeStockItems.value.length > 0;
 });
 
 // ----- Define Hooks -------

@@ -9,13 +9,41 @@
       </NuxtLink>
     </div>
     <div class="flex flex-col gap-1">
-      <div v-for="p in products" class="flex gap-4 items-center p-2 border rounded-lg shadow w-full items-start">
+      <!-- Add warning header for negative stock products -->
+      <div v-if="hasNegativeStockProducts" class="bg-yellow-50 border-2 border-yellow-400 p-4 mb-4 rounded-lg">
+        <div class="text-yellow-800 flex flex-col gap-2">
+          <div class="flex items-start gap-2">
+            <MaterialSymbolsWarningRounded class="text-yellow-600 text-xl flex-shrink-0 mt-0.5" />
+            <span class="font-medium">Este pedido requiere actualización de inventario</span>
+          </div>
+          <p>Los siguientes productos exceden el stock disponible:</p>
+          <ul class="ml-6 list-disc">
+            <li v-for="product in negativeStockProducts" :key="product.productId">
+              <span class="font-medium">{{ product.productName }}</span
+              >:
+              <span class="text-red-600"
+                >Necesita {{ formatQuantity(product.quantity - product.currentProductStock) }} adicionales</span
+              >
+            </li>
+          </ul>
+          <p class="text-sm mt-1">El pedido se creará con estado "Requiere Actualización de Inventario"</p>
+        </div>
+      </div>
+
+      <div
+        v-for="p in products"
+        class="flex gap-4 items-center p-2 border rounded-lg shadow w-full items-start"
+        :class="{ 'border-yellow-400 bg-yellow-50': isNegativeStock(p) }"
+      >
         <div class="w-full h-full flex flex-col justify-start gap-1">
           <span class="font-semibold">{{ p.productName }}</span>
           <div class="flex flex-col">
             <span class="text-sm">Cantidad: {{ formatQuantity(p.quantity) }}</span>
             <span class="text-sm">Precio Unitario: {{ formatPrice(p.price) }}</span>
-            <span class="text-sm">Stock restante: {{ formatQuantity(p.currentProductStock - p.quantity) }}</span>
+            <span class="text-sm" :class="{ 'text-red-600 font-medium': isNegativeStock(p) }">
+              Stock restante: {{ formatQuantity(p.currentProductStock - p.quantity) }}
+              <span v-if="isNegativeStock(p)">(insuficiente)</span>
+            </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="font-bold">{{ formatPrice(p.total) }}</span>
@@ -156,6 +184,7 @@
 import TablerPlus from "~icons/tabler/plus";
 import TablerTrash from "~icons/tabler/trash";
 import IonArrowBack from "~icons/ion/arrow-back";
+import MaterialSymbolsWarningRounded from "~icons/material-symbols/warning-rounded";
 import { ToastEvents } from "~/interfaces";
 
 // ------- Define Useful Properties --------
@@ -222,7 +251,21 @@ const formattedClients = computed(() => {
   });
 });
 
+const negativeStockProducts = computed(() => {
+  return products.value.filter((product) => product.quantity > product.currentProductStock);
+});
+
+const hasNegativeStockProducts = computed(() => {
+  return negativeStockProducts.value.length > 0;
+});
+
 // ------- Define Methods --------
+
+// Helper function to check if a specific product has negative stock
+function isNegativeStock(product) {
+  return product.quantity > product.currentProductStock;
+}
+
 async function saveClient() {
   // Check if loading
   if (loading.value) return;
@@ -312,6 +355,9 @@ async function confirmOrder() {
     return;
   }
 
+  // Determine order status based on product stock availability
+  const orderStatus = hasNegativeStockProducts.value ? "requiere-actualizacion-inventario" : "pendiente";
+
   // Place the order. Current business is is managed internally
   const orderObject = await ordersStore.placeOrder(
     {
@@ -322,7 +368,7 @@ async function confirmOrder() {
       totalAmount: totalWithShipping.value,
       totalProductsAmount: totalAmount.value,
       shippingType: shippingType.value,
-      orderStatus: "pendiente"
+      orderStatus: orderStatus
     },
     clientId.value
   );
@@ -330,7 +376,10 @@ async function confirmOrder() {
   // Check if it was successful
   if (orderObject) {
     // Show success message
-    useToast(ToastEvents.success, "Pedido creado correctamente.");
+    const successMessage = hasNegativeStockProducts.value
+      ? "Pedido creado con estado 'Requiere Actualización de Inventario'."
+      : "Pedido creado correctamente.";
+    useToast(ToastEvents.success, successMessage);
     orderCreated.value = true;
     navigateTo("/pedidos/confirmado");
   }

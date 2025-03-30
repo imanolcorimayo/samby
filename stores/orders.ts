@@ -164,7 +164,15 @@ export const useOrdersStore = defineStore("orders", {
             continue;
           }
 
+          // If product quantity is major than the current stock, then bypass this product
+          // We will update the stock once there is stock available, not otherwise
+          if (parseFloat(product.quantity) > parseFloat(product.currentProductStock ?? 0)) {
+            product.stockUsed = 0;
+            continue;
+          }
+
           // We use either the quantity or the current stock, whichever is lower
+          // Always should be the quantity, but just in case
           product.stockUsed = Math.min(product.quantity, product.currentProductStock);
           const productStock = parseFloat(product.currentProductStock ?? 0) - product.quantity;
           await productsStore.updateStock(
@@ -238,7 +246,12 @@ export const useOrdersStore = defineStore("orders", {
       try {
         const q = query(
           collection(db, "pedido"),
-          where("orderStatus", "in", ["pendiente", "pendiente-modificado", "pendiente-de-confirmacion"]),
+          where("orderStatus", "in", [
+            "pendiente",
+            "pendiente-modificado",
+            "pendiente-de-confirmacion",
+            "requiere-actualizacion-inventario"
+          ]),
           where("businessId", "==", businessId.value),
           orderBy("shippingDate", "asc")
         );
@@ -476,15 +489,99 @@ export const useOrdersStore = defineStore("orders", {
 
       try {
         // Check if it's in the pending orders
-        // This needs to be before updating in firestore because it will update reactively with the db
         const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
-        const order = this.$state.pendingOrders[orderIndex];
+        const order = orderIndex > -1 ? this.$state.pendingOrders[orderIndex] : false;
 
+        if (!order) {
+          useToast(ToastEvents.error, "No se encontró la orden.");
+          return false;
+        }
+
+        // Check if the status is valid
+        if (!ORDER_STATUS_OPTIONS.includes(status)) {
+          useToast(ToastEvents.error, "Estado inválido.");
+          return false;
+        }
+
+        const currentStatus = order.orderStatus;
+
+        // If status is changed from "requiere-actualizacion-inventario" to "pendiente"
+        // Update the remaining product stock
+        if (currentStatus === "requiere-actualizacion-inventario" && status === "pendiente") {
+          const productsStore = useProductsStore();
+
+          // Process each product in the order
+          const updatedProducts = [...order.products]; // Update the product in the order
+          let areProductsUpdated = false;
+          for (const product of order.products) {
+            const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
+
+            if (!productInStore) continue;
+
+            const currentStock = parseFloat(productInStore.productStock ?? 0);
+
+            // Calculate how much stock was NOT yet used
+            // stockUsed should be 0 if the stock was not updated
+            const stockUsed = parseFloat(product.stockUsed ?? 0);
+            const totalNeeded = parseFloat(product.quantity ?? 0);
+            const remainingToUse = totalNeeded - stockUsed;
+
+            if (remainingToUse > 0 && currentStock < remainingToUse) {
+              // Show the user which product is missing stock
+              useToast(
+                ToastEvents.error,
+                `No hay stock suficiente para el producto ${product.productName}. Intenta recargando la página o contactanos si pensas que es un error.`
+              );
+              return false;
+            }
+
+            // Only update if we need to use more stock
+            if (remainingToUse > 0 && currentStock >= totalNeeded && stockUsed == 0) {
+              // Use as much stock as is available, update the stockUsed field
+              const additionalStockToUse = Math.min(currentStock, remainingToUse);
+
+              if (additionalStockToUse > 0) {
+                // Update product stock
+                await productsStore.updateStock(
+                  {
+                    productStock: Math.max(currentStock - additionalStockToUse, 0),
+                    cost: productInStore.cost ?? 0
+                  },
+                  productInStore
+                );
+
+                // Update the stockUsed in the order document
+                const newStockUsed = stockUsed + additionalStockToUse;
+
+                const productIndex = updatedProducts.findIndex((p) => p.productId === product.productId);
+
+                if (productIndex !== -1) {
+                  areProductsUpdated = true;
+                  updatedProducts[productIndex] = {
+                    ...updatedProducts[productIndex],
+                    stockUsed: newStockUsed,
+                    currentProductStock: Math.max(currentStock, 0),
+                    currentCost: productInStore.cost ?? 0
+                  };
+                }
+              }
+            }
+          }
+
+          // If any product changed, update the order
+          if (areProductsUpdated) {
+            await updateDoc(doc(db, "pedido", orderId), {
+              products: updatedProducts
+            });
+          }
+        }
+
+        // Update order status in Firestore
         await updateDoc(doc(db, "pedido", orderId), {
           orderStatus: status
         });
 
-        // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
+        // Save the order status log
         await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {
           orderStatus: status,
           message: `Cambio de estado hecho por ${user.value.displayName}`,
