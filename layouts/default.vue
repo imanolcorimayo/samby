@@ -210,15 +210,6 @@
                 <IcRoundPlus class="text-gray-500" /> Nuevo Producto
               </NuxtLink>
             </li>
-            <li>
-              <NuxtLink
-                v-if="indexStore.isOwner"
-                to="/inventario/costo-diario"
-                class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
-              >
-                <IcRoundPlus class="text-gray-500" /> Costo Diario de Producto
-              </NuxtLink>
-            </li>
           </ul>
         </div>
         <div class="mt-auto">
