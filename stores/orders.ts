@@ -192,12 +192,17 @@ export const useOrdersStore = defineStore("orders", {
             productInStore,
             {
               type: StockMovementType.SALE,
-              notes: `Pedido #${order.clientId} - ${order.client.clientName}`,
+              notes: `Pedido #${orderId} - ${order.client.clientName}`,
               quantity: -quantityToUse,
               orderId: orderId
             }
           );
         }
+
+        // Update stock used on the order
+        await updateDoc(doc(db, "pedido", orderId), {
+          products: order.products
+        });
 
         // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
         await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {

@@ -41,10 +41,7 @@
         </div>
 
         <!-- Returned Stock Value Card -->
-        <div
-          v-if="pendingOrdersStats.returnedStockValue > 0"
-          class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200"
-        >
+        <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
           <div class="flex justify-between mb-2">
             <h3 class="text-gray-600 font-medium">Stock devuelto</h3>
             <LucideArrowLeft class="text-gray-500 text-xl" />
@@ -296,6 +293,7 @@ clientsStore.fetchData(); // Load clients data
 // Fetch stock movements.We need to call pending orders first
 const forPendingOrders = true;
 await productsStore.fetchStockMovements(null, 20, null, forPendingOrders);
+await productsStore.fetchData();
 
 // ----- Define Vars -------
 const submitting = ref(null);
