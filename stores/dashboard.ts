@@ -4,6 +4,7 @@ import { StockMovementType, ToastEvents, type StockMovement } from "~/interfaces
 
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore"; // ES 2015
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // ES 2015
+import Stock from "~/pages/resumen/stock.vue";
 
 interface Prerequisites {
   valid: boolean;
@@ -156,6 +157,9 @@ export const useDashboardStore = defineStore("dashboard", {
           };
         });
 
+        // Order ids
+        const orderIds = orders.map((el: any) => el.id);
+
         // Client tracking sets
         const allClientsInPeriod = new Set();
 
@@ -186,8 +190,7 @@ export const useDashboardStore = defineStore("dashboard", {
           const stockMovementsQuery = query(
             collection(db, "stockMovements"),
             where("businessId", "==", businessId.value),
-            where("date", ">=", Timestamp.fromDate(startDateTime)),
-            where("date", "<=", Timestamp.fromDate(endDateTime))
+            where("orderId", "in", orderIds)
           );
 
           const stockMovementsSnapshot = await getDocs(stockMovementsQuery);
@@ -241,7 +244,9 @@ export const useDashboardStore = defineStore("dashboard", {
                     // Find associated stock movements for this order
                     const productMovements = stockMovements.filter(
                       (m: any) =>
-                        m.productId === product.productId && m.type === StockMovementType.SALE && m.orderId === order.id
+                        m.productId === product.productId &&
+                        m.orderId === order.id &&
+                        (m.type === StockMovementType.SALE || m.type === StockMovementType.RETURN)
                     );
 
                     let productCost = 0;
@@ -249,6 +254,12 @@ export const useDashboardStore = defineStore("dashboard", {
                     if (productMovements.length > 0) {
                       // Calculate actual cost from movements
                       productCost = productMovements.reduce((sum: number, movement: any) => {
+                        if (movement.type === StockMovementType.RETURN) {
+                          const returnCost = movement.unitBuyingPrice || movement.previousCost;
+                          // Value that has been given back to the stock
+                          return sum - returnCost * Math.abs(movement.quantity);
+                        }
+
                         // Cost is previousCost * abs(quantity) because quantity is negative for sales
                         return sum + movement.previousCost * Math.abs(movement.quantity);
                       }, 0);

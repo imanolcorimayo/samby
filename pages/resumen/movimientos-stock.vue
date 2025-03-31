@@ -18,11 +18,21 @@
           <!-- Date range -->
           <div class="flex flex-col gap-2">
             <label class="text-sm text-gray-600">Desde:</label>
-            <input type="date" class="border rounded" v-model="filters.startDate" :max="filters.endDate" />
+            <input
+              type="datetime-local"
+              class="border rounded"
+              v-model="filters.startDateTime"
+              :max="filters.endDateTime"
+            />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm text-gray-600">Hasta:</label>
-            <input type="date" class="border rounded" v-model="filters.endDate" :min="filters.startDate" />
+            <input
+              type="datetime-local"
+              class="border rounded"
+              v-model="filters.endDateTime"
+              :min="filters.startDateTime"
+            />
           </div>
 
           <!-- Movement type filter -->
@@ -169,52 +179,64 @@
       </div>
 
       <!-- Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
           <div class="flex justify-between mb-2">
-            <h3 class="text-gray-600 font-medium">Total Movimientos</h3>
-            <LucideHistory class="text-gray-500 text-xl" />
+            <h3 class="text-gray-600 font-medium">Total Vendido</h3>
+            <LucideDollarSign class="text-gray-500 text-xl" />
           </div>
           <div class="mt-1">
-            <span class="font-semibold text-lg">{{ filteredMovements.length }}</span>
+            <span class="font-semibold text-lg">{{ formatPrice(calculateTotalSales()) }}</span>
+          </div>
+          <div class="text-sm text-gray-500 mt-1">
+            <span
+              >{{
+                filteredMovements.filter((m) => m.type === "sale").reduce((sum, m) => sum + Math.abs(m.quantity), 0)
+              }}
+              productos</span
+            >
           </div>
         </div>
 
         <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
           <div class="flex justify-between mb-2">
-            <h3 class="text-gray-600 font-medium">Total Adiciones</h3>
-            <LucideShoppingCart class="text-gray-500 text-xl" />
-          </div>
-          <div class="mt-1">
-            <span class="font-semibold text-lg">{{
-              filteredMovements.filter((m) => m.type === "addition").reduce((sum, m) => sum + m.quantity, 0)
-            }}</span>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
-          <div class="flex justify-between mb-2">
-            <h3 class="text-gray-600 font-medium">Costo de Compras</h3>
+            <h3 class="text-gray-600 font-medium">Total Costo de Compra</h3>
             <LucideShoppingBag class="text-gray-500 text-xl" />
           </div>
           <div class="mt-1">
             <span class="font-semibold text-lg">{{ formatPrice(calculateTotalPurchases()) }}</span>
           </div>
+          <div class="text-sm text-gray-500 mt-1">
+            <span
+              >{{
+                filteredMovements.filter((m) => m.type === "addition").reduce((sum, m) => sum + m.quantity, 0)
+              }}
+              productos</span
+            >
+          </div>
         </div>
 
         <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
           <div class="flex justify-between mb-2">
-            <h3 class="text-gray-600 font-medium">Pérdidas</h3>
+            <h3 class="text-gray-600 font-medium">Total Pérdida</h3>
             <FlowbiteDollarOutline class="text-gray-500 text-xl" />
           </div>
           <div class="mt-1">
             <span class="font-semibold text-lg">{{ formatPrice(calculateTotalLosses()) }}</span>
           </div>
+          <div class="text-sm text-gray-500 mt-1">
+            <span
+              >{{
+                filteredMovements.filter((m) => m.type === "loss").reduce((sum, m) => sum + Math.abs(m.quantity), 0)
+              }}
+              productos</span
+            >
+          </div>
         </div>
 
         <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
           <div class="flex justify-between mb-2">
-            <h3 class="text-gray-600 font-medium">Devoluciones</h3>
+            <h3 class="text-gray-600 font-medium">Total Devoluciones</h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-6 w-6 text-purple-500"
@@ -248,11 +270,9 @@
 </template>
 
 <script setup>
-import { ToastEvents } from "~/interfaces";
 import LucidePackage2 from "~icons/lucide/package-2";
-import LucideHistory from "~icons/lucide/history";
-import LucideShoppingCart from "~icons/lucide/shopping-cart";
 import LucideShoppingBag from "~icons/lucide/shopping-bag";
+import LucideDollarSign from "~icons/lucide/dollar-sign";
 import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
 
 // ----- Define Pinia Vars -----
@@ -266,8 +286,8 @@ const isLoadingMore = ref(false);
 const hasMoreMovements = ref(true);
 
 const filters = ref({
-  startDate: $dayjs().subtract(30, "days").format("YYYY-MM-DD"),
-  endDate: $dayjs().format("YYYY-MM-DD"),
+  startDateTime: $dayjs().subtract(30, "days").startOf("day").format("YYYY-MM-DDTHH:mm"),
+  endDateTime: $dayjs().endOf("day").format("YYYY-MM-DDTHH:mm"),
   movementType: "",
   productSearch: "",
   supplierId: ""
@@ -292,6 +312,16 @@ async function fetchInitialData() {
   isLoading.value = false;
 }
 
+function calculateTotalSales() {
+  return filteredMovements.value
+    .filter((m) => m.type === "sale")
+    .reduce((sum, m) => {
+      const saleQuantity = Math.abs(m.quantity);
+      const costPerUnit = m.previousCost || 0;
+      return sum + saleQuantity * costPerUnit;
+    }, 0);
+}
+
 async function applyFilters() {
   isLoading.value = true;
 
@@ -301,8 +331,11 @@ async function applyFilters() {
   const filtered = allMovements.filter((movement) => {
     // Filter by date
     const movementDate = $dayjs(movement.date, "YYYY-MM-DD HH:mm");
-    const isAfterStart = movementDate.isAfter($dayjs(filters.value.startDate).startOf("day"));
-    const isBeforeEnd = movementDate.isBefore($dayjs(filters.value.endDate).endOf("day"));
+    const startDateTime = $dayjs(filters.value.startDateTime);
+    const endDateTime = $dayjs(filters.value.endDateTime);
+
+    const isAfterStart = movementDate.isAfter(startDateTime) || movementDate.isSame(startDateTime);
+    const isBeforeEnd = movementDate.isBefore(endDateTime) || movementDate.isSame(endDateTime);
 
     if (!isAfterStart || !isBeforeEnd) return false;
 
@@ -427,6 +460,15 @@ onMounted(async () => {
   // Check URL for filters
   const route = useRoute();
 
+  // Apply date filters if in URL
+  if (route.query.desde) {
+    filters.value.startDateTime = route.query.desde.toString();
+  }
+
+  if (route.query.hasta) {
+    filters.value.endDateTime = route.query.hasta.toString();
+  }
+
   // Apply supplier filter if in URL
   if (route.query.proveedor) {
     filters.value.supplierId = route.query.proveedor.toString();
@@ -442,7 +484,7 @@ onMounted(async () => {
   }
 
   // Apply filters if parameters were found
-  if (route.query.proveedor || route.query.producto) {
+  if (route.query.proveedor || route.query.producto || route.query.desde || route.query.hasta) {
     await applyFilters();
   }
 });
