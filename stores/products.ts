@@ -13,7 +13,8 @@ import {
   orderBy,
   limit,
   Timestamp,
-  startAfter
+  startAfter,
+  onSnapshot
 } from "firebase/firestore";
 // @ts-ignore
 import { StockMovement, StockMovementType, LossReason, ToastEvents } from "~/interfaces";
@@ -71,15 +72,21 @@ export const useProductsStore = defineStore("products", {
 
       // Connect with firebase and get payments structure
       const db = useFirestore();
-      const querySnapshot = await getDocs(
-        query(collection(db, "producto"), where("businessId", "==", businessId.value))
-      );
+      const q = query(collection(db, "producto"), where("businessId", "==", businessId.value));
 
-      querySnapshot.forEach((doc) => {
-        products.push({
-          id: doc.id,
-          ...doc.data()
+      // Replace getDocs with onSnapshot for real-time updates
+      onSnapshot(q, (querySnapshot) => {
+        const products: Array<any> = [];
+
+        querySnapshot.forEach((doc) => {
+          products.push({
+            id: doc.id,
+            ...doc.data()
+          });
         });
+
+        this.$state.fetched = true;
+        this.$state.products = products;
       });
 
       this.$state.fetched = true;
