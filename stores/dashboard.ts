@@ -186,22 +186,42 @@ export const useDashboardStore = defineStore("dashboard", {
             };
           });
         } else {
-          // New method: fetch stock movements to calculate costs
-          const stockMovementsQuery = query(
-            collection(db, "stockMovements"),
-            where("businessId", "==", businessId.value),
-            where("orderId", "in", orderIds)
-          );
+          // Split the orderIds array into chunks of maximum 30 items
+          const chunkSize = 30;
+          const orderIdChunks = [];
+          for (let i = 0; i < orderIds.length; i += chunkSize) {
+            orderIdChunks.push(orderIds.slice(i, i + chunkSize));
+          }
 
-          const stockMovementsSnapshot = await getDocs(stockMovementsQuery);
-          stockMovements = stockMovementsSnapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-              ...data,
-              id: doc.id,
-              date: $dayjs(data.date.toDate()).format("YYYY-MM-DD")
-            };
-          });
+          // Create an array to hold all stock movements
+          let allStockMovements: Array<any> = [];
+
+          // Query each chunk separately
+          for (const chunk of orderIdChunks) {
+            if (chunk.length > 0) {
+              const stockMovementsQuery = query(
+                collection(db, "stockMovements"),
+                where("businessId", "==", businessId.value),
+                where("orderId", "in", chunk)
+              );
+
+              const stockMovementsSnapshot = await getDocs(stockMovementsQuery);
+              const chunkMovements = stockMovementsSnapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                  ...data,
+                  id: doc.id,
+                  date: $dayjs(data.date.toDate()).format("YYYY-MM-DD")
+                };
+              });
+
+              // Add this chunk's results to the overall results
+              allStockMovements = [...allStockMovements, ...chunkMovements];
+            }
+          }
+
+          // Use allStockMovements instead of the result from a single query
+          stockMovements = allStockMovements;
         }
 
         // 2. Process orders to calculate daily stats
