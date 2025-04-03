@@ -50,7 +50,7 @@
       <FormKit
         type="select"
         name="product_unit"
-        :options="['Kg', 'Unitario', 'Bolsa', 'Cajon', 'Gramo', 'Litro', 'Docena']"
+        :options="['Kg', 'Unitario', 'Bolsa', 'Cajon', 'Jaula', 'Bandeja', 'Gramo', 'Litro', 'Docena']"
         label-class="font-medium"
         messages-class="text-red-500 text-[0.75rem]"
         input-class="w-full"

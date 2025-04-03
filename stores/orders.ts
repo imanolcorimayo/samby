@@ -263,7 +263,12 @@ export const useOrdersStore = defineStore("orders", {
         onSnapshot(q, (querySnapshot) => {
           const orders = querySnapshot.docs.map((doc) => {
             const data = doc.data();
-            return { ...data, id: doc.id, shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD") };
+            return {
+              ...data,
+              id: doc.id,
+              shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD"),
+              createdAt: $dayjs(data.createdAt.toDate()).format("YYYY-MM-DD")
+            };
           });
 
           this.$state.pendingOrders = orders;
@@ -333,7 +338,12 @@ export const useOrdersStore = defineStore("orders", {
 
         const orders = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-          return { ...data, id: doc.id, shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD") };
+          return {
+            ...data,
+            id: doc.id,
+            shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD"),
+            createdAt: $dayjs(data.createdAt.toDate()).format("YYYY-MM-DD")
+          };
         });
 
         if (!startAfterLastVisible) {
