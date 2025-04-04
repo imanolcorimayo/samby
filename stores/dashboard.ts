@@ -304,7 +304,7 @@ export const useDashboardStore = defineStore("dashboard", {
         }
 
         // Process cost data differently based on approach
-        const costsByDay: any = {};
+        /* const costsByDay: any = {}; */
         const productCostHistory: any = {};
 
         if (useLegacyLogic) {
@@ -313,12 +313,12 @@ export const useDashboardStore = defineStore("dashboard", {
             const costDay = cost.date;
 
             // Add to daily tally
-            if (dailyData[costDay]) {
+            /* if (dailyData[costDay]) {
               if (!costsByDay[costDay]) {
                 costsByDay[costDay] = 0;
               }
               costsByDay[costDay] = dailyData[costDay].totalCosts || 0;
-            }
+            } */
 
             // Track product cost history for variation
             if (!productCostHistory[cost.productId]) {
@@ -352,7 +352,7 @@ export const useDashboardStore = defineStore("dashboard", {
             }
 
             // Track daily costs used
-            const costDay = movement.date;
+            /* const costDay = movement.date;
 
             if (!costsByDay[costDay]) {
               costsByDay[costDay] = 0;
@@ -365,7 +365,7 @@ export const useDashboardStore = defineStore("dashboard", {
               // For returns, subtract the ORIGINAL cost from the daily tally
               const returnCost = movement.unitBuyingPrice || movement.previousCost;
               costsByDay[costDay] -= Math.abs(movement.quantity) * returnCost;
-            }
+            } */
           }
         }
 
@@ -404,7 +404,7 @@ export const useDashboardStore = defineStore("dashboard", {
         // 5. Calculate earnings based on income and costs
         days.forEach((day) => {
           const dayStats = dailyData[day];
-          const dayCosts = costsByDay[day] || 0;
+          const dayCosts = dayStats.totalCosts; // costsByDay[day] || 0;
 
           dayStats.productCosts = dayCosts;
           dayStats.totalEarnings = dayStats.totalIncome - dayCosts;
@@ -416,7 +416,7 @@ export const useDashboardStore = defineStore("dashboard", {
 
           // Add to weekly totals
           weeklyDataInit.totalIncome += dayStats.totalIncome;
-          weeklyDataInit.totalProductCosts += dayCosts;
+          weeklyDataInit.totalProductCosts += parseFloat(dayCosts || 0);
         });
 
         // Calculate overall earnings
