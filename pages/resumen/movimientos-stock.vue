@@ -125,7 +125,14 @@
                 </td>
               </tr>
               <tr v-for="(movement, index) in filteredMovements" :key="index" class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ movement.date }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div class="flex flex-col">
+                    <span>
+                      {{ movement.date }}
+                    </span>
+                    <span class="text-xs text-gray-400">{{ movement.id }}</span>
+                  </div>
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ movement.productName }}
                 </td>
@@ -392,7 +399,6 @@ async function loadMoreMovements() {
 
   // Check if there are more movements to load
   const lastVisible = productsStore.$state.lastVisibleStockMovement;
-  console.log("Last visible stock movement:", lastVisible);
   if (!lastVisible) {
     hasMoreMovements.value = false;
     isLoadingMore.value = false;

@@ -269,7 +269,7 @@ import PhSealCheckDuotone from "~icons/ph/seal-check-duotone";
 import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import IcRoundPlus from "~icons/ic/round-plus";
 import MingcuteUser4Fill from "~icons/mingcute/user-4-fill";
-import { ToastEvents } from "~/interfaces";
+import { StockMovementType, ToastEvents } from "~/interfaces";
 import IconParkOutlineTransactionOrder from "~icons/icon-park-outline/transaction-order";
 
 import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
@@ -291,15 +291,13 @@ await ordersStore.fetchPendingOrders();
 clientsStore.fetchData(); // Load clients data
 
 // Fetch stock movements.We need to call pending orders first
-const forPendingOrders = true;
-await productsStore.fetchStockMovements(null, 20, null, forPendingOrders);
 await productsStore.fetchData();
 
 // ----- Define Vars -------
 const submitting = ref(null);
 const ordersToShow = ref(pendingOrders.value);
 const orderStatus = ref("pending");
-const search = ref("");
+const movementsFetched = ref(false);
 const isPendingShown = ref(true);
 
 // Refs
@@ -354,16 +352,17 @@ const pendingOrdersStats = computed(() => {
           const stockMovements = productsStore.getStockMovements.filter(
             (m) =>
               m.productId === product.productId &&
-              ((m.type === "sale" && m.orderId === order.id) || (m.type === "return" && m.orderId === order.id))
+              (m.type === StockMovementType.SALE || m.type === StockMovementType.RETURN) &&
+              m.orderId === order.id
           );
 
           if (stockMovements.length > 0) {
             // Calculate cost from actual movements, considering both sales and returns
             const movementCost = stockMovements.reduce((sum, movement) => {
               // For sales, add the cost; for returns, subtract the cost
-              if (movement.type === "sale") {
+              if (movement.type === StockMovementType.SALE) {
                 return sum + movement.previousCost * Math.abs(movement.quantity);
-              } else if (movement.type === "return") {
+              } else if (movement.type === StockMovementType.RETURN) {
                 // Use unitBuyingPrice for returns when available
                 // Unit buying price means the price at what the stock was returned
                 // It's calculated on the order store when returning back and saved in the stock movements
@@ -525,8 +524,15 @@ function formattedDate(dateString) {
 }
 
 // ----- Define Watchers -------
-watch(pendingOrders, () => {
+watch(pendingOrders, async () => {
   ordersToShow.value = pendingOrders.value;
+
+  // Fetch stock movements only when pending orders are ready
+  if (!movementsFetched.value) {
+    const forPendingOrders = true;
+    await productsStore.fetchStockMovements(null, 0, null, forPendingOrders);
+    movementsFetched.value = true;
+  }
 });
 
 watch(orders, () => {
