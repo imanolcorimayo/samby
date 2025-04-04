@@ -304,21 +304,12 @@ export const useDashboardStore = defineStore("dashboard", {
         }
 
         // Process cost data differently based on approach
-        /* const costsByDay: any = {}; */
         const productCostHistory: any = {};
 
         if (useLegacyLogic) {
           // Group product costs by day and product - legacy approach
           for (const cost of productCosts) {
             const costDay = cost.date;
-
-            // Add to daily tally
-            /* if (dailyData[costDay]) {
-              if (!costsByDay[costDay]) {
-                costsByDay[costDay] = 0;
-              }
-              costsByDay[costDay] = dailyData[costDay].totalCosts || 0;
-            } */
 
             // Track product cost history for variation
             if (!productCostHistory[cost.productId]) {
@@ -350,22 +341,6 @@ export const useDashboardStore = defineStore("dashboard", {
                 cost: costValue
               });
             }
-
-            // Track daily costs used
-            /* const costDay = movement.date;
-
-            if (!costsByDay[costDay]) {
-              costsByDay[costDay] = 0;
-            }
-
-            if (movement.type === StockMovementType.SALE && dailyData[costDay]) {
-              // For sales, add the cost to the daily tally
-              costsByDay[costDay] += Math.abs(movement.quantity) * movement.previousCost;
-            } else if (movement.type === StockMovementType.RETURN && dailyData[costDay]) {
-              // For returns, subtract the ORIGINAL cost from the daily tally
-              const returnCost = movement.unitBuyingPrice || movement.previousCost;
-              costsByDay[costDay] -= Math.abs(movement.quantity) * returnCost;
-            } */
           }
         }
 
