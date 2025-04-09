@@ -225,12 +225,6 @@ export const useProductsStore = defineStore("products", {
           this.currentProductImage = null;
         }
 
-        this.$state.products.push({
-          id: newProduct.id,
-          businessId: businessId.value,
-          ...product
-        });
-
         return newProduct;
       } catch (error) {
         console.error(error);
@@ -257,14 +251,6 @@ export const useProductsStore = defineStore("products", {
           await deleteDoc(doc(db, "producto", productId));
         }
 
-        // Get index of the product in the current store
-        const index = this.$state.products.findIndex((p: any) => p.id === productId);
-
-        // Remove from the store
-        if (index > -1) {
-          this.$state.products.splice(index, 1);
-        }
-
         return true;
       } catch (error) {
         console.error(error);
@@ -274,7 +260,6 @@ export const useProductsStore = defineStore("products", {
     async updateProduct(product: any, current: any) {
       const db = useFirestore();
       const productReference = doc(db, "producto", current.id);
-      const productIndex = this.$state.products.findIndex((el: any) => el.id == current.id);
 
       // Validate sell object
       const isProductValid = validateProduct(product);
@@ -289,7 +274,6 @@ export const useProductsStore = defineStore("products", {
 
         // Update doc using paymentRef only if it's not one time payment
         await updateDoc(productReference, product);
-        this.$state.products[productIndex] = Object.assign({}, { ...this.$state.products[productIndex], ...product });
 
         // Update the productImage collection accordingly
         if (imageChanged) {
@@ -314,7 +298,6 @@ export const useProductsStore = defineStore("products", {
     async updateStock(stock: any, current: any) {
       const db = useFirestore();
       const productReference = doc(db, "producto", current.id);
-      const productIndex = this.$state.products.findIndex((el: any) => el.id == current.id);
 
       // Validate sell object. Merge with other properties to validate the whole object just in case
       const isProductValid = validateProduct({ ...current, ...stock });
@@ -335,7 +318,6 @@ export const useProductsStore = defineStore("products", {
           cost: parseFloat(stock.cost),
           productStock: parseFloat(stock.productStock)
         });
-        this.$state.products[productIndex] = Object.assign({}, { ...this.$state.products[productIndex], ...stock });
 
         return true;
       } catch (error) {

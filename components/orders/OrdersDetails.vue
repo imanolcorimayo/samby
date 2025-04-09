@@ -601,9 +601,7 @@ function addProduct(productId) {
     price: product.price,
     quantity: product.step ?? 0.5,
     total: product.price * (product.step ?? 0.5),
-    unit: product.unit,
-    currentProductStock: product.productStock ?? 0,
-    currentCost: product.cost ?? 0
+    unit: product.unit
   });
 
   // Update the total amount
