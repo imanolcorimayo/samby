@@ -128,6 +128,7 @@
                     <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                     <input
                       type="number"
+                      @input="editProductPrice(product.productId)"
                       v-model="product.price"
                       class="!py-[0.214rem] !px-[0.428rem] max-h-[2.143rem] !pl-6"
                     />
@@ -593,6 +594,23 @@ function manageProduct(productId, action) {
   // Manage remove action
   product.quantity = product.quantity - productStep;
   product.total = product.price * product.quantity;
+  updateOrderFinancial();
+}
+
+function editProductPrice(productId) {
+  // Find the product in the editableOrder
+  const product = editableOrder.value.products.find((p) => p.productId === productId);
+
+  // Check if the product exists
+  if (!product) {
+    useToast("error", "El producto no existe, por favor intenta nuevamente.");
+    return;
+  }
+
+  // Update the subtotal
+  product.total = product.price * product.quantity;
+
+  // Update the total amount
   updateOrderFinancial();
 }
 
