@@ -28,7 +28,7 @@
       </div>
     </template>
     <template #default>
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 mb-4">
         <div v-if="needsInventoryUpdate" class="bg-orange-50 border-2 border-orange-400 p-4 rounded-lg">
           <div class="text-orange-800 flex flex-col gap-2">
             <div class="flex items-start gap-2">
@@ -189,12 +189,15 @@
                 <td class="py-3 hidden sm:block"></td>
                 <td class="py-3"></td>
                 <td class="py-3 py-3 flex items-center gap-2 max-w-[10rem]">
-                  $<input
-                    v-model="editableOrder.shippingPrice"
-                    type="number"
-                    class="text-center"
-                    placeholder="Ej: 1000"
-                  />
+                  <div class="relative mx-auto">
+                    <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                    <input
+                      v-model="editableOrder.shippingPrice"
+                      type="number"
+                      class="text-center !py-[0.214rem] !px-[0.428rem] max-h-[2.143rem] !pl-6"
+                      placeholder="Ej: 1000"
+                    />
+                  </div>
                 </td>
               </tr>
               <tr class="text-center border-b font-bold">
