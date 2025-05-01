@@ -93,7 +93,7 @@
           <table>
             <thead>
               <tr class="text-gray-400 border-b">
-                <th class="font-medium text-start">Producto</th>
+                <th class="font-medium text-start">Nombre Producto</th>
                 <th class="font-medium hidden sm:block">Precio</th>
                 <th class="font-medium">Cantidad</th>
                 <th class="font-medium flex flex-col items-center justify-center">
@@ -110,15 +110,30 @@
                 :class="{ 'bg-orange-50': needsInventoryUpdate && productNeedsMoreStock(product) }"
               >
                 <td class="py-3 text-start">
-                  {{ `${product.productName} (${product.unit})` }}
-                  <span
-                    v-if="needsInventoryUpdate && productNeedsMoreStock(product)"
-                    class="text-xs text-orange-700 block"
-                  >
-                    Falta stock: {{ formatQuantity(product.quantity - (product.stockUsed || 0)) }}
-                  </span>
+                  <div class="flex flex-col">
+                    <div>
+                      {{ `${product.productName} (${product.unit})` }}
+                      <span
+                        v-if="needsInventoryUpdate && productNeedsMoreStock(product)"
+                        class="text-xs text-orange-700 block"
+                      >
+                        Falta stock: {{ formatQuantity(product.quantity - (product.stockUsed || 0)) }}
+                      </span>
+                    </div>
+                    <span class="text-xs">Costo: {{ getCurrentProductCost(product.productId) }}</span>
+                  </div>
                 </td>
-                <td class="py-3 hidden sm:block">{{ formatPrice(product.price) }}</td>
+                <td class="py-3 hidden sm:block max-w-[7rem] mx-auto">
+                  <div class="relative" v-if="isEditable">
+                    <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                    <input
+                      type="number"
+                      v-model="product.price"
+                      class="!py-[0.214rem] !px-[0.428rem] max-h-[2.143rem] !pl-6"
+                    />
+                  </div>
+                  <span v-else>${{ formatPrice(product.price) }}</span>
+                </td>
                 <td class="py-3">
                   <div class="flex justify-between items-center gap-2 w-full" v-if="isEditable">
                     <button
@@ -685,6 +700,11 @@ async function modifyOrder() {
     useToast(ToastEvents.error, "Hubo un error al modificar el pedido, por favor intenta nuevamente");
     submitting.value = false;
   }
+}
+
+function getCurrentProductCost(productId) {
+  const product = products.value.find((p) => p.id === productId);
+  return formatPrice(product ? parseFloat(product.cost || 0) : 0);
 }
 
 // ----- Define Hooks -----
