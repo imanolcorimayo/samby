@@ -89,6 +89,23 @@
         </div>
       </div>
 
+      <!-- List of products that needs to be sold -->
+      <div class="flex gap-2 items-center flex-wrap">
+        <span class="text-gray-500">Productos que necesitan ser vendidos:</span>
+        <div class="flex flex-wrap gap-1.5">
+          <span
+            v-for="product in highlightedProducts"
+            :key="product.id"
+            class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-50 text-amber-800 ring-1 ring-amber-600/20"
+          >
+            {{ product.productName }}
+          </span>
+          <span v-if="!highlightedProducts.length" class="text-sm text-gray-400 italic">
+            No hay productos destacados
+          </span>
+        </div>
+      </div>
+
       <!-- Orders list -->
       <div class="flex flex-col mb-3" v-if="ordersToShow.length">
         <!-- Date groups and stock calculation button -->
@@ -426,6 +443,16 @@ const pendingOrdersStats = computed(() => {
   }
 
   return stats;
+});
+
+// Add this computed property to your script setup
+const highlightedProducts = computed(() => {
+  if (!productsStore.getProducts || !productsStore.getProducts.length) {
+    return [];
+  }
+
+  // Filter products with highlightProduct flag
+  return productsStore.getProducts.filter((product) => product.highlightProduct === true);
 });
 
 // ----- Define Methods -------
