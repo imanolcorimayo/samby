@@ -33,21 +33,21 @@
             <button class="flex items-center w-full gap-2 p-4 cursor-pointer" @click="tooltip.toggleTooltip">
               <div class="flex justify-center items-center w-[2.7rem] h-[2.7rem] rounded-full bg-white shrink-0">
                 <MageShopFill
-                  v-if="!indexStore.currentBusiness.imageUrlThumbnail"
+                  v-if="!indexStore?.currentBusiness.imageUrlThumbnail"
                   class="text-gray-600 text-[1.4rem]"
                 />
                 <img
                   v-else
                   class="rounded-full w-full h-full object-cover"
-                  :src="indexStore.currentBusiness.imageUrlThumbnail"
+                  :src="indexStore?.currentBusiness.imageUrlThumbnail"
                   alt="Business thumbnail"
                 />
               </div>
               <div class="flex flex-col items-start flex-1 min-w-0">
                 <span class="text-md font-medium truncate w-full text-start">{{
-                  indexStore.currentBusiness.name
+                  indexStore?.currentBusiness.name
                 }}</span>
-                <span class="text-xs text-gray-500">{{ indexStore.currentBusiness.type }}</span>
+                <span class="text-xs text-gray-500">{{ indexStore?.currentBusiness.type }}</span>
               </div>
               <MaterialSymbolsKeyboardArrowDown class="text-gray-600" />
             </button>
@@ -56,9 +56,11 @@
                 <ul
                   class="flex flex-col items-start w-fit max-w-[25rem] max-h-[15rem] overflow-y-scroll no-scrollbar rounded-lg"
                 >
-                  <li v-for="business in indexStore.businesses" class="w-full">
+                  <li v-for="business in indexStore?.businesses" class="w-full">
                     <button
-                      @click="indexStore.changeCurrentBusiness(business.isEmployee ? business.businessId : business.id)"
+                      @click="
+                        indexStore?.changeCurrentBusiness(business.isEmployee ? business.businessId : business.id)
+                      "
                       class="flex justify-between items-center gap-2 p-4 hover:bg-primary/60 w-full text-start"
                     >
                       <div
@@ -77,7 +79,7 @@
                         <span class="text-nowrap text-xs text-gray-500">{{ business.type }}</span>
                       </div>
                       <IconParkOutlineCheckOne
-                        v-if="indexStore.currentBusiness.id == business.id"
+                        v-if="indexStore?.currentBusiness.id == business.id"
                         class="shrink-0 text-success-600 ms-2 text-success"
                       />
                     </button>
@@ -111,7 +113,7 @@
           </li>
           <li>
             <NuxtLink
-              v-if="indexStore.isOwner"
+              v-if="indexStore?.isOwner"
               to="/clientes"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -120,7 +122,7 @@
           </li>
 
           <!-- Accordion for Resumen -->
-          <li v-if="indexStore.isOwner" class="flex flex-col">
+          <li v-if="indexStore?.isOwner" class="flex flex-col">
             <button
               @click="toggleResumenAccordion"
               class="flex items-center justify-between w-full text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
@@ -172,7 +174,7 @@
 
           <li>
             <NuxtLink
-              v-if="indexStore.isOwner"
+              v-if="indexStore?.isOwner"
               to="/inventario"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -181,7 +183,7 @@
           </li>
           <li>
             <NuxtLink
-              v-if="indexStore.isOwner"
+              v-if="indexStore?.isOwner"
               to="/empleados"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -189,12 +191,12 @@
             </NuxtLink>
           </li>
         </ul>
-        <div class="flex flex-col gap-3" v-if="indexStore.isOwner">
+        <div class="flex flex-col gap-3" v-if="indexStore?.isOwner">
           <span class="font-medium text-gray-500 text-sm">Acciones de gestión</span>
           <ul class="flex flex-col gap-2 text-sm">
             <li>
               <NuxtLink
-                v-if="indexStore.isOwner"
+                v-if="indexStore?.isOwner"
                 to="/pedidos/nuevo"
                 class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
               >
@@ -203,7 +205,7 @@
             </li>
             <li>
               <NuxtLink
-                v-if="indexStore.isOwner"
+                v-if="indexStore?.isOwner"
                 to="/inventario/nuevo"
                 class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
               >
@@ -269,7 +271,7 @@ const auth = useFirebaseAuth();
 // ------ Define Pinia Vars --------
 const ordersStore = useOrdersStore();
 const indexStore = useIndexStore();
-indexStore.fetchBusinesses();
+indexStore?.fetchBusinesses();
 const { doesOrderExist, productsCount, totalAmount } = storeToRefs(ordersStore);
 
 // ------ Define Vars --------

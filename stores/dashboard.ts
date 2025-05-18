@@ -42,7 +42,18 @@ export const useDashboardStore = defineStore("dashboard", {
       productCostVariation: [],
       startDate: "",
       endDate: "",
-      productStats: []
+      productStats: [],
+      clientStats: {
+        newClients: 0,
+        repeatClients: 0,
+        newClientPercentage: 0,
+        repeatClientPercentage: 0,
+        averageOrderValueAll: 0,
+        averageOrderValueNew: 0,
+        averageOrderValueRepeat: 0,
+        averageProductsPerOrder: 0,
+        outstandingClients: []
+      }
     },
     isLoading: false,
     weeklyDataFetched: false,
@@ -106,7 +117,18 @@ export const useDashboardStore = defineStore("dashboard", {
           productCostVariation: [],
           startDate: formattedStartDate,
           endDate: formattedEndDate,
-          productsStats: []
+          productsStats: [],
+          clientStats: {
+            newClients: 0,
+            repeatClients: 0,
+            newClientPercentage: 0,
+            repeatClientPercentage: 0,
+            averageOrderValueAll: 0,
+            averageOrderValueNew: 0,
+            averageOrderValueRepeat: 0,
+            averageProductsPerOrder: 0,
+            outstandingClients: []
+          }
         };
 
         // Structure to track daily data
@@ -562,6 +584,107 @@ export const useDashboardStore = defineStore("dashboard", {
 
         weeklyDataInit.productCostVariation = productVariations.slice(0, 10); // Top 10 variations
 
+        // Track client activity in the period
+        const clientActivity = new Map();
+
+        // Process orders to extract client information
+        for (const order of orders) {
+          if (order.clientId) {
+            // Initialize client data if this is the first order we're seeing for this client
+            if (!clientActivity.has(order.clientId)) {
+              clientActivity.set(order.clientId, {
+                clientId: order.clientId,
+                clientName: order.client?.clientName || "Cliente",
+                orderCount: 0,
+                totalSpent: 0,
+                totalProducts: 0,
+                averageOrderValue: 0,
+                firstOrderDate: null,
+                orders: []
+              });
+            }
+
+            const client = clientActivity.get(order.clientId);
+            client.orderCount++;
+            client.totalSpent += order.totalAmount || 0;
+
+            // Track products per order
+            const productCount = order.products?.length || 0;
+            client.totalProducts += productCount;
+
+            // Track order dates to determine first order
+            const orderDate = order.shippingDate;
+            if (!client.firstOrderDate || orderDate < client.firstOrderDate) {
+              client.firstOrderDate = orderDate;
+            }
+
+            // Store reference to order
+            client.orders.push(order);
+          }
+        }
+
+        // Identify new vs. repeat clients
+        const newClientsInPeriod = [];
+        const repeatClientsInPeriod = [];
+
+        // Check if clients had orders before this period
+        for (const [clientId, clientData] of clientActivity) {
+          // Use your cached client data to determine if this client is new
+          const client = this.clientsCache.get(clientId);
+          const creationDate = client?.createdAt ? $dayjs(client.createdAt.toDate()).format("YYYY-MM-DD") : null;
+
+          const isNew =
+            creationDate &&
+            $dayjs(creationDate).isSameOrAfter(formattedStartDate) &&
+            $dayjs(creationDate).isSameOrBefore(formattedEndDate);
+
+          if (isNew) {
+            newClientsInPeriod.push({ ...clientData, isNew: true });
+          } else {
+            repeatClientsInPeriod.push({ ...clientData, isNew: false });
+          }
+        }
+
+        // Calculate metrics
+        const totalClients = clientActivity.size;
+        const newClientsCount = newClientsInPeriod.length;
+        const repeatClientsCount = repeatClientsInPeriod.length;
+
+        // Calculate average metrics
+        const averageOrderValue = orders.length > 0 ? weeklyDataInit.totalIncome / orders.length : 0;
+
+        // Calculate averages by client segment
+        const newClientOrders = newClientsInPeriod.reduce((sum, client) => sum + client.orderCount, 0);
+        const repeatClientOrders = repeatClientsInPeriod.reduce((sum, client) => sum + client.orderCount, 0);
+
+        const newClientSpend = newClientsInPeriod.reduce((sum, client) => sum + client.totalSpent, 0);
+        const repeatClientSpend = repeatClientsInPeriod.reduce((sum, client) => sum + client.totalSpent, 0);
+
+        const avgOrderValueNew = newClientOrders > 0 ? newClientSpend / newClientOrders : 0;
+        const avgOrderValueRepeat = repeatClientOrders > 0 ? repeatClientSpend / repeatClientOrders : 0;
+
+        // Calculate average products per order
+        const totalProductCount = orders.reduce((sum: any, order: any) => sum + (order.products?.length || 0), 0);
+        const avgProductsPerOrder = orders.length > 0 ? totalProductCount / orders.length : 0;
+
+        // Find outstanding clients (sort by total spent)
+        const outstandingBySpend = Array.from(clientActivity.values())
+          .sort((a, b) => b.totalSpent - a.totalSpent)
+          .slice(0, 10);
+
+        // Update weeklyDataInit
+        weeklyDataInit.clientStats = {
+          newClients: newClientsCount,
+          repeatClients: repeatClientsCount,
+          newClientPercentage: totalClients > 0 ? (newClientsCount / totalClients) * 100 : 0,
+          repeatClientPercentage: totalClients > 0 ? (repeatClientsCount / totalClients) * 100 : 0,
+          averageOrderValueAll: averageOrderValue,
+          averageOrderValueNew: avgOrderValueNew,
+          averageOrderValueRepeat: avgOrderValueRepeat,
+          averageProductsPerOrder: avgProductsPerOrder,
+          outstandingClients: outstandingBySpend
+        };
+
         // Update state
         this.weeklyData = weeklyDataInit;
         this.weeklyDataFetched = true;
@@ -589,7 +712,18 @@ export const useDashboardStore = defineStore("dashboard", {
         productCostVariation: [],
         startDate: "",
         endDate: "",
-        productStats: []
+        productStats: [],
+        clientStats: {
+          newClients: 0,
+          repeatClients: 0,
+          newClientPercentage: 0,
+          repeatClientPercentage: 0,
+          averageOrderValueAll: 0,
+          averageOrderValueNew: 0,
+          averageOrderValueRepeat: 0,
+          averageProductsPerOrder: 0,
+          outstandingClients: []
+        }
       };
     }
   }

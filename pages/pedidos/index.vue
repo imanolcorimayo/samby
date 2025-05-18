@@ -11,7 +11,10 @@
       </div>
 
       <!-- KPI Cards for Pending Orders -->
-      <div v-if="pendingOrders.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+      <div
+        v-if="pendingOrders.length > 0 && indexStore?.isOwner"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2"
+      >
         <!-- Total Stock Used Card -->
         <div class="bg-white rounded-lg shadow flex flex-col p-4 border border-gray-200">
           <div class="flex justify-between mb-2">
@@ -297,6 +300,7 @@ import LucideUsers from "~icons/lucide/users";
 const { $dayjs } = useNuxtApp();
 
 // ----- Define Pinia Vars --------
+const indexStore = useIndexStore();
 const ordersStore = useOrdersStore();
 const clientsStore = useClientsStore();
 const { getPendingOrders: pendingOrders, getOrders: orders, arePendingOrdersFetched } = storeToRefs(ordersStore);

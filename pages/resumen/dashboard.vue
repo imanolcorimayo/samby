@@ -178,6 +178,102 @@
         </div>
       </div>
 
+      <!-- Client Analytics Section -->
+      <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
+        <h3 class="font-semibold mb-4">Análisis de Clientes</h3>
+
+        <!-- Client Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <!-- New vs Repeat Clients Card -->
+          <div class="bg-white p-3 rounded-md border border-gray-100 shadow-sm">
+            <div class="text-sm text-gray-500 mb-1">Nuevos vs Recurrentes</div>
+            <div class="flex items-center gap-2">
+              <div class="flex-1">
+                <div class="text-xl font-bold">{{ weeklyData.clientStats.newClients }}</div>
+                <div class="text-xs text-blue-600">
+                  Nuevos ({{ weeklyData.clientStats.newClientPercentage.toFixed(1) }}%)
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="text-xl font-bold">{{ weeklyData.clientStats.repeatClients }}</div>
+                <div class="text-xs text-green-600">
+                  Recurrentes ({{ weeklyData.clientStats.repeatClientPercentage.toFixed(1) }}%)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Average Order Value Card -->
+          <div class="bg-white p-3 rounded-md border border-gray-100 shadow-sm">
+            <div class="text-sm text-gray-500 mb-1">Valor Promedio de Pedidos</div>
+            <div class="text-xl font-bold">{{ formatPrice(weeklyData.clientStats.averageOrderValueAll) }}</div>
+            <div class="flex text-xs mt-1">
+              <div class="flex-1 text-blue-600">
+                Nuevos: {{ formatPrice(weeklyData.clientStats.averageOrderValueNew) }}
+              </div>
+              <div class="flex-1 text-green-600">
+                Recurrentes: {{ formatPrice(weeklyData.clientStats.averageOrderValueRepeat) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Products Per Order Card -->
+          <div class="bg-white p-3 rounded-md border border-gray-100 shadow-sm">
+            <div class="text-sm text-gray-500 mb-1">Productos por Pedido</div>
+            <div class="text-xl font-bold">{{ weeklyData.clientStats.averageProductsPerOrder.toFixed(1) }}</div>
+            <div class="text-xs text-gray-500">Promedio para todos los clientes</div>
+          </div>
+
+          <!-- Client Retention Card (you could add retention metrics here) -->
+          <div class="bg-white p-3 rounded-md border border-gray-100 shadow-sm">
+            <div class="text-sm text-gray-500 mb-1">Retención de Clientes</div>
+            <div class="text-xl font-bold">{{ weeklyData.clientStats.repeatClientPercentage.toFixed(1) }}%</div>
+            <div class="text-xs text-gray-500">De clientes activos son recurrentes</div>
+          </div>
+        </div>
+
+        <!-- Outstanding Clients Table -->
+        <div class="bg-white rounded-md border border-gray-200">
+          <h4 class="px-4 py-2 bg-gray-50 border-b border-gray-200 font-medium">Clientes Destacados</h4>
+          <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="py-2 px-3 text-left text-xs font-medium text-gray-500">Cliente</th>
+                  <th class="py-2 px-3 text-right text-xs font-medium text-gray-500">Pedidos</th>
+                  <th class="py-2 px-3 text-right text-xs font-medium text-gray-500">Gasto Total</th>
+                  <th class="py-2 px-3 text-right text-xs font-medium text-gray-500">Promedio</th>
+                  <th class="py-2 px-3 text-right text-xs font-medium text-gray-500">Tipo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="client in weeklyData.clientStats.outstandingClients"
+                  :key="client.clientId"
+                  class="border-b border-gray-200 hover:bg-gray-50"
+                >
+                  <td class="py-2 px-3">{{ client.clientName }}</td>
+                  <td class="py-2 px-3 text-right">{{ client.orderCount }}</td>
+                  <td class="py-2 px-3 text-right">{{ formatPrice(client.totalSpent) }}</td>
+                  <td class="py-2 px-3 text-right">{{ formatPrice(client.totalSpent / client.orderCount) }}</td>
+                  <td class="py-2 px-3 text-right">
+                    <span
+                      :class="client.isNew ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'"
+                      class="px-2 py-0.5 rounded-full text-xs font-medium"
+                    >
+                      {{ client.isNew ? "Nuevo" : "Recurrente" }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-if="!weeklyData.clientStats.outstandingClients.length" class="p-4 text-center text-gray-500">
+            No hay datos de clientes destacados para este período
+          </div>
+        </div>
+      </div>
+
       <!-- Product Weekly Recap Table -->
       <div class="ring-1 ring-gray-400 rounded flex flex-col p-4 bg-secondary shadow">
         <h3 class="font-semibold mb-4">Resumen de Productos</h3>

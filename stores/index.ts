@@ -677,13 +677,15 @@ export const useIndexStore = defineStore("index", {
             where("status", "!=", "Archivado")
           )
         );
+        /* 
+        TODO: Add restriction if the business scales
         if (userBusiness.docs.length >= 3) {
           useToast(
             ToastEvents.error,
             "No puedes tener mas de 3 empleados registrados. Para aumentar este limite contactate con soporte"
           );
           return false;
-        }
+        } */
 
         const objectToSave = {
           name: businessInfo.name,

@@ -120,7 +120,9 @@
                         Falta stock: {{ formatQuantity(product.quantity - (product.stockUsed || 0)) }}
                       </span>
                     </div>
-                    <span class="text-xs">Costo: {{ getCurrentProductCost(product.productId) }}</span>
+                    <span v-if="indexStore?.isOwner" class="text-xs"
+                      >Costo: {{ getCurrentProductCost(product.productId) }}</span
+                    >
                   </div>
                 </td>
                 <td class="py-3 hidden sm:block max-w-[7rem] mx-auto">
@@ -369,6 +371,8 @@ import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
 import { ToastEvents } from "~/interfaces";
 
 // ----- Define Pinia Vars -----
+const indexStore = useIndexStore();
+
 const productsStore = useProductsStore();
 const { products } = storeToRefs(productsStore);
 
