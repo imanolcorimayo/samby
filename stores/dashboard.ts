@@ -367,7 +367,7 @@ export const useDashboardStore = defineStore("dashboard", {
         }
 
         // 4. Fetch clients to identify new clients
-        const clientsQuery = query(collection(db, "clientes"), where("businessId", "==", businessId.value));
+        const clientsQuery = query(collection(db, "cliente"), where("businessId", "==", businessId.value));
         const clientsSnapshot = await getDocs(clientsQuery);
 
         // Process clients to identify new ones in the period
