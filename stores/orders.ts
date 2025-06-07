@@ -4,22 +4,184 @@ import {
   query,
   where,
   getDocs,
-  getDoc,
   addDoc,
+  serverTimestamp,
   doc,
   updateDoc,
-  deleteDoc,
+  getDoc,
   orderBy,
-  serverTimestamp,
   limit,
   startAfter,
+  onSnapshot,
   Timestamp,
-  onSnapshot
+  DocumentSnapshot,
+  QueryDocumentSnapshot
 } from "firebase/firestore";
-import { StockMovementType, ToastEvents, type StockMovement } from "~/interfaces";
+import type { StockMovement } from "~/interfaces";
+import { StockMovementType, ToastEvents } from "~/interfaces";
 
-// Helper function to validate prerequisites
-function validatePrerequisites() {
+// Order status options and values
+export const ORDER_STATUS_OPTIONS = [
+  "pendiente",
+  "pendiente-modificado",
+  "pendiente-de-confirmacion",
+  "requiere-actualizacion-inventario",
+  "entregado",
+  "cancelado",
+  "rechazado"
+] as const;
+
+export const ORDER_SHIPPING_TYPES = ["Envío", "Retiro en Local"];
+export const ORDER_SHIPPING_TYPES_UTILS = { delivery: "Envío", pickup: "Retiro en Local" };
+export const ORDER_STATUS_VALUES = {
+  pending: "pendiente",
+  pendingModified: "pendiente-modificado",
+  pendienteModificado: "pendiente-modificado",
+  pendingConfirmation: "pendiente-de-confirmacion",
+  requiresInventoryUpdate: "requiere-actualizacion-inventario",
+  requiereActualizacionInventario: "requiere-actualizacion-inventario",
+  delivered: "entregado",
+  canceled: "cancelado",
+  rejected: "rechazado",
+  pendiente: "pendiente",
+  entregado: "entregado",
+  cancelado: "cancelado",
+  rechazado: "rechazado"
+};
+
+export type OrderStatus = (typeof ORDER_STATUS_OPTIONS)[number];
+
+// Shipping types
+export type OrderShippingType = "Envío" | "Retiro en Local" | null;
+
+// Interface for shopping cart items
+export interface ShoppingCartItem {
+  productId: string;
+  quantity: number;
+  productName: string;
+  price: number;
+  unit: string;
+  total: number;
+  stockUsed: number;
+}
+
+// Interface for client information in orders
+export interface OrderClient {
+  clientName: string;
+  phone: string;
+  address: string | null;
+  fromEmprendeVerde?: boolean;
+  lat?: number;
+  lng?: number;
+}
+
+// Interface for product in orders
+export interface OrderProduct {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+  unit: string;
+  total: number;
+  stockUsed: number;
+}
+
+// Interface for status log entries
+export interface OrderStatusLog {
+  id?: string;
+  orderStatus: OrderStatus;
+  message?: string;
+  createdAt: Timestamp | string;
+  userUid: string;
+}
+
+// Interface for the order document in Firestore
+export interface OrderDocument {
+  id?: string;
+  products: OrderProduct[];
+  client: OrderClient;
+  clientId: string;
+  businessId: string;
+  userUid: string;
+  shippingDate: Timestamp | string;
+  shippingType: OrderShippingType;
+  shippingPrice: number;
+  totalAmount: number;
+  totalProductsAmount: number;
+  createdAt: Timestamp | string;
+  orderStatus: OrderStatus;
+}
+
+// Interface for formatted order (with date strings)
+export interface FormattedOrderDocument extends Omit<OrderDocument, "shippingDate" | "createdAt"> {
+  id?: string;
+  shippingDate: string;
+  createdAt: string;
+}
+
+// Interface for the last inserted order
+export interface LastInsertedOrder {
+  order: OrderDocument & { id: string };
+  orderId: string | false;
+  createdAt: Date | false;
+}
+
+// Interface for daily product cost
+export interface DailyProductCost {
+  id?: string;
+  productId: string;
+  productName: string;
+  cost: number;
+  date: Timestamp | string;
+  businessId: string;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+}
+
+// Interface for prerequisite validation result
+interface PrerequisiteResult {
+  valid: boolean;
+  reason?: string;
+  user?: any;
+  businessId?: any;
+}
+
+// Store state interface
+interface OrdersState {
+  shoppingCart: ShoppingCartItem[];
+  orders: FormattedOrderDocument[];
+  lastInsertedOrder: LastInsertedOrder;
+  pendingOrders: FormattedOrderDocument[];
+  pendingOrdersFetched: boolean;
+  ordersFetched: boolean;
+  lastVisible: QueryDocumentSnapshot | DocumentSnapshot | false | null;
+  dailyProductCost: DailyProductCost[];
+  dailyProductCostByDate: Map<string, DailyProductCost[]>;
+  ordersByDate: Map<string, FormattedOrderDocument[]>;
+}
+
+// Default state object
+const defaultState: OrdersState = {
+  shoppingCart: [],
+  orders: [],
+  lastInsertedOrder: {
+    order: {} as OrderDocument & { id: string },
+    orderId: false,
+    createdAt: false
+  },
+  pendingOrders: [],
+  pendingOrdersFetched: false,
+  ordersFetched: false,
+  lastVisible: false,
+  dailyProductCost: [],
+  dailyProductCostByDate: new Map(),
+  ordersByDate: new Map()
+};
+
+/**
+ * Helper function to validate prerequisites
+ */
+function validatePrerequisites(): PrerequisiteResult {
   const user = useCurrentUser();
   const businessId = useLocalStorage("cBId", null);
 
@@ -35,46 +197,29 @@ function validatePrerequisites() {
 }
 
 export const useOrdersStore = defineStore("orders", {
-  state: (): any => {
-    return {
-      shoppingCart: [],
-      orders: [],
-      lastInsertedOrder: {
-        order: {},
-        orderId: false,
-        createdAt: false
-      },
-      pendingOrders: [],
-      pendingOrdersFetched: false,
-      ordersFetched: false,
-      lastVisible: false,
-      dailyProductCost: [],
-
-      // New map implementations
-      dailyProductCostByDate: new Map(), // New Map structure for caching
-      ordersByDate: new Map()
-    };
+  state: (): OrdersState => {
+    return Object.assign({}, defaultState);
   },
   getters: {
-    getShoppingCart: (state) => state.shoppingCart,
-    doesOrderExist: (state) => state.shoppingCart.length > 0,
-    productsCount: (state) => state.shoppingCart.length,
-    totalAmount: (state: any) => state.shoppingCart.reduce((acc: any, product: any) => acc + product.total, 0),
-    getOrders: (state) => state.orders,
-    areOrdersFetched: (state) => state.ordersFetched,
-    getPendingOrders: (state) => state.pendingOrders,
-    arePendingOrdersFetched: (state) => state.pendingOrdersFetched,
-    getDailyProductCost: (state) => state.dailyProductCost
+    getShoppingCart: (state): ShoppingCartItem[] => state.shoppingCart,
+    doesOrderExist: (state): boolean => state.shoppingCart.length > 0,
+    productsCount: (state): number => state.shoppingCart.length,
+    totalAmount: (state): number => state.shoppingCart.reduce((acc, product) => acc + product.total, 0),
+    getOrders: (state): FormattedOrderDocument[] => state.orders,
+    areOrdersFetched: (state): boolean => state.ordersFetched,
+    getPendingOrders: (state): FormattedOrderDocument[] => state.pendingOrders,
+    arePendingOrdersFetched: (state): boolean => state.pendingOrdersFetched,
+    getDailyProductCost: (state): DailyProductCost[] => state.dailyProductCost
   },
   actions: {
-    async saveShoppingCart(productsQuantity: any) {
+    async saveShoppingCart(productsQuantity: Record<string, number>): Promise<void> {
       // Get the products from the store
       const productsStore = useProductsStore();
-      // @ts-ignore
+      // @ts-ignore - Using storeToRefs
       const { getProducts: products } = storeToRefs(productsStore);
 
       // Create the order object
-      let order = [];
+      const order: ShoppingCartItem[] = [];
       for (const pId in productsQuantity) {
         if (productsQuantity[pId] <= 0) {
           continue;
@@ -82,18 +227,17 @@ export const useOrdersStore = defineStore("orders", {
 
         // Search product in products object
         const product = products.value.find((p: any) => p.id === pId);
+        if (!product) continue;
 
-        product.price = product.price ? parseFloat(product.price) : 0;
+        const price = product.price ? parseFloat(product.price.toString()) : 0;
 
         order.push({
           productId: pId,
           quantity: productsQuantity[pId],
           productName: product.productName,
-          price: product.price,
+          price: price,
           unit: product.unit,
-          total: productsQuantity[pId] * product.price,
-
-          // Keep tracking stockUsed for orders
+          total: productsQuantity[pId] * price,
           stockUsed: 0 // Will be updated when placing order
         });
       }
@@ -101,15 +245,25 @@ export const useOrdersStore = defineStore("orders", {
       // Save the order in the store
       this.$state.shoppingCart = order;
     },
-    removeProduct(product: any) {
+
+    removeProduct(product: ShoppingCartItem): void {
       // Remove product from cart
-      // Stringify is not the cleanest way but we keep this for simplicity now
-      this.$state.shoppingCart = this.$state.shoppingCart.filter(
-        (p: any) => JSON.stringify(p) !== JSON.stringify(product)
-      );
-      // Update Local Storage
+      this.$state.shoppingCart = this.$state.shoppingCart.filter((p) => JSON.stringify(p) !== JSON.stringify(product));
     },
-    async placeOrder(order: any, clientId: string) {
+
+    async placeOrder(
+      order: {
+        products: OrderProduct[];
+        shippingPrice: number;
+        shippingDate: string;
+        client: OrderClient;
+        totalAmount: number;
+        totalProductsAmount: number;
+        shippingType: OrderShippingType;
+        orderStatus: OrderStatus;
+      },
+      clientId: string
+    ): Promise<OrderDocument | null> {
       const db = useFirestore();
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
@@ -146,7 +300,7 @@ export const useOrdersStore = defineStore("orders", {
         order.shippingType = "Envío";
       }
 
-      // Double check products still exits
+      // Double check products still exists
       if (!order.products.length) {
         useToast(ToastEvents.error, "No hay productos en el carrito.");
         return null;
@@ -156,11 +310,11 @@ export const useOrdersStore = defineStore("orders", {
 
       try {
         // Create object to be inserted
-        const orderObject = {
+        const orderObject: OrderDocument = {
           ...order,
           businessId: businessId.value,
           shippingDate: Timestamp.fromDate(shippingTime),
-          createdAt: serverTimestamp(),
+          createdAt: serverTimestamp() as Timestamp,
           userUid: user.value.uid,
           clientId: clientId
         };
@@ -177,7 +331,7 @@ export const useOrdersStore = defineStore("orders", {
           if (!productInStore) continue;
 
           // Get current stock directly from store
-          const currentStock = parseFloat(productInStore.productStock ?? 0);
+          const currentStock = parseFloat(productInStore.productStock?.toString() ?? "0");
 
           // Use available stock
           const quantityToUse = Math.min(product.quantity, currentStock);
@@ -193,7 +347,6 @@ export const useOrdersStore = defineStore("orders", {
             {
               type: StockMovementType.SALE,
               notes: `Pedido #${orderId} - ${order.client.clientName}`,
-              quantity: -quantityToUse,
               orderId: orderId
             }
           );
@@ -204,17 +357,21 @@ export const useOrdersStore = defineStore("orders", {
           products: order.products
         });
 
-        // Save the order status log in a new sub-collection in the new order doc called "pedidoStatusLog"
+        // Save the order status log in a new sub-collection in the new order doc
         await addDoc(collection(db, `pedido/${orderId}/pedidoStatusLog`), {
           orderStatus: "pendiente",
           createdAt: serverTimestamp(),
           userUid: user.value.uid
-        });
+        } as OrderStatusLog);
 
         // Update last inserted order to be shown in the confirmation page
         this.$state.lastInsertedOrder = {
-          order: { ...orderObject, shippingDate: orderObject.shippingDate.toDate(), id: newOrder.id },
-          createdAt: $dayjs(),
+          order: {
+            ...orderObject,
+            shippingDate: $dayjs((orderObject.shippingDate as Timestamp).toDate()).format("YYYY-MM-DD"),
+            id: newOrder.id
+          },
+          createdAt: $dayjs().toDate(),
           orderId: newOrder.id
         };
 
@@ -227,7 +384,8 @@ export const useOrdersStore = defineStore("orders", {
         return null;
       }
     },
-    async fetchPendingOrders() {
+
+    async fetchPendingOrders(): Promise<FormattedOrderDocument[] | null> {
       const db = useFirestore();
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
@@ -241,12 +399,13 @@ export const useOrdersStore = defineStore("orders", {
 
       // If data is already fetched, return
       if (this.$state.pendingOrdersFetched) {
-        return;
+        return this.$state.pendingOrders;
       }
 
       if (!user || !user.value) {
         return null;
       }
+
       try {
         const q = query(
           collection(db, "pedido"),
@@ -261,25 +420,28 @@ export const useOrdersStore = defineStore("orders", {
         );
 
         onSnapshot(q, (querySnapshot) => {
-          const orders = querySnapshot.docs.map((doc) => {
-            const data = doc.data();
+          const orders = querySnapshot.docs.map((document) => {
+            const data = document.data() as OrderDocument;
             return {
               ...data,
-              id: doc.id,
-              shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD"),
-              createdAt: $dayjs(data.createdAt.toDate()).format("YYYY-MM-DD")
-            };
+              id: document.id,
+              shippingDate: $dayjs((data.shippingDate as Timestamp).toDate()).format("YYYY-MM-DD"),
+              createdAt: $dayjs((data.createdAt as Timestamp).toDate()).format("YYYY-MM-DD")
+            } as FormattedOrderDocument;
           });
 
           this.$state.pendingOrders = orders;
           this.$state.pendingOrdersFetched = true;
         });
+
+        return this.$state.pendingOrders;
       } catch (error) {
         console.error(error);
         return null;
       }
     },
-    async fetchOrders(startAfterLastVisible: boolean = false) {
+
+    async fetchOrders(startAfterLastVisible: boolean = false): Promise<void> {
       const db = useFirestore();
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
@@ -287,7 +449,7 @@ export const useOrdersStore = defineStore("orders", {
       // Get current business id from localStorage
       const businessId = useLocalStorage("cBId", null);
       if (!businessId.value) {
-        return null;
+        return;
       }
 
       // If data is already fetched, return
@@ -301,12 +463,17 @@ export const useOrdersStore = defineStore("orders", {
       }
 
       if (!user || !user.value) {
-        return null;
+        return;
       }
+
       try {
-        let reference = null;
+        let reference;
         if (startAfterLastVisible) {
           const lastVisible = this.$state.lastVisible;
+
+          if (!lastVisible) {
+            return;
+          }
 
           reference = query(
             collection(db, "pedido"),
@@ -336,14 +503,14 @@ export const useOrdersStore = defineStore("orders", {
           this.$state.lastVisible = null;
         }
 
-        const orders = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
+        const orders = querySnapshot.docs.map((document) => {
+          const data = document.data() as OrderDocument;
           return {
             ...data,
-            id: doc.id,
-            shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD"),
-            createdAt: $dayjs(data.createdAt.toDate()).format("YYYY-MM-DD")
-          };
+            id: document.id,
+            shippingDate: $dayjs((data.shippingDate as Timestamp).toDate()).format("YYYY-MM-DD"),
+            createdAt: $dayjs((data.createdAt as Timestamp).toDate()).format("YYYY-MM-DD")
+          } as FormattedOrderDocument;
         });
 
         if (!startAfterLastVisible) {
@@ -351,13 +518,14 @@ export const useOrdersStore = defineStore("orders", {
         } else {
           this.$state.orders = [...this.$state.orders, ...orders];
         }
+
         this.$state.ordersFetched = true;
       } catch (error) {
         console.error(error);
-        return null;
       }
     },
-    async updatePendingOrder(newOrder: any, currentOrder: any) {
+
+    async updatePendingOrder(newOrder: FormattedOrderDocument, currentOrder: FormattedOrderDocument): Promise<boolean> {
       const db = useFirestore();
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
@@ -367,11 +535,18 @@ export const useOrdersStore = defineStore("orders", {
       }
 
       // Get id and remove it from the object
-      const orderId = newOrder.id;
-      delete newOrder.id;
+      const orderId = newOrder.id as string;
+
+      if (!orderId) {
+        useToast(ToastEvents.error, "No se encontró el ID de la orden.");
+        return false;
+      }
+
+      const orderToUpdate = { ...newOrder };
+      delete orderToUpdate.id;
 
       // Get order from orders
-      const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
+      const orderIndex = this.$state.pendingOrders.findIndex((o) => o.id === orderId);
 
       if (orderIndex === -1) {
         useToast(ToastEvents.error, "No se encontró la orden.");
@@ -399,13 +574,13 @@ export const useOrdersStore = defineStore("orders", {
           if (!productInStore) continue;
 
           // Get currentQuantity from the current order
-          const currentProduct = currentOrder.products.find((p: any) => p.productId === product.productId);
-          const currentQuantity = currentProduct ? parseFloat(currentProduct.quantity ?? 0) : 0;
-          const stockUsed = currentProduct ? parseFloat(currentProduct.stockUsed ?? 0) : 0;
+          const currentProduct = currentOrder.products.find((p) => p.productId === product.productId);
+          const currentQuantity = currentProduct ? parseFloat(currentProduct.quantity.toString() ?? "0") : 0;
+          const stockUsed = currentProduct ? parseFloat(currentProduct.stockUsed.toString() ?? "0") : 0;
 
-          const newQuantity = parseFloat(product.quantity ?? 0);
+          const newQuantity = parseFloat(product.quantity.toString() ?? "0");
           const quantityDiff = currentQuantity - newQuantity;
-          const stockNow = parseFloat(productInStore.productStock ?? 0);
+          const stockNow = parseFloat(productInStore.productStock?.toString() ?? "0");
 
           if (quantityDiff === 0) {
             // No change in quantity, keep existing stockUsed
@@ -444,8 +619,8 @@ export const useOrdersStore = defineStore("orders", {
               }
 
               // Calculate new weighted average cost
-              const currentTotalValue = stockNow * productInStore.cost;
-              const returnedValue = auxStockBack * originalCost;
+              const currentTotalValue = stockNow * (productInStore.cost ?? 0);
+              const returnedValue = auxStockBack * (originalCost ?? 0);
               const newTotalQuantity = stockNow + auxStockBack;
               const newWeightedCost = (currentTotalValue + returnedValue) / newTotalQuantity;
 
@@ -458,7 +633,6 @@ export const useOrdersStore = defineStore("orders", {
                 {
                   type: StockMovementType.RETURN,
                   notes: `Modificación: Pedido #${orderId} - Reducción de cantidad`,
-                  quantity: auxStockBack,
                   orderId: orderId,
                   unitBuyingPrice: originalCost
                 }
@@ -484,7 +658,6 @@ export const useOrdersStore = defineStore("orders", {
                 {
                   type: StockMovementType.SALE,
                   notes: `Modificación: Pedido #${orderId} - Aumento de cantidad`,
-                  quantity: -stockToUse,
                   orderId: orderId
                 }
               );
@@ -506,7 +679,6 @@ export const useOrdersStore = defineStore("orders", {
                   {
                     type: StockMovementType.SALE,
                     notes: `Modificación: Pedido #${orderId} - Aumento de cantidad (stock parcial)`,
-                    quantity: -stockNow,
                     orderId: orderId
                   }
                 );
@@ -524,12 +696,12 @@ export const useOrdersStore = defineStore("orders", {
         // Find any deleted product and add back the stock if it was used
         for (const product of currentOrder.products) {
           // if stock used is 0, then we don't need to update anything
-          const stockUsed = parseFloat(product.stockUsed ?? 0);
+          const stockUsed = parseFloat(product.stockUsed.toString() ?? "0");
           if (stockUsed === 0) {
             continue;
           }
 
-          const productInNewOrder = newOrder.products.find((p: any) => p.productId === product.productId);
+          const productInNewOrder = newOrder.products.find((p) => p.productId === product.productId);
 
           if (!productInNewOrder) {
             const productsStore = useProductsStore();
@@ -540,7 +712,7 @@ export const useOrdersStore = defineStore("orders", {
             }
 
             // Get current stock from the store
-            const currentStock = parseFloat(productInStore.productStock ?? 0);
+            const currentStock = parseFloat(productInStore.productStock?.toString() ?? "0");
 
             // Find the original sale movement(s) for this product in this order
             const saleMovements = productsStore.getStockMovements.filter(
@@ -565,8 +737,8 @@ export const useOrdersStore = defineStore("orders", {
             }
 
             // Calculate new weighted average cost
-            const currentTotalValue = currentStock * productInStore.cost;
-            const returnedValue = stockUsed * originalCost;
+            const currentTotalValue = currentStock * (productInStore.cost ?? 0);
+            const returnedValue = stockUsed * (originalCost ?? 0);
             const newTotalQuantity = currentStock + stockUsed;
             const newWeightedCost = (currentTotalValue + returnedValue) / newTotalQuantity;
 
@@ -580,7 +752,6 @@ export const useOrdersStore = defineStore("orders", {
               {
                 type: StockMovementType.RETURN,
                 notes: `Modificación: Pedido #${orderId} - Producto eliminado (${product.productName})`,
-                quantity: stockUsed,
                 orderId: orderId,
                 unitBuyingPrice: originalCost
               }
@@ -589,10 +760,13 @@ export const useOrdersStore = defineStore("orders", {
         }
 
         // Remove createdAt from the new order. This crashes firebase otherwise
-        delete newOrder.createdAt;
+        if ("createdAt" in orderToUpdate) {
+          // @ts-ignore
+          delete orderToUpdate.createdAt;
+        }
 
         // Determine the appropriate status based on inventory needs and previous status
-        let orderStatus;
+        let orderStatus: OrderStatus;
 
         if (requiresInventoryUpdate) {
           // Still needs inventory update
@@ -606,14 +780,14 @@ export const useOrdersStore = defineStore("orders", {
         }
 
         // Update the order in Firestore
-        await updateDoc(doc(db, "pedido", orderId), {
-          ...newOrder,
+        await updateDoc(doc(db, "pedido", orderId as string), {
+          ...orderToUpdate,
           shippingDate: Timestamp.fromDate($dayjs(newOrder.shippingDate).toDate()),
           orderStatus: orderStatus
         });
 
         // Customize the log message based on the status change
-        let logMessage;
+        let logMessage: string;
         if (requiresInventoryUpdate) {
           logMessage = "Orden modificada pero requiere actualización de inventario";
         } else if (wasRequiringInventoryUpdate) {
@@ -628,7 +802,7 @@ export const useOrdersStore = defineStore("orders", {
           message: logMessage,
           createdAt: serverTimestamp(),
           userUid: user.value.uid
-        });
+        } as OrderStatusLog);
 
         // Provide appropriate feedback
         if (requiresInventoryUpdate) {
@@ -645,7 +819,8 @@ export const useOrdersStore = defineStore("orders", {
         return false;
       }
     },
-    async updateStatusOrder(orderId: string, status: string) {
+
+    async updateStatusOrder(orderId: string, status: OrderStatus): Promise<boolean> {
       const db = useFirestore();
       const user = useCurrentUser();
 
@@ -655,7 +830,7 @@ export const useOrdersStore = defineStore("orders", {
 
       try {
         // Check if it's in the pending orders
-        const orderIndex = this.$state.pendingOrders.findIndex((o: any) => o.id === orderId);
+        const orderIndex = this.$state.pendingOrders.findIndex((o) => o.id === orderId);
         const order = orderIndex > -1 ? this.$state.pendingOrders[orderIndex] : false;
 
         if (!order) {
@@ -679,14 +854,15 @@ export const useOrdersStore = defineStore("orders", {
           // Process each product in the order
           const updatedProducts = [...order.products]; // Update the product in the order
           let areProductsUpdated = false;
+
           for (const product of order.products) {
             const productInStore = productsStore.getProducts.find((p: any) => p.id === product.productId);
 
             if (!productInStore) continue;
 
-            const currentStock = parseFloat(productInStore.productStock ?? 0);
-            const stockUsed = parseFloat(product.stockUsed ?? 0);
-            const totalNeeded = parseFloat(product.quantity ?? 0);
+            const currentStock = parseFloat(productInStore.productStock?.toString() ?? "0");
+            const stockUsed = parseFloat(product.stockUsed.toString() ?? "0");
+            const totalNeeded = parseFloat(product.quantity.toString() ?? "0");
             const remainingToUse = totalNeeded - stockUsed;
 
             if (remainingToUse > 0 && currentStock < remainingToUse) {
@@ -713,22 +889,15 @@ export const useOrdersStore = defineStore("orders", {
                   {
                     type: StockMovementType.SALE,
                     notes: `Actualización: Pedido #${orderId} - Cambio a estado "pendiente"`,
-                    quantity: -additionalStockToUse, // Make negative since it's decreasing stock
                     orderId: orderId
                   }
                 );
 
-                // Update the stockUsed in the order document
-                const newStockUsed = stockUsed + additionalStockToUse;
-
+                // Update the product in our updated array
                 const productIndex = updatedProducts.findIndex((p) => p.productId === product.productId);
-
                 if (productIndex !== -1) {
+                  updatedProducts[productIndex].stockUsed = stockUsed + additionalStockToUse;
                   areProductsUpdated = true;
-                  updatedProducts[productIndex] = {
-                    ...updatedProducts[productIndex],
-                    stockUsed: newStockUsed
-                  };
                 }
               }
             }
@@ -753,7 +922,7 @@ export const useOrdersStore = defineStore("orders", {
           message: `Cambio de estado hecho por ${user.value.displayName}`,
           createdAt: serverTimestamp(),
           userUid: user.value.uid
-        });
+        } as OrderStatusLog);
 
         // For canceled/rejected orders, return stock to inventory
         if (orderIndex > -1 && (status === "rechazado" || status === "cancelado")) {
@@ -772,7 +941,7 @@ export const useOrdersStore = defineStore("orders", {
             );
 
             // Calculate weighted average of the original cost
-            let originalCost = productInStore.cost; // Fallback to current cost
+            let originalCost = productInStore.cost ?? 0;
 
             if (saleMovements.length > 0) {
               // Calculate the weighted average of the original costs
@@ -784,19 +953,24 @@ export const useOrdersStore = defineStore("orders", {
                 (sum: number, m: StockMovement) => sum + Math.abs(m.quantity) * m.previousCost,
                 0
               );
-              originalCost = totalValue / totalQuantity;
+              if (totalQuantity > 0) {
+                originalCost = totalValue / totalQuantity;
+              }
             }
 
             // Get current stock from Firebase
             const productSnapshot = await getDoc(doc(db, "producto", product.productId));
             const productInFirebase = productSnapshot.data();
-            if (!productInFirebase) continue;
 
-            const currentStock = parseFloat(productInFirebase.productStock ?? 0);
-            const stockUsed = parseFloat(product.stockUsed ?? 0);
+            if (!productInFirebase) {
+              continue;
+            }
+
+            const currentStock = parseFloat(productInFirebase.productStock?.toString() ?? "0");
+            const stockUsed = parseFloat(product.stockUsed.toString() ?? "0");
 
             // Calculate new weighted average cost
-            const currentTotalValue = currentStock * productInStore.cost;
+            const currentTotalValue = currentStock * (productInStore.cost ?? 0);
             const returnedValue = stockUsed * originalCost;
             const newTotalQuantity = currentStock + stockUsed;
             const newWeightedCost = (currentTotalValue + returnedValue) / newTotalQuantity;
@@ -811,10 +985,7 @@ export const useOrdersStore = defineStore("orders", {
               {
                 type: StockMovementType.RETURN,
                 notes: `Pedido #${orderId} - ${status === "rechazado" ? "Rechazado" : "Cancelado"}`,
-                quantity: stockUsed,
                 orderId: orderId,
-                // Store the original cost for reporting purposes.
-                // Even though it's not buying price, we keep the name for consistency
                 unitBuyingPrice: originalCost
               }
             );
@@ -828,8 +999,8 @@ export const useOrdersStore = defineStore("orders", {
       }
     },
 
-    // New structures
-    async fetchDailyProductCost(date: string) {
+    // Daily product cost methods
+    async fetchDailyProductCost(date: string): Promise<DailyProductCost[]> {
       const { $dayjs } = useNuxtApp();
 
       // Validate date format
@@ -840,7 +1011,7 @@ export const useOrdersStore = defineStore("orders", {
 
       // Check if we already have this date in cache
       if (this.$state.dailyProductCostByDate.has(date)) {
-        return this.$state.dailyProductCostByDate.get(date);
+        return this.$state.dailyProductCostByDate.get(date) || [];
       }
 
       // Validate prerequisites
@@ -857,18 +1028,17 @@ export const useOrdersStore = defineStore("orders", {
           query(
             collection(db, "dailyProductCost"),
             where("date", "==", Timestamp.fromDate($dayjs(date).toDate())),
-            // @ts-ignore
-            where("businessId", "==", businessId.value)
+            where("businessId", "==", businessId!.value)
           )
         );
 
-        const costs = dailyProductCostQuery.docs.map((doc) => {
-          const data = doc.data();
+        const costs = dailyProductCostQuery.docs.map((document) => {
+          const data = document.data() as DailyProductCost;
           return {
             ...data,
-            id: doc.id,
-            date: $dayjs(data.date.toDate()).format("YYYY-MM-DD")
-          };
+            id: document.id,
+            date: $dayjs((data.date as Timestamp).toDate()).format("YYYY-MM-DD")
+          } as DailyProductCost;
         });
 
         // Cache the results in both the old array and new Map
@@ -881,7 +1051,11 @@ export const useOrdersStore = defineStore("orders", {
         return [];
       }
     },
-    async updateDailyProductCost(products: Array<any>, date: string) {
+
+    async updateDailyProductCost(
+      products: Array<{ productId: string; productName: string; cost: number }>,
+      date: string
+    ): Promise<boolean> {
       const { $dayjs } = useNuxtApp();
 
       // Validate date format
@@ -906,53 +1080,52 @@ export const useOrdersStore = defineStore("orders", {
       try {
         // Ensure we have the latest data first
         const currentCosts = await this.fetchDailyProductCost(date);
-        const costsMap = new Map(currentCosts.map((item: any) => [item.productId, item]));
+        const costsMap = new Map(currentCosts.map((item) => [item.productId, item]));
 
         const updatedCosts = [...currentCosts]; // Start with current data
 
         for (const product of products) {
           if (!product.cost) {
-            product.cost = 0;
+            continue;
           }
 
-          const existingCost: any = costsMap.get(product.productId);
+          const existingCost = costsMap.get(product.productId);
 
           if (existingCost) {
-            if (existingCost.cost !== product.cost) {
-              await updateDoc(doc(db, "dailyProductCost", existingCost.id), {
-                cost: product.cost
-              });
-            }
+            // Update existing cost
+            await updateDoc(doc(db, "dailyProductCost", existingCost.id!), {
+              cost: product.cost,
+              updatedAt: serverTimestamp()
+            });
 
-            // Update the cost in our cached data
-            const index = updatedCosts.findIndex((c: any) => c.id === existingCost.id);
+            // Update in local array
+            const index = updatedCosts.findIndex((c) => c.id === existingCost.id);
             if (index !== -1) {
               updatedCosts[index] = {
-                ...updatedCosts[index],
-                cost: product.cost
+                ...existingCost,
+                cost: product.cost,
+                updatedAt: new Date().toISOString()
               };
             }
           } else {
-            const result = await addDoc(collection(db, "dailyProductCost"), {
+            // Create new cost
+            const newCost: DailyProductCost = {
               productId: product.productId,
+              productName: product.productName,
               cost: product.cost,
               date: Timestamp.fromDate($dayjs(date).toDate()),
-              // @ts-ignore
-              userUid: user.value.uid,
-              // @ts-ignore
-              businessId: businessId.value
-            });
+              businessId: businessId!.value,
+              createdAt: serverTimestamp() as Timestamp
+            };
 
-            // Add to our cached data
+            const docRef = await addDoc(collection(db, "dailyProductCost"), newCost);
+
+            // Add to local array
             updatedCosts.push({
-              productId: product.productId,
-              cost: product.cost,
+              ...newCost,
+              id: docRef.id,
               date: date,
-              id: result.id,
-              // @ts-ignore
-              userUid: user.value.uid,
-              // @ts-ignore
-              businessId: businessId.value
+              createdAt: new Date().toISOString()
             });
           }
         }
@@ -967,7 +1140,8 @@ export const useOrdersStore = defineStore("orders", {
         return false;
       }
     },
-    async fetchOrdersByDate(date: string) {
+
+    async fetchOrdersByDate(date: string): Promise<FormattedOrderDocument[]> {
       const { $dayjs } = useNuxtApp();
 
       // Validate date format
@@ -978,7 +1152,7 @@ export const useOrdersStore = defineStore("orders", {
 
       // Check if we already have this date in cache
       if (this.$state.ordersByDate.has(date)) {
-        return this.$state.ordersByDate.get(date);
+        return this.$state.ordersByDate.get(date) || [];
       }
 
       // Validate prerequisites
@@ -997,22 +1171,22 @@ export const useOrdersStore = defineStore("orders", {
 
         const q = query(
           collection(db, "pedido"),
-          // @ts-ignore
-          where("businessId", "==", businessId.value),
+          where("businessId", "==", businessId!.value),
           where("shippingDate", ">=", Timestamp.fromDate(startDate)),
           where("shippingDate", "<=", Timestamp.fromDate(endDate)),
-          where("orderStatus", "not-in", [ORDER_STATUS_VALUES.cancelado, ORDER_STATUS_VALUES.rechazado])
+          where("orderStatus", "not-in", [ORDER_STATUS_VALUES.canceled, ORDER_STATUS_VALUES.rejected])
         );
 
         const querySnapshot = await getDocs(q);
 
-        const orders = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
+        const orders = querySnapshot.docs.map((document) => {
+          const data = document.data() as OrderDocument;
           return {
             ...data,
-            id: doc.id,
-            shippingDate: $dayjs(data.shippingDate.toDate()).format("YYYY-MM-DD")
-          };
+            id: document.id,
+            shippingDate: $dayjs((data.shippingDate as Timestamp).toDate()).format("YYYY-MM-DD"),
+            createdAt: $dayjs((data.createdAt as Timestamp).toDate()).format("YYYY-MM-DD")
+          } as FormattedOrderDocument;
         });
 
         // Cache the results

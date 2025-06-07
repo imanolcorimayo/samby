@@ -9,16 +9,92 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  getDoc
+  getDoc,
+  Timestamp
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
-const defaultObject = {
+// Type definitions
+type GeoJSONFeature = {
+  type: string;
+  properties: {
+    id: string;
+    name: string;
+    [key: string]: any;
+  };
+  geometry: {
+    type: string;
+    coordinates: any[];
+  };
+};
+
+// Zone document in Firestore
+interface ZoneDocument {
+  id?: string;
+  name: string;
+  color: string;
+  description: string;
+  businessId: string;
+  userUid: string;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+}
+
+// Zone assignment document in Firestore
+interface ZoneAssignmentDocument {
+  id?: string;
+  neighborhoodId: string;
+  businessId: string;
+  featureName: string;
+  zoneId: string;
+  zoneName: string;
+  zoneColor: string;
+  createdAt?: Timestamp | string;
+  updatedAt: Timestamp | string;
+}
+
+// Zone count for statistics
+interface ZoneCount {
+  zoneId: string;
+  zoneName: string;
+  zoneColor: string;
+  clientCount: number;
+}
+
+// Zone statistics
+interface ZoneStatistics {
+  totalClientsInZones: number;
+  totalClientsWithLocation?: number;
+  zoneCounts: ZoneCount[];
+  mostPopulatedZone: ZoneCount | null;
+  leastPopulatedZone: ZoneCount | null;
+  unassignedClients: number;
+}
+
+// Store state
+interface ZonesState {
+  fetched: boolean;
+  zones: ZoneDocument[];
+  zoneAssignments: Map<string, ZoneAssignmentDocument>;
+  zoneStatistics: ZoneStatistics;
+}
+
+// Prerequisites return type
+interface PrerequisiteResult {
+  valid: boolean;
+  reason: string | null;
+  user: any;
+  businessId: any;
+}
+
+// Default state object
+const defaultState: ZonesState = {
   fetched: false,
   zones: [],
-  zoneAssignments: new Map(),
+  zoneAssignments: new Map<string, ZoneAssignmentDocument>(),
   zoneStatistics: {
     totalClientsInZones: 0,
+    totalClientsWithLocation: 0,
     zoneCounts: [],
     mostPopulatedZone: null,
     leastPopulatedZone: null,
@@ -29,7 +105,7 @@ const defaultObject = {
 /**
  * Helper function to validate prerequisites
  */
-function validatePrerequisites() {
+function validatePrerequisites(): PrerequisiteResult {
   const user = useCurrentUser();
   const businessId = useLocalStorage("cBId", null);
 
@@ -45,29 +121,29 @@ function validatePrerequisites() {
 }
 
 export const useZonesStore = defineStore("zones", {
-  state: (): any => {
-    return Object.assign({}, defaultObject);
+  state: (): ZonesState => {
+    return Object.assign({}, defaultState);
   },
   getters: {
-    getState: (state) => state,
-    getZones: (state) => state.zones,
-    areZonesFetched: (state) => state.fetched,
-    getZoneAssignments: (state) => state.zoneAssignments,
-    getZoneStatistics: (state) => state.zoneStatistics
+    getState: (state): ZonesState => state,
+    getZones: (state): ZoneDocument[] => state.zones,
+    areZonesFetched: (state): boolean => state.fetched,
+    getZoneAssignments: (state): Map<string, ZoneAssignmentDocument> => state.zoneAssignments,
+    getZoneStatistics: (state): ZoneStatistics => state.zoneStatistics
   },
   actions: {
     /**
      * Fetch all zones for the current business
      */
-    async fetchZones() {
+    async fetchZones(): Promise<ZoneDocument[] | null> {
       // If zones are already fetched, return
       if (this.fetched) {
-        return;
+        return this.zones;
       }
 
       // Validate prerequisites
       const prereq = validatePrerequisites();
-      if (!prereq.valid && typeof prereq.reason == "string") {
+      if (!prereq.valid && typeof prereq.reason === "string") {
         useToast(ToastEvents.error, prereq.reason);
         return null;
       } else if (!prereq.valid) {
@@ -88,23 +164,25 @@ export const useZonesStore = defineStore("zones", {
         const zonesQuery = query(collection(db, "zones"), where("businessId", "==", businessId.value));
 
         const zonesSnapshot = await getDocs(zonesQuery);
-        const zones = zonesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const zones: ZoneDocument[] = zonesSnapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data()
+            } as ZoneDocument)
+        );
 
         // Fetch zone assignments
         const assignmentsQuery = query(collection(db, "zoneAssignments"), where("businessId", "==", businessId.value));
-
         const assignmentsSnapshot = await getDocs(assignmentsQuery);
-        const zoneAssignmentsMap = new Map();
+        const zoneAssignmentsMap = new Map<string, ZoneAssignmentDocument>();
 
         assignmentsSnapshot.docs.forEach((doc) => {
           const data = doc.data();
           zoneAssignmentsMap.set(data.neighborhoodId, {
             id: doc.id,
             ...data
-          });
+          } as ZoneAssignmentDocument);
         });
 
         // Update state
@@ -125,12 +203,12 @@ export const useZonesStore = defineStore("zones", {
 
     /**
      * Add a new zone
-     * @param {Object} zone - The zone object to add
+     * @param zone The zone object to add
      */
-    async addZone(zone: any) {
+    async addZone(zone: Partial<ZoneDocument>): Promise<ZoneDocument | null> {
       // Validate prerequisites
       const prereq = validatePrerequisites();
-      if (!prereq.valid && typeof prereq.reason == "string") {
+      if (!prereq.valid && typeof prereq.reason === "string") {
         useToast(ToastEvents.error, prereq.reason);
         return null;
       } else if (!prereq.valid) {
@@ -154,7 +232,7 @@ export const useZonesStore = defineStore("zones", {
         }
 
         // Check if zone with this name already exists
-        const existingZoneIndex = this.zones.findIndex((z: any) => z.name.toLowerCase() === zone.name.toLowerCase());
+        const existingZoneIndex = this.zones.findIndex((z) => z.name.toLowerCase() === zone.name?.toLowerCase());
         if (existingZoneIndex !== -1) {
           useToast(ToastEvents.error, `Ya existe una zona llamada "${zone.name}"`);
           return null;
@@ -171,7 +249,7 @@ export const useZonesStore = defineStore("zones", {
         });
 
         // Add to state
-        const zoneData = {
+        const zoneData: ZoneDocument = {
           id: newZone.id,
           name: zone.name,
           color: zone.color,
@@ -193,13 +271,13 @@ export const useZonesStore = defineStore("zones", {
 
     /**
      * Update a zone
-     * @param {string} zoneId - The ID of the zone to update
-     * @param {Object} zoneData - The updated zone data
+     * @param zoneId The ID of the zone to update
+     * @param zoneData The updated zone data
      */
-    async updateZone(zoneId: string, zoneData: any) {
+    async updateZone(zoneId: string, zoneData: Partial<ZoneDocument>): Promise<boolean> {
       // Validate prerequisites
       const prereq = validatePrerequisites();
-      if (!prereq.valid && typeof prereq.reason == "string") {
+      if (!prereq.valid && typeof prereq.reason === "string") {
         useToast(ToastEvents.error, prereq.reason);
         return false;
       } else if (!prereq.valid) {
@@ -225,7 +303,7 @@ export const useZonesStore = defineStore("zones", {
         });
 
         // Update in state
-        const zoneIndex = this.zones.findIndex((z: any) => z.id === zoneId);
+        const zoneIndex = this.zones.findIndex((z) => z.id === zoneId);
         if (zoneIndex !== -1) {
           this.zones[zoneIndex] = {
             ...this.zones[zoneIndex],
@@ -244,12 +322,12 @@ export const useZonesStore = defineStore("zones", {
 
     /**
      * Delete a zone
-     * @param {string} zoneId - The ID of the zone to delete
+     * @param zoneId The ID of the zone to delete
      */
-    async deleteZone(zoneId: string) {
+    async deleteZone(zoneId: string): Promise<boolean> {
       // Validate prerequisites
       const prereq = validatePrerequisites();
-      if (!prereq.valid && typeof prereq.reason == "string") {
+      if (!prereq.valid && typeof prereq.reason === "string") {
         useToast(ToastEvents.error, prereq.reason);
         return false;
       } else if (!prereq.valid) {
@@ -262,7 +340,7 @@ export const useZonesStore = defineStore("zones", {
       try {
         // Check if the zone has assignments
         const hasAssignments = Array.from(this.zoneAssignments.values()).some(
-          (assignment: any) => assignment.zoneId === zoneId
+          (assignment) => assignment.zoneId === zoneId
         );
 
         if (hasAssignments) {
@@ -274,7 +352,7 @@ export const useZonesStore = defineStore("zones", {
         await deleteDoc(doc(db, "zones", zoneId));
 
         // Delete from state
-        this.zones = this.zones.filter((z: any) => z.id !== zoneId);
+        this.zones = this.zones.filter((z) => z.id !== zoneId);
 
         return true;
       } catch (error) {
@@ -283,16 +361,17 @@ export const useZonesStore = defineStore("zones", {
         return false;
       }
     },
+
     /**
      * Assign a feature to a zone
-     * @param {Object} feature - The GeoJSON feature to assign
-     * @param {Object} zone - The zone to assign to
-     * @returns {Promise<Object|false>} - Returns the updated feature or false if failed
+     * @param feature The GeoJSON feature to assign
+     * @param zone The zone to assign to
+     * @returns The updated feature or false if failed
      */
-    async assignFeatureToZone(feature: any, zone: any) {
+    async assignFeatureToZone(feature: GeoJSONFeature, zone: ZoneDocument): Promise<GeoJSONFeature | false> {
       // Validate prerequisites
       const prereq = validatePrerequisites();
-      if (!prereq.valid && typeof prereq.reason == "string") {
+      if (!prereq.valid && typeof prereq.reason === "string") {
         useToast(ToastEvents.error, prereq.reason);
         return false;
       } else if (!prereq.valid) {
@@ -317,28 +396,26 @@ export const useZonesStore = defineStore("zones", {
         const assignmentExists = this.zoneAssignments.has(featureNeighborhoodId);
 
         // Prepare assignment data
-        const assignmentData: {
-          id?: string;
-          neighborhoodId: string;
-          businessId: string | null;
-          featureName: any;
-          zoneId: any;
-          zoneName: any;
-          zoneColor: any;
-          updatedAt: any;
-        } = {
+        const assignmentData: ZoneAssignmentDocument = {
           neighborhoodId: featureNeighborhoodId,
           businessId: businessId.value,
           featureName: feature.properties.name,
           zoneId: zone.id,
           zoneName: zone.name,
           zoneColor: zone.color,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp() as Timestamp
         };
 
         if (assignmentExists) {
           // Get assignment id
           const assignmentId = this.zoneAssignments.get(featureNeighborhoodId)?.id;
+
+          if (!assignmentId) {
+            useToast(ToastEvents.error, "Error al asignar el barrio a la zona: ID de asignación no encontrado");
+            return false;
+          }
+
+          assignmentData.id = assignmentId;
 
           // Create zone assignment obj variable w/o id
           const zoneAssignment = {
@@ -350,8 +427,6 @@ export const useZonesStore = defineStore("zones", {
             zoneColor: zone.color,
             updatedAt: serverTimestamp()
           };
-
-          assignmentData.id = assignmentId;
 
           // Update existing assignment
           await updateDoc(doc(db, "zoneAssignments", assignmentId), zoneAssignment);
@@ -370,7 +445,7 @@ export const useZonesStore = defineStore("zones", {
         this.zoneAssignments.set(featureNeighborhoodId, {
           ...assignmentData,
           neighborhoodId: featureNeighborhoodId,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString() as string
         });
 
         // Update feature with zone info (for immediate visual update)
@@ -393,7 +468,7 @@ export const useZonesStore = defineStore("zones", {
     /**
      * Calculate zone statistics
      */
-    async calculateZoneStatistics() {
+    async calculateZoneStatistics(): Promise<void> {
       // Get clients store data
       const clientsStore = useClientsStore();
       if (!clientsStore.areClientsFetched) {
@@ -404,7 +479,7 @@ export const useZonesStore = defineStore("zones", {
       const { $turf } = useNuxtApp();
 
       // Load neighborhood data
-      let neighborhoodFeatures = [];
+      let neighborhoodFeatures: GeoJSONFeature[] = [];
       try {
         const response = await fetch("/barrios.json");
         if (response.ok) {
@@ -418,8 +493,8 @@ export const useZonesStore = defineStore("zones", {
       const clients = clientsStore.getClients;
 
       // Map neighborhoods to zones
-      const neighborhoodToZoneMap = new Map();
-      this.zoneAssignments.forEach((assignment: any) => {
+      const neighborhoodToZoneMap = new Map<string, { zoneId: string; zoneName: string; zoneColor: string }>();
+      this.zoneAssignments.forEach((assignment) => {
         neighborhoodToZoneMap.set(assignment.neighborhoodId, {
           zoneId: assignment.zoneId,
           zoneName: assignment.zoneName,
@@ -428,14 +503,14 @@ export const useZonesStore = defineStore("zones", {
       });
 
       // Count clients per zone
-      const zoneCounts = new Map();
+      const zoneCounts = new Map<string, ZoneCount>();
       let unassignedClients = 0;
       let totalClientsWithLocation = 0;
 
       // Initialize counts for all zones
-      this.zones.forEach((zone: any) => {
-        zoneCounts.set(zone.id, {
-          zoneId: zone.id,
+      this.zones.forEach((zone) => {
+        zoneCounts.set(zone.id as string, {
+          zoneId: zone.id as string,
           zoneName: zone.name,
           zoneColor: zone.color,
           clientCount: 0
@@ -448,7 +523,7 @@ export const useZonesStore = defineStore("zones", {
           totalClientsWithLocation++;
 
           // Try to find which neighborhood the client is in
-          let clientNeighborhoods = [];
+          let clientNeighborhoods: GeoJSONFeature[] = [];
 
           // Find all matching neighborhoods for this client
           for (const feature of neighborhoodFeatures) {
@@ -464,12 +539,14 @@ export const useZonesStore = defineStore("zones", {
             const neighborhoodId = neighborhood.properties.id;
             if (neighborhoodToZoneMap.has(neighborhoodId)) {
               const zoneData = neighborhoodToZoneMap.get(neighborhoodId);
-              const zoneCount = zoneCounts.get(zoneData.zoneId);
+              if (zoneData) {
+                const zoneCount = zoneCounts.get(zoneData.zoneId);
 
-              if (zoneCount) {
-                zoneCount.clientCount++;
-                foundZone = true;
-                break; // Count the client only once
+                if (zoneCount) {
+                  zoneCount.clientCount++;
+                  foundZone = true;
+                  break; // Count the client only once
+                }
               }
             }
           }
@@ -481,8 +558,8 @@ export const useZonesStore = defineStore("zones", {
       });
 
       // Find most and least populated zones
-      let mostPopulatedZone = null;
-      let leastPopulatedZone = null;
+      let mostPopulatedZone: ZoneCount | null = null;
+      let leastPopulatedZone: ZoneCount | null = null;
       let maxCount = -1;
       let minCount = Number.MAX_SAFE_INTEGER;
 

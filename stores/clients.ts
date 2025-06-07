@@ -16,18 +16,54 @@ import {
 } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
+// Type definitions for client document in Firestore
+interface ClientDocument {
+  id?: string;
+  clientName: string;
+  phone: string;
+  address: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  businessId: string;
+  userUid: string;
+  fromEmprendeVerde?: boolean;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+  archivedAt?: Timestamp | string;
+}
+
+// Type for client form input (subset of fields that can be edited)
+interface ClientInput {
+  clientName: string;
+  phone: string;
+  address: string | null;
+  lat?: number | null;
+  lng?: number | null;
+}
+
+// Type for client recommendations
 interface ClientRecommendations {
   recommendations: any;
   createdAt: Date;
   ordersAnalyzed: number;
 }
 
+// Type for client orders cache
 interface ClientOrdersCache {
-  orders: any[];
+  orders: any[]; // We could further type this if needed
   fetchedAt: Date;
 }
 
-const defaultObject = {
+// Store state interface
+interface ClientsState {
+  fetched: boolean;
+  clients: ClientDocument[];
+  clientsOrders: Map<string, ClientOrdersCache>;
+  clientsRecommendations: Map<string, ClientRecommendations>;
+}
+
+// Default state object
+const defaultState: ClientsState = {
   fetched: false,
   clients: [],
   clientsOrders: new Map<string, ClientOrdersCache>(),
@@ -35,36 +71,48 @@ const defaultObject = {
 };
 
 export const useClientsStore = defineStore("clients", {
-  state: (): any => {
-    return Object.assign({}, defaultObject);
+  state: (): ClientsState => {
+    return Object.assign({}, defaultState);
   },
   getters: {
-    getState: (state) => state,
-    getClients: (state) => state.clients,
-    areClientsFetched: (state) => state.fetched,
+    getState: (state): ClientsState => state,
+    getClients: (state): ClientDocument[] => state.clients,
+    areClientsFetched: (state): boolean => state.fetched,
 
     // Client orders getter
-    getClientOrders: (state) => (clientId: string) => {
-      return state.clientsOrders.get(clientId)?.orders || [];
-    },
+    getClientOrders:
+      (state) =>
+      (clientId: string): any[] => {
+        return state.clientsOrders.get(clientId)?.orders || [];
+      },
 
     // Client recommendations getter
-    getClientRecommendations: (state) => (clientId: string) => {
-      return state.clientsRecommendations.get(clientId) || null;
-    },
+    getClientRecommendations:
+      (state) =>
+      (clientId: string): ClientRecommendations | null => {
+        return state.clientsRecommendations.get(clientId) || null;
+      },
 
     // Getter to check if client orders are cached
-    areClientOrdersCached: (state) => (clientId: string) => {
-      return state.clientsOrders.has(clientId);
-    },
+    areClientOrdersCached:
+      (state) =>
+      (clientId: string): boolean => {
+        return state.clientsOrders.has(clientId);
+      },
 
     // Getter to check if client recommendations are cached
-    areClientRecommendationsCached: (state) => (clientId: string) => {
-      return state.clientsRecommendations.has(clientId);
-    }
+    areClientRecommendationsCached:
+      (state) =>
+      (clientId: string): boolean => {
+        return state.clientsRecommendations.has(clientId);
+      }
   },
   actions: {
-    async fetchData() {
+    /**
+     * Fetch clients data from Firestore
+     * @returns {Promise<void>}
+     */
+    async fetchData(): Promise<void> {
       if (this.areClientsFetched) {
         return;
       }
@@ -72,21 +120,20 @@ export const useClientsStore = defineStore("clients", {
       // Get current business id from localStorage
       const businessId = useLocalStorage("cBId", null);
       if (!businessId.value) {
-        return null;
+        return;
       }
 
-      const clients: Array<any> = [];
-      // Index store will manage all logic needed in the app to run
+      const clients: ClientDocument[] = [];
+
       // First check if there is a user
       const user = useCurrentUser();
 
       // Safe check, but already handled with middleware
       if (!user || !user.value) {
-        // Handle the case when there is no user
         return;
       }
 
-      // Connect with firebase and get payments structure
+      // Connect with firebase and get clients
       const db = useFirestore();
       const querySnapshot = await getDocs(
         query(collection(db, "cliente"), where("businessId", "==", businessId.value))
@@ -96,11 +143,11 @@ export const useClientsStore = defineStore("clients", {
         clients.push({
           id: doc.id,
           ...doc.data()
-        });
+        } as ClientDocument);
       });
 
-      this.$state.fetched = true;
-      this.$state.clients = clients;
+      this.fetched = true;
+      this.clients = clients;
     },
 
     /**
@@ -109,18 +156,20 @@ export const useClientsStore = defineStore("clients", {
      * @param {boolean} forceRefresh - Whether to force a refresh from Firestore
      * @returns {Promise<Array>} - Array of client orders
      */
-    async fetchClientOrders(clientId: string, forceRefresh: boolean = false) {
+    async fetchClientOrders(clientId: string, forceRefresh: boolean = false): Promise<any[]> {
       const { $dayjs } = useNuxtApp();
 
       // Check if we have cached orders and they're not stale
-      if (!forceRefresh && this.$state.clientsOrders.has(clientId)) {
-        const cachedData = this.$state.clientsOrders.get(clientId);
-        const now = new Date();
-        const cachedTime = cachedData.fetchedAt;
+      if (!forceRefresh && this.clientsOrders.has(clientId)) {
+        const cachedData = this.clientsOrders.get(clientId);
+        if (cachedData) {
+          const now = new Date();
+          const cachedTime = cachedData.fetchedAt;
 
-        // Use cache if it's less than 30 minutes old
-        if (now.getTime() - cachedTime.getTime() < 30 * 60 * 1000) {
-          return cachedData.orders;
+          // Use cache if it's less than 30 minutes old
+          if (now.getTime() - cachedTime.getTime() < 30 * 60 * 1000) {
+            return cachedData.orders;
+          }
         }
       }
 
@@ -131,7 +180,7 @@ export const useClientsStore = defineStore("clients", {
         if (snapshot.empty) {
           console.log("No orders found for this client");
           // Cache empty array with current timestamp
-          this.$state.clientsOrders.set(clientId, {
+          this.clientsOrders.set(clientId, {
             orders: [],
             fetchedAt: new Date()
           });
@@ -161,7 +210,7 @@ export const useClientsStore = defineStore("clients", {
         });
 
         // Cache the orders with current timestamp
-        this.$state.clientsOrders.set(clientId, {
+        this.clientsOrders.set(clientId, {
           orders,
           fetchedAt: new Date()
         });
@@ -172,16 +221,20 @@ export const useClientsStore = defineStore("clients", {
         return [];
       }
     },
+
     /**
      * Fetch recommendations for a specific client from Firestore
      * @param {string} clientId - The client ID to fetch recommendations for
      * @param {boolean} forceRefresh - Whether to force a refresh from Firestore
-     * @returns {Promise<Object|null>} - The client recommendations or null if not found
+     * @returns {Promise<ClientRecommendations|null>} - The client recommendations or null if not found
      */
-    async fetchClientRecommendations(clientId: string, forceRefresh: boolean = false) {
+    async fetchClientRecommendations(
+      clientId: string,
+      forceRefresh: boolean = false
+    ): Promise<ClientRecommendations | null> {
       // Check if we have cached recommendations
-      if (!forceRefresh && this.$state.clientsRecommendations.has(clientId)) {
-        return this.$state.clientsRecommendations.get(clientId);
+      if (!forceRefresh && this.clientsRecommendations.has(clientId)) {
+        return this.clientsRecommendations.get(clientId) || null;
       }
 
       try {
@@ -207,7 +260,7 @@ export const useClientsStore = defineStore("clients", {
         };
 
         // Cache the recommendations
-        this.$state.clientsRecommendations.set(clientId, formattedData);
+        this.clientsRecommendations.set(clientId, formattedData);
 
         return formattedData;
       } catch (error) {
@@ -215,7 +268,13 @@ export const useClientsStore = defineStore("clients", {
         return null;
       }
     },
-    async addClient(client: any) {
+
+    /**
+     * Add a new client to Firestore
+     * @param {ClientInput} client - The client data to add
+     * @returns {Promise<any|null>} - The new client or null if failed
+     */
+    async addClient(client: ClientInput): Promise<any | null> {
       const db = useFirestore();
       const user = useCurrentUser();
 
@@ -238,27 +297,31 @@ export const useClientsStore = defineStore("clients", {
       }
 
       // Get all keys and keep only editable ones
-      const keys = Object.keys(client);
-      keys.forEach((key) => {
-        if (!["clientName", "phone", "address", "lat", "lng"].includes(key)) {
-          delete client[key];
-        }
-      });
+      const clientData: ClientInput = {
+        clientName: client.clientName,
+        phone: client.phone,
+        address: client.address,
+        lat: client.lat,
+        lng: client.lng
+      };
 
       try {
-        // Handle recurrent payments
+        // Create the client
         const newClient = await addDoc(collection(db, "cliente"), {
-          ...client,
+          ...clientData,
           businessId: businessId.value,
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
 
-        this.$state.clients.push({
+        // Add to store state
+        this.clients.push({
           businessId: businessId.value,
           id: newClient.id,
-          ...client
-        });
+          userUid: user.value.uid,
+          createdAt: new Date().toISOString(),
+          ...clientData
+        } as ClientDocument);
 
         return newClient;
       } catch (error) {
@@ -266,7 +329,13 @@ export const useClientsStore = defineStore("clients", {
         return null;
       }
     },
-    async deleteClient(clientId: string) {
+
+    /**
+     * Delete or archive a client in Firestore
+     * @param {string} clientId - The ID of the client to delete/archive
+     * @returns {Promise<boolean>} - Success status
+     */
+    async deleteClient(clientId: string): Promise<boolean> {
       const db = useFirestore();
 
       try {
@@ -275,32 +344,32 @@ export const useClientsStore = defineStore("clients", {
           query(collection(db, "pedido"), where("clientId", "==", clientId), limit(1))
         );
 
-        // Only archive the client if the client is used in a order
+        // Only archive the client if the client is used in an order
         if (!querySnapshot.empty) {
           const clientRef = doc(db, "cliente", clientId);
           await updateDoc(clientRef, {
             archivedAt: serverTimestamp()
           });
         } else {
-          // Remove first from main payment object
+          // Remove if not used in any order
           await deleteDoc(doc(db, "cliente", clientId));
         }
 
         // Also remove from caches if present
-        if (this.$state.clientsOrders.has(clientId)) {
-          this.$state.clientsOrders.delete(clientId);
+        if (this.clientsOrders.has(clientId)) {
+          this.clientsOrders.delete(clientId);
         }
 
-        if (this.$state.clientsRecommendations.has(clientId)) {
-          this.$state.clientsRecommendations.delete(clientId);
+        if (this.clientsRecommendations.has(clientId)) {
+          this.clientsRecommendations.delete(clientId);
         }
 
         // Get index of the client in the current store
-        const index = this.$state.clients.findIndex((p: any) => p.id === clientId);
+        const index = this.clients.findIndex((p) => p.id === clientId);
 
         // Remove from the store
         if (index > -1) {
-          this.$state.clients.splice(index, 1);
+          this.clients.splice(index, 1);
         }
 
         return true;
@@ -309,10 +378,22 @@ export const useClientsStore = defineStore("clients", {
         return false;
       }
     },
-    async updateClient(client: any, clientId: string) {
+
+    /**
+     * Update a client in Firestore
+     * @param {ClientInput} client - The updated client data
+     * @param {string} clientId - The ID of the client to update
+     * @returns {Promise<boolean>} - Success status
+     */
+    async updateClient(client: ClientInput, clientId: string): Promise<boolean> {
       const db = useFirestore();
       const clientReference = doc(db, "cliente", clientId);
-      const clientIndex = this.$state.clients.findIndex((el: any) => el.id == clientId);
+      const clientIndex = this.clients.findIndex((el) => el.id === clientId);
+
+      if (clientIndex === -1) {
+        console.error("Client not found in store");
+        return false;
+      }
 
       // Validate client object
       const isClientValid = validateClient(client);
@@ -323,17 +404,25 @@ export const useClientsStore = defineStore("clients", {
       }
 
       // Get all keys and keep only editable ones
-      const keys = Object.keys(client);
-      keys.forEach((key) => {
-        if (!["clientName", "phone", "address", "lat", "lng"].includes(key)) {
-          delete client[key];
-        }
-      });
+      const clientData: ClientInput = {
+        clientName: client.clientName,
+        phone: client.phone,
+        address: client.address,
+        lat: client.lat,
+        lng: client.lng
+      };
 
       try {
-        // Update doc using paymentRef only if it's not one time payment
-        await updateDoc(clientReference, client);
-        this.$state.clients[clientIndex] = Object.assign({}, { ...this.$state.clients[clientIndex], ...client });
+        // Update doc in Firestore
+        await updateDoc(clientReference, {
+          ...clientData
+        });
+
+        // Update in store
+        this.clients[clientIndex] = {
+          ...this.clients[clientIndex],
+          ...clientData
+        };
 
         return true;
       } catch (error) {

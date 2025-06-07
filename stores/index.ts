@@ -1,4 +1,3 @@
-import { update } from "firebase/database";
 import {
   addDoc,
   collection,
@@ -9,13 +8,123 @@ import {
   query,
   where,
   deleteDoc,
+  Timestamp,
   limit
 } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { ToastEvents } from "~/interfaces";
 
-const defaultObject = {
-  userRole: "employee",
+// Role types
+type UserRole = "propietario" | "empleado";
+
+// Employee status types
+type EmployeeStatus = "Pendiente de aprobación" | "Activo" | "Archivado";
+
+// Shipping types
+type ShippingType = "fixed" | "variable" | null;
+
+// Role document in Firestore
+interface RoleDocument {
+  id?: string;
+  userUid: string;
+  businessId: string;
+  role: UserRole;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+  archivedAt?: Timestamp | string;
+}
+
+// Business image document
+interface BusinessImageDocument {
+  id?: string;
+  imageUrl: string;
+  imagePublicId: string;
+  imageCompleteInfo: Record<string, unknown>;
+  userUid: string;
+  businessId: string | false;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+  archivedAt?: Timestamp | string;
+}
+
+// Base business fields shared across documents
+interface BusinessBaseFields {
+  name: string;
+  phone: string | null;
+  description: string | null;
+  address: string | null;
+  imageUrl: string | null;
+  imageUrlThumbnail?: string | null; // Derived field
+  userBusinessImageId: string | null;
+  shippingPrice: number | null;
+  shippingType: ShippingType;
+  businessUrl?: string | null;
+}
+
+// Business document in Firestore
+interface BusinessDocument extends BusinessBaseFields {
+  id?: string;
+  userUid: string;
+  isEmployee: boolean;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+  archivedAt?: Timestamp | string;
+}
+
+// Employee document in Firestore
+interface EmployeeDocument extends BusinessBaseFields {
+  id?: string;
+  businessId: string;
+  employeeName: string;
+  role: "Propietario" | "Empleado";
+  status: EmployeeStatus;
+  isEmployee: boolean;
+  code: string;
+  userUid: string | null;
+  acceptedAt: Timestamp | null | string;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+  archivedAt?: Timestamp | string;
+}
+
+// Union type for both business types
+type UserBusinessDocument = BusinessDocument | EmployeeDocument;
+
+// Store state
+interface IndexState {
+  userRole: UserRole;
+  businessImage: {
+    imageUrl: string;
+    imagePublicId: string;
+    imageCompleteInfo: Record<string, unknown>;
+    id?: string;
+    userUid?: string;
+    businessId?: string | false;
+    createdAt?: string | Timestamp;
+  };
+  currentBusiness: {
+    id: string;
+    name: string;
+    description: string;
+    address: string;
+    phone?: string;
+    imageUrl: string;
+    imageUrlThumbnail?: string | null;
+    shippingPrice?: number | null;
+    shippingType?: ShippingType;
+    businessId?: string;
+    isEmployee?: boolean;
+    employees: Array<EmployeeDocument>;
+    createdAt: string | Timestamp;
+    type?: UserRole;
+  };
+  businesses: Array<UserBusinessDocument>;
+  businessesFetched: boolean;
+  employeesFetched: boolean;
+}
+
+const defaultObject: IndexState = {
+  userRole: "empleado",
   businessImage: {
     imageUrl: "",
     imagePublicId: "",
@@ -35,21 +144,21 @@ const defaultObject = {
   employeesFetched: false
 };
 export const useIndexStore = defineStore("index", {
-  state: (): any => {
+  state: (): IndexState => {
     return Object.assign({}, defaultObject);
   },
   getters: {
-    getUserRole: (state) => state.userRole,
-    isOwner: (state) => state.userRole === "propietario",
+    getUserRole: (state): string => state.userRole,
+    isOwner: (state): boolean => state.userRole === "propietario",
     getBusinessImage: (state) => state.businessImage,
-    areBusinessesFetched: (state) => state.businessesFetched,
-    areEmployeesFetched: (state) => state.employeesFetched,
+    areBusinessesFetched: (state): boolean => state.businessesFetched,
+    areEmployeesFetched: (state): boolean => state.employeesFetched,
     getBusinesses: (state) => state.businesses,
     getCurrentBusiness: (state) => state.currentBusiness,
     getEmployees: (state) => state.currentBusiness.employees
   },
   actions: {
-    async updateUserRole() {
+    async updateUserRole(): Promise<UserRole | false> {
       const user = await getCurrentUser();
       const db = useFirestore();
       const businessId = useLocalStorage("cBId", null);
@@ -65,141 +174,197 @@ export const useIndexStore = defineStore("index", {
       }
 
       // Get the user role
-      const userRole = role.docs[0].data().role;
+      const userRole = (role.docs[0].data() as RoleDocument).role;
 
       this.userRole = userRole;
-      return userRole;
+      return userRole as UserRole;
     },
-    async fetchBusinesses() {
+    async fetchBusinesses(): Promise<boolean> {
       // Get Firestore and Current User
       const db = useFirestore();
       const user = useCurrentUser();
       const { $dayjs } = useNuxtApp();
 
+      // Validation: Check user is logged in and businesses aren't already fetched
       if (!user.value || this.areBusinessesFetched) {
         return false;
       }
 
       try {
-        // Get all business for this user
-        const userBusiness = await getDocs(
-          query(
-            collection(db, "userBusiness"),
-            where("userUid", "==", user.value.uid),
-            where("isEmployee", "==", false)
-          )
+        // Get all businesses owned by this user
+        const userBusinessQuery = query(
+          collection(db, "userBusiness"),
+          where("userUid", "==", user.value.uid),
+          where("isEmployee", "==", false)
         );
+        const userBusiness = await getDocs(userBusinessQuery);
 
-        // Get owned businesses
-        this.businesses = userBusiness.docs.map((doc) => {
-          const docData = doc.data();
+        // Map owned businesses with proper types
+        const ownedBusinesses: Array<UserBusinessDocument> = userBusiness.docs.map((doc) => {
+          const docData = doc.data() as BusinessDocument;
 
-          // Create thumbnail
-          docData.imageUrlThumbnail = null;
-          if (docData.imageUrl) {
-            docData.imageUrlThumbnail = docData.imageUrl.replace("upload/", "upload/c_thumb,w_200,g_face/");
+          // Create thumbnail with explicit null default
+          let imageUrlThumbnail: string | null = null;
+          if (docData.imageUrl && typeof docData.imageUrl === "string") {
+            imageUrlThumbnail = docData.imageUrl.replace("upload/", "upload/c_thumb,w_200,g_face/");
+          }
+
+          // Format creation date or use fallback
+          let formattedCreatedAt = "";
+          if (docData.createdAt && typeof (docData.createdAt as Timestamp)?.toDate === "function") {
+            formattedCreatedAt = $dayjs((docData.createdAt as Timestamp).toDate()).format("DD/MM/YYYY");
           }
 
           return {
             id: doc.id,
-            ...docData,
-            type: "propietario",
-            createdAt: $dayjs(docData.createdAt.toDate()).format("DD/MM/YYYY")
+            name: docData.name || "",
+            phone: docData.phone || "",
+            description: docData.description || null,
+            address: docData.address || null,
+            imageUrl: docData.imageUrl || null,
+            imageUrlThumbnail: imageUrlThumbnail,
+            userBusinessImageId: docData.userBusinessImageId || null,
+            shippingPrice: docData.shippingPrice || null,
+            shippingType: docData.shippingType || null,
+            businessUrl: docData.businessUrl || null,
+            userUid: docData.userUid || "",
+            isEmployee: false,
+            type: "propietario" as UserRole,
+            createdAt: formattedCreatedAt
           };
         });
 
+        this.businesses = ownedBusinesses;
+
         // Get businesses where this user is an employee
-        const userEmployeeBusiness = await getDocs(
-          query(collection(db, "userBusiness"), where("userUid", "==", user.value.uid), where("isEmployee", "==", true))
+        const employeeQuery = query(
+          collection(db, "userBusiness"),
+          where("userUid", "==", user.value.uid),
+          where("isEmployee", "==", true)
         );
+        const userEmployeeBusiness = await getDocs(employeeQuery);
 
-        this.businesses = [
-          ...this.businesses,
-          ...userEmployeeBusiness.docs.map((doc) => {
-            const docData = doc.data();
+        // Map employee businesses with proper types
+        const employeeBusinesses: Array<EmployeeDocument> = userEmployeeBusiness.docs.map((doc) => {
+          const docData = doc.data() as EmployeeDocument;
 
-            // Create thumbnail
-            docData.imageUrlThumbnail = null;
-            if (docData.imageUrl) {
-              docData.imageUrlThumbnail = docData.imageUrl.replace("upload/", "upload/c_thumb,w_200,g_face/");
-            }
+          // Create thumbnail with explicit null default
+          let imageUrlThumbnail: string | null = null;
+          if (docData.imageUrl && typeof docData.imageUrl === "string") {
+            imageUrlThumbnail = docData.imageUrl.replace("upload/", "upload/c_thumb,w_200,g_face/");
+          }
 
-            return {
-              id: doc.id,
-              ...docData,
-              type: docData.role.toLowerCase(),
-              createdAt: $dayjs(docData.createdAt.toDate()).format("DD/MM/YYYY")
-            };
-          })
-        ];
+          // Format creation date or use fallback
+          let formattedCreatedAt = "";
+          if (docData.createdAt && typeof (docData.createdAt as Timestamp)?.toDate === "function") {
+            formattedCreatedAt = $dayjs((docData.createdAt as Timestamp).toDate()).format("DD/MM/YYYY");
+          }
 
-        // Update current business id in localStorage in case it's not set
-        const currentBusinessId = useLocalStorage("cBId", null);
+          // Ensure role is lowercase and valid
+          const roleLower = docData.role && typeof docData.role === "string" ? docData.role.toLowerCase() : "empleado";
+          const userRole =
+            roleLower === "propietario" || roleLower === "empleado"
+              ? (roleLower as UserRole)
+              : ("empleado" as UserRole);
+
+          return {
+            id: doc.id,
+            name: docData.name || "",
+            phone: docData.phone || null,
+            description: docData.description || null,
+            address: docData.address || null,
+            imageUrl: docData.imageUrl || null,
+            imageUrlThumbnail: imageUrlThumbnail,
+            userBusinessImageId: docData.userBusinessImageId || null,
+            shippingPrice: docData.shippingPrice || null,
+            shippingType: docData.shippingType || null,
+            businessUrl: docData.businessUrl || null,
+            businessId: docData.businessId || "",
+            employeeName: docData.employeeName || "",
+            role: docData.role || "Empleado",
+            status: docData.status || "Pendiente de aprobación",
+            isEmployee: true,
+            code: docData.code || "",
+            userUid: docData.userUid as string,
+            acceptedAt: docData.acceptedAt,
+            type: userRole,
+            createdAt: formattedCreatedAt
+          };
+        });
+
+        // Combine the businesses arrays
+        this.businesses = [...this.businesses, ...employeeBusinesses];
+
+        // Update current business id in localStorage if not set
+        const currentBusinessId: any = useLocalStorage("cBId", null);
         if (!this.currentBusiness.id && this.businesses.length > 0) {
           // Find matching business
-          let business = this.businesses[0];
+          let business: UserBusinessDocument | undefined = this.businesses[0];
+
           if (currentBusinessId.value) {
-            business = this.businesses.find((b: any) => {
+            business = this.businesses.find((b) => {
               if (!b.isEmployee) {
                 return b.id === currentBusinessId.value;
               }
-              return b.businessId === currentBusinessId.value;
+              return (b as EmployeeDocument).businessId === currentBusinessId.value;
             });
 
-            // If for some reason the business is not found it might have an old businessId
+            // If business not found, might have an old businessId
             if (!business) {
               currentBusinessId.value = null;
               // Reload the full page
               window.location.reload();
-              return;
+              return false;
             }
           }
 
-          // If for some reason the business is not found it might have an old businessId
+          // If still no business found
           if (!business) {
             currentBusinessId.value = null;
-            return;
+            return false;
           }
 
           // Always save the original businessId
-          currentBusinessId.value = !business.isEmployee ? business.id : business.businessId;
+          currentBusinessId.value = !business.isEmployee ? business.id : (business as EmployeeDocument).businessId;
 
-          // Update store
+          // Update store with current business (explicit property assignment)
           this.currentBusiness = {
-            id: !business.isEmployee ? business.id : business.businessId,
+            id: currentBusinessId.value,
             name: business.name,
-            phone: business.phone,
-            imageUrl: business.imageUrl,
-            imageUrlThumbnail: business.imageUrlThumbnail,
+            description: business.description || "",
+            address: business.address || "",
+            phone: business.phone || "",
+            imageUrl: business.imageUrl || "",
+            imageUrlThumbnail: business.imageUrlThumbnail || null,
             shippingPrice: business.shippingPrice || null,
             shippingType: business.shippingType || null,
             employees: [],
-            type: business.type
+            createdAt: business.createdAt || "",
+            type: business.isEmployee ? "empleado" : "propietario"
           };
 
-          this.updateUserRole();
+          await this.updateUserRole();
         }
 
-        // If not business is found, clear the current business id
+        // Verify the stored business ID still exists
         if (currentBusinessId.value) {
-          const business = this.businesses.find((b: any) => {
+          const business = this.businesses.find((b) => {
             if (!b.isEmployee) {
               return b.id === currentBusinessId.value;
             }
-            return b.businessId === currentBusinessId.value;
+            return (b as EmployeeDocument).businessId === currentBusinessId.value;
           });
 
           if (!business) {
             currentBusinessId.value = null;
-            return;
+            return false;
           }
         }
 
         this.$state.businessesFetched = true;
-
         return true;
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching businesses:", error);
         useToast(ToastEvents.error, "Hubo un error al obtener la información, por favor intenta nuevamente");
         return false;
       }
@@ -232,12 +397,12 @@ export const useIndexStore = defineStore("index", {
 
         // Get owned businesses
         this.currentBusiness.employees = userBusiness.docs.map((doc) => {
-          const docData = doc.data();
+          const docData = doc.data() as EmployeeDocument;
           return {
             id: doc.id,
             ...docData,
             type: "empleado",
-            createdAt: $dayjs(docData.createdAt.toDate()).format("DD/MM/YYYY")
+            createdAt: $dayjs((docData.createdAt as Timestamp).toDate()).format("DD/MM/YYYY")
           };
         });
 
@@ -292,7 +457,7 @@ export const useIndexStore = defineStore("index", {
           userUid: user.value.uid,
           businessId: false,
           createdAt: $dayjs().format("DD/MM/YYYY")
-        };
+        } as BusinessImageDocument;
 
         return true;
       } catch (error) {
@@ -301,7 +466,7 @@ export const useIndexStore = defineStore("index", {
         return false;
       }
     },
-    async saveBusiness(businessInfo: any) {
+    async saveBusiness(businessInfo: BusinessDocument) {
       // Get Firestore and Current User
       const db = useFirestore();
       const user = useCurrentUser();
@@ -376,10 +541,16 @@ export const useIndexStore = defineStore("index", {
             id: newBusiness.id,
             name: businessInfo.name,
             phone: businessInfo.phone,
-            imageUrl: businessInfo.imageUrl || null,
+            imageUrl: businessInfo.imageUrl || "",
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
             shippingPrice: businessInfo.shippingPrice || null,
             shippingType: businessInfo.shippingType || null,
+            description: businessInfo.description || "",
+            address: businessInfo.address || "",
+            createdAt: $dayjs().format("DD/MM/YYYY"),
+            businessId: newBusiness.id,
+            isEmployee: false,
+            // Initialize employees as an empty array
             employees: [],
             type: "propietario" // Only owner can create a business
           };
@@ -395,9 +566,12 @@ export const useIndexStore = defineStore("index", {
             description: businessInfo.description || null,
             address: businessInfo.address || null,
             imageUrl: businessInfo.imageUrl || null,
+            imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
             userBusinessImageId: businessInfo.userBusinessImageId || null,
             shippingPrice: businessInfo.shippingPrice || null,
-            type: "propietario", // Only owner can create a business
+            shippingType: businessInfo.shippingType || null,
+            businessUrl: businessInfo.businessUrl || null,
+            isEmployee: false,
             userUid: user.value.uid,
             createdAt: $dayjs().format("DD/MM/YYYY")
           }
@@ -517,6 +691,11 @@ export const useIndexStore = defineStore("index", {
             imageUrlThumbnail: businessNewInfo.imageUrlThumbnail || null,
             shippingPrice: businessNewInfo.shippingPrice || null,
             shippingType: businessNewInfo.shippingType || null,
+            description: businessNewInfo.description || null,
+            address: businessNewInfo.address || null,
+            createdAt: $dayjs().format("DD/MM/YYYY"),
+            businessId: current.id,
+            isEmployee: false,
             employees: [],
             type: "propietario" // Only owner can update a business
           };
@@ -568,8 +747,10 @@ export const useIndexStore = defineStore("index", {
         }
 
         // Update user business image
-        const business = this.getBusinesses.find((b: any) => b.id === businessId);
-        if (business.userBusinessImageId) {
+        const business: BusinessDocument | undefined = this.getBusinesses.find(
+          (b: UserBusinessDocument) => b.id === businessId
+        ) as BusinessDocument | undefined;
+        if (business && business.userBusinessImageId) {
           await updateDoc(doc(db, "userBusinessImage", business.userBusinessImageId), {
             businessId: false
           });
@@ -584,17 +765,22 @@ export const useIndexStore = defineStore("index", {
         if (cBId.value === businessId) {
           cBId.value = this.$state.businesses[0].id;
 
+          const firstBusiness = this.$state.businesses[0] as UserBusinessDocument;
           // Update store
           this.currentBusiness = {
-            id: this.$state.businesses[0].id,
-            name: this.$state.businesses[0].name,
-            phone: this.$state.businesses[0].phone,
-            imageUrl: this.$state.businesses[0].imageUrl,
-            imageUrlThumbnail: this.$state.businesses[0].imageUrlThumbnail,
-            shippingPrice: this.$state.businesses[0].shippingPrice || null,
-            shippingType: this.$state.businesses[0].shippingType || null,
-            employees: [],
-            type: this.$state.businesses[0].type
+            id: firstBusiness.id || "",
+            name: firstBusiness.name,
+            phone: firstBusiness.phone || "",
+            imageUrl: firstBusiness.imageUrl || "",
+            imageUrlThumbnail: firstBusiness.imageUrlThumbnail || null,
+            shippingPrice: firstBusiness.shippingPrice || null,
+            shippingType: firstBusiness.shippingType || null,
+            description: firstBusiness.description || "",
+            address: firstBusiness.address || "",
+            createdAt: firstBusiness.createdAt || "",
+            businessId: firstBusiness.id,
+            isEmployee: false,
+            employees: []
           };
         }
 
@@ -629,7 +815,7 @@ export const useIndexStore = defineStore("index", {
       }
     },
     // This count as a new userBusiness but for an employee, so the properties are different
-    async saveEmployee(businessInfo: any) {
+    async saveEmployee(businessInfo: EmployeeDocument) {
       // Get Firestore and Current User
       const db = useFirestore();
       const user = useCurrentUser();
@@ -687,19 +873,25 @@ export const useIndexStore = defineStore("index", {
           return false;
         } */
 
-        const objectToSave = {
+        const objectToSave: EmployeeDocument = {
           name: businessInfo.name,
+          description: null,
+          address: null,
           imageUrl: businessInfo.imageUrl || null,
           employeeName: businessInfo.employeeName,
           businessId: businessInfo.businessId,
           phone: businessInfo.phone || null,
+          userBusinessImageId: null,
+          shippingPrice: null,
+          shippingType: null,
+          businessUrl: null,
           role: businessInfo.role,
           status: "Pendiente de aprobación",
           isEmployee: true,
           code: `${businessInfo.businessId}-${Math.floor(1000 + Math.random() * 9000)}`,
           userUid: null, // This will be updated once accepted the invitation
           acceptedAt: null,
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp() as Timestamp
         };
 
         // Create employee
@@ -846,6 +1038,7 @@ export const useIndexStore = defineStore("index", {
       // Get Firestore and Current User
       const db = useFirestore();
       const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
 
       if (!user.value) {
         return false;
@@ -922,6 +1115,9 @@ export const useIndexStore = defineStore("index", {
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
             shippingPrice: businessInfo.shippingPrice || null,
             shippingType: businessInfo.shippingType || null,
+            description: businessInfo.description || "",
+            address: businessInfo.address || "",
+            createdAt: $dayjs().format("DD/MM/YYYY"),
             employees: [],
             type: businessInfo.role.toLowerCase()
           };
@@ -937,8 +1133,19 @@ export const useIndexStore = defineStore("index", {
             isEmployee: true,
             imageUrl: businessInfo.imageUrl || null,
             imageUrlThumbnail: businessInfo.imageUrlThumbnail || null,
-            employees: [],
-            type: businessInfo.role.toLowerCase()
+            shippingPrice: businessInfo.shippingPrice || null,
+            shippingType: businessInfo.shippingType || null,
+            description: businessInfo.description || null,
+            address: businessInfo.address || null,
+            phone: businessInfo.phone || null,
+            userBusinessImageId: businessInfo.userBusinessImageId || null,
+            employeeName: businessInfo.employeeName || "",
+            role: businessInfo.role || "Empleado",
+            status: "Activo",
+            code: businessInfo.code || "",
+            userUid: user.value.uid,
+            createdAt: $dayjs().format("DD/MM/YYYY"),
+            acceptedAt: $dayjs().format("DD/MM/YYYY")
           }
         ];
 
@@ -956,7 +1163,6 @@ export const useIndexStore = defineStore("index", {
 
       try {
         const db = useFirestore();
-        const user = useCurrentUser();
 
         // Get business with this code
         const userBusiness = await getDocs(

@@ -4,7 +4,7 @@ import {
   query,
   where,
   getDocs,
-  getDoc,
+  startAfter,
   addDoc,
   serverTimestamp,
   doc,
@@ -12,49 +12,116 @@ import {
   deleteDoc,
   orderBy,
   limit,
+  onSnapshot,
   Timestamp,
-  startAfter,
-  onSnapshot
+  DocumentSnapshot,
+  QueryDocumentSnapshot
 } from "firebase/firestore";
-// @ts-ignore
-import { StockMovement, StockMovementType, LossReason, ToastEvents } from "~/interfaces";
+import { ToastEvents, type StockMovement, StockMovementType } from "~/interfaces";
 
-const defaultObject = {
+// --- Loss Reason Types ---
+export enum LossReason {
+  SPOILAGE = "spoilage",
+  DAMAGE = "damage",
+  THEFT = "theft",
+  EXPIRATION = "expiration",
+  OTHER = "other"
+}
+
+// --- Product Document Interface ---
+export interface ProductDocument {
+  id?: string;
+  productName: string;
+  description: string | null;
+  unit: string;
+  step: number;
+  price: number;
+  category: string;
+  isAvailable: boolean;
+  highlightProduct: boolean;
+  imageUrl?: string | null;
+  productImageId?: string | null;
+  productStock: number;
+  cost: number;
+  businessId: string;
+  userUid: string;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+  archivedAt?: Timestamp | string;
+}
+
+// --- Product Image Document Interface ---
+export interface ProductImageDocument {
+  id?: string;
+  imageUrl: string;
+  imagePublicId: string;
+  imageCompleteInfo?: Record<string, unknown>;
+  userUid: string;
+  businessId: string;
+  productId: string | false;
+  createdAt: Timestamp | string;
+  updatedAt?: Timestamp | string;
+}
+
+// --- Supplier Document Interface ---
+export interface SupplierDocument {
+  id?: string;
+  name: string;
+  businessId: string;
+  userUid: string;
+  createdAt: Timestamp | string | Date;
+}
+
+// --- Products Store State Interface ---
+interface ProductsState {
+  fetched: boolean;
+  products: ProductDocument[];
+  currentProductImage: ProductImageDocument | null;
+  stockMovements: StockMovement[];
+  stockMovementsFetched: boolean;
+  lastVisibleStockMovement: QueryDocumentSnapshot | DocumentSnapshot | null;
+  suppliers: SupplierDocument[];
+  suppliersFetched: boolean;
+}
+
+// --- Default State Object ---
+const defaultObject: ProductsState = {
   fetched: false,
   products: [],
   currentProductImage: null,
-
   stockMovements: [],
   stockMovementsFetched: false,
   lastVisibleStockMovement: null,
-
   suppliers: [],
   suppliersFetched: false
 };
 
 export const useProductsStore = defineStore("products", {
-  state: (): any => {
+  state: (): ProductsState => {
     return Object.assign({}, defaultObject);
   },
   getters: {
-    getState: (state) => state,
-    getProducts: (state) => state.products,
-    areProductsFetched: (state) => state.fetched,
-    getCurrentProductImage: (state) => state.currentProductImage,
-    getStockMovements: (state) => state.stockMovements,
-    areStockMovementsFetched: (state) => state.stockMovementsFetched,
-
-    getSuppliers: (state) => state.suppliers,
-    areSuppliersFetched: (state) => state.suppliersFetched
+    getState: (state): ProductsState => state,
+    getProducts: (state): ProductDocument[] => state.products,
+    areProductsFetched: (state): boolean => state.fetched,
+    getCurrentProductImage: (state): ProductImageDocument | null => state.currentProductImage,
+    getStockMovements: (state): StockMovement[] => state.stockMovements,
+    areStockMovementsFetched: (state): boolean => state.stockMovementsFetched,
+    getSuppliers: (state): SupplierDocument[] => state.suppliers,
+    areSuppliersFetched: (state): boolean => state.suppliersFetched
   },
   actions: {
-    async fetchData(forceUpdate = false) {
+    /**
+     * Fetch products from Firestore
+     * @param forceUpdate Force update even if data is already fetched
+     * @returns Promise that resolves with the fetched products or null on error
+     */
+    async fetchData(forceUpdate: boolean = false): Promise<ProductDocument[] | null> {
       if (this.areProductsFetched && !forceUpdate) {
-        return;
+        return this.products;
       }
 
-      const products: Array<any> = [];
-      // Index store will manage all logic needed in the app to run
+      const products: ProductDocument[] = [];
       // First check if there is a user
       const user = useCurrentUser();
 
@@ -67,22 +134,22 @@ export const useProductsStore = defineStore("products", {
       // Safe check, but already handled with middleware
       if (!user || !user.value) {
         // Handle the case when there is no user
-        return;
+        return null;
       }
 
-      // Connect with firebase and get payments structure
+      // Connect with firebase and get products
       const db = useFirestore();
       const q = query(collection(db, "producto"), where("businessId", "==", businessId.value));
 
       // Replace getDocs with onSnapshot for real-time updates
       onSnapshot(q, (querySnapshot) => {
-        const products: Array<any> = [];
+        const products: ProductDocument[] = [];
 
         querySnapshot.forEach((doc) => {
           products.push({
             id: doc.id,
             ...doc.data()
-          });
+          } as ProductDocument);
         });
 
         this.$state.fetched = true;
@@ -91,8 +158,20 @@ export const useProductsStore = defineStore("products", {
 
       this.$state.fetched = true;
       this.$state.products = products;
+
+      return products;
     },
-    async saveProductImage(imageInformation: any) {
+
+    /**
+     * Save product image to Firestore
+     * @param imageInformation Image information object
+     * @returns Promise that resolves with success status
+     */
+    async saveProductImage(imageInformation: {
+      imageUrl: string;
+      imagePublicId: string;
+      imageCompleteInfo?: Record<string, unknown>;
+    }): Promise<boolean> {
       // Get Firestore and Current User
       const db = useFirestore();
       const user = useCurrentUser();
@@ -101,7 +180,7 @@ export const useProductsStore = defineStore("products", {
       // Get current business id from localStorage
       const businessId = useLocalStorage("cBId", null);
       if (!businessId.value) {
-        return null;
+        return false;
       }
 
       if (!user.value) {
@@ -109,8 +188,6 @@ export const useProductsStore = defineStore("products", {
       }
 
       // Validate information
-      //! Important
-      // TODO: For now it's ok to save this info but if the user base grows, we should consider managing this differently
       if (
         !imageInformation.imageUrl ||
         typeof imageInformation.imageUrl !== "string" ||
@@ -142,7 +219,7 @@ export const useProductsStore = defineStore("products", {
           ...newImageObj,
           id: newProductImage.id,
           createdAt: $dayjs().format("DD/MM/YYYY")
-        };
+        } as ProductImageDocument;
 
         return true;
       } catch (error) {
@@ -151,7 +228,13 @@ export const useProductsStore = defineStore("products", {
         return false;
       }
     },
-    async addProduct(product: any) {
+
+    /**
+     * Add a new product to Firestore
+     * @param product Product object to add
+     * @returns Promise that resolves with the new product reference or null
+     */
+    async addProduct(product: Partial<ProductDocument>): Promise<any> {
       const db = useFirestore();
       const user = useCurrentUser();
 
@@ -166,8 +249,8 @@ export const useProductsStore = defineStore("products", {
       }
 
       // Safe data handling - Fix step and price to float
-      product.step = parseFloat(product.step);
-      product.price = parseFloat(product.price);
+      product.step = parseFloat(String(product.step));
+      product.price = parseFloat(String(product.price));
 
       // Validate product object
       const isProductValid = validateProduct(product);
@@ -187,41 +270,39 @@ export const useProductsStore = defineStore("products", {
         "description",
         "isAvailable",
         "highlightProduct",
-        // Image related
         "productImageId",
         "imageUrl",
-        // Stock related
         "productStock",
         "cost"
       ];
-      Object.keys(product).forEach((key) => {
-        if (!validKeys.includes(key)) {
-          delete product[key];
+
+      const cleanProduct: Record<string, any> = {};
+      validKeys.forEach((key) => {
+        if (key in product) {
+          cleanProduct[key] = product[key as keyof Partial<ProductDocument>];
         }
       });
 
       try {
         // Handle recurrent payments
         const newProduct = await addDoc(collection(db, "producto"), {
-          ...product,
+          ...cleanProduct,
           businessId: businessId.value,
           createdAt: serverTimestamp(),
           userUid: user.value.uid
         });
 
         // Update product image
-        // Triple check the flow matches the product image creation
         if (
-          product.productImageId &&
-          this.currentProductImage.id &&
-          this.currentProductImage.id == product.productImageId
+          cleanProduct.productImageId &&
+          this.currentProductImage?.id &&
+          this.currentProductImage.id === cleanProduct.productImageId
         ) {
-          await updateDoc(doc(db, "productImage", product.productImageId), {
+          await updateDoc(doc(db, "productImage", cleanProduct.productImageId), {
             productId: newProduct.id
           });
 
           // Once image is saved and updated, we reset the current product image
-          // so other picture can be uploaded and this one is not used as default
           this.currentProductImage = null;
         }
 
@@ -231,7 +312,13 @@ export const useProductsStore = defineStore("products", {
         return null;
       }
     },
-    async deleteProduct(productId: string) {
+
+    /**
+     * Delete a product from Firestore
+     * @param productId ID of the product to delete
+     * @returns Promise that resolves with success status
+     */
+    async deleteProduct(productId: string): Promise<boolean> {
       const db = useFirestore();
 
       try {
@@ -257,9 +344,16 @@ export const useProductsStore = defineStore("products", {
         return false;
       }
     },
-    async updateProduct(product: any, current: any) {
+
+    /**
+     * Update a product in Firestore
+     * @param product New product data
+     * @param current Current product data
+     * @returns Promise that resolves with success status
+     */
+    async updateProduct(product: Partial<ProductDocument>, current: ProductDocument): Promise<boolean> {
       const db = useFirestore();
-      const productReference = doc(db, "producto", current.id);
+      const productReference = doc(db, "producto", current.id || "");
 
       // Validate sell object
       const isProductValid = validateProduct(product);
@@ -272,11 +366,11 @@ export const useProductsStore = defineStore("products", {
       try {
         const imageChanged = product.productImageId !== current.productImageId;
 
-        // Update doc using paymentRef only if it's not one time payment
+        // Update doc using paymentRef
         await updateDoc(productReference, product);
 
         // Update the productImage collection accordingly
-        if (imageChanged) {
+        if (imageChanged && product.productImageId) {
           await updateDoc(doc(db, "productImage", product.productImageId), {
             productId: current.id
           });
@@ -295,9 +389,16 @@ export const useProductsStore = defineStore("products", {
         return false;
       }
     },
-    async updateStock(stock: any, current: any) {
+
+    /**
+     * Update product stock in Firestore
+     * @param stock Stock update object
+     * @param current Current product data
+     * @returns Promise that resolves with success status
+     */
+    async updateStock(stock: { cost: number; productStock: number }, current: ProductDocument): Promise<boolean> {
       const db = useFirestore();
-      const productReference = doc(db, "producto", current.id);
+      const productReference = doc(db, "producto", current.id || "");
 
       // Validate sell object. Merge with other properties to validate the whole object just in case
       const isProductValid = validateProduct({ ...current, ...stock });
@@ -315,8 +416,8 @@ export const useProductsStore = defineStore("products", {
 
       try {
         await updateDoc(productReference, {
-          cost: parseFloat(stock.cost),
-          productStock: parseFloat(stock.productStock)
+          cost: parseFloat(String(stock.cost)),
+          productStock: parseFloat(String(stock.productStock))
         });
 
         return true;
@@ -326,13 +427,17 @@ export const useProductsStore = defineStore("products", {
       }
     },
 
-    // ----------- Stock Movements
+    // ----------- Stock Movements -----------
+
     /**
      * Record a stock movement in the database
+     * @param movement Stock movement object
+     * @returns Promise that resolves with success status
      */
-    async recordStockMovement(movement: StockMovement) {
+    async recordStockMovement(movement: StockMovement): Promise<boolean> {
       const db = useFirestore();
       const user = useCurrentUser();
+      const { $dayjs } = useNuxtApp();
 
       // Get current business ID
       const businessId = useLocalStorage("cBId", null);
@@ -351,18 +456,18 @@ export const useProductsStore = defineStore("products", {
         movement.businessId = businessId.value;
         movement.userUid = user.value.uid;
         movement.createdByName = user.value.displayName || "Usuario";
-        movement.createdAt = serverTimestamp();
-        movement.date = movement.date || serverTimestamp();
+        movement.createdAt = serverTimestamp() as Timestamp;
+        movement.date = (movement.date || serverTimestamp()) as Timestamp;
 
         // Create the stock movement document
         const docRef = await addDoc(collection(db, "stockMovements"), movement);
 
         // Add to local state
-        const newMovement = {
+        const newMovement: StockMovement = {
           ...movement,
           id: docRef.id,
-          createdAt: new Date(), // Local date object for immediate display
-          date: movement.date instanceof Date ? movement.date : new Date()
+          createdAt: $dayjs().format("YYYY-MM-DD"), // Local date object for immediate display
+          date: movement.date ? movement.date : $dayjs().format("YYYY-MM-DD") // Format date for display
         };
 
         this.$state.stockMovements.unshift(newMovement);
@@ -377,10 +482,14 @@ export const useProductsStore = defineStore("products", {
 
     /**
      * Enhanced version of updateStock that records the movement
+     * @param stockUpdate Stock update object
+     * @param current Current product data
+     * @param movementDetails Movement details
+     * @returns Promise that resolves with success status
      */
     async updateStockWithMovement(
-      stockUpdate: any,
-      current: any,
+      stockUpdate: { cost: number; productStock: number },
+      current: ProductDocument,
       movementDetails: {
         type: StockMovementType;
         lossReason?: LossReason;
@@ -390,17 +499,15 @@ export const useProductsStore = defineStore("products", {
         notes?: string;
         orderId?: string;
       }
-    ) {
-      const db = useFirestore();
-
+    ): Promise<boolean> {
       try {
         // First calculate quantities
-        const previousStock = parseFloat(current.productStock || 0);
-        const newStock = parseFloat(stockUpdate.productStock || 0);
+        const previousStock = parseFloat(String(current.productStock || 0));
+        const newStock = parseFloat(String(stockUpdate.productStock || 0));
         const quantityChange = newStock - previousStock;
 
-        const previousCost = parseFloat(current.cost || 0);
-        const newCost = parseFloat(stockUpdate.cost || 0);
+        const previousCost = parseFloat(String(current.cost || 0));
+        const newCost = parseFloat(String(stockUpdate.cost || 0));
 
         // Check if we need to add a new supplier
         if (movementDetails.supplierName && !movementDetails.supplierId) {
@@ -412,16 +519,15 @@ export const useProductsStore = defineStore("products", {
 
         // Create the movement record
         const movement: StockMovement = {
-          productId: current.id,
+          productId: current.id || "",
           productName: current.productName,
-          orderId: movementDetails.orderId || null, // Add this field
+          orderId: movementDetails.orderId || null,
           type: movementDetails.type,
           quantity: quantityChange,
           previousStock: previousStock,
           newStock: newStock,
           previousCost: previousCost,
           newCost: newCost,
-          // Optional fields
           lossReason: movementDetails.lossReason || null,
           supplierId: movementDetails.supplierId || null,
           supplierName: movementDetails.supplierName || null,
@@ -453,14 +559,19 @@ export const useProductsStore = defineStore("products", {
     },
 
     /**
-     * Fetch recent stock movements for reporting or for pending orders
-     * @param {string|null} productId - Optional specific product ID to fetch movements for
-     * @param {number} pageLimit - Number of movements to fetch per page
-     * @param {any} startAfterNum - Pagination cursor
-     * @param {boolean} forPendingOrders - If true, fetch all movements related to pending orders
-     * @returns {Promise<boolean>} - Success status
+     * Fetch stock movements from Firestore
+     * @param productId Optional specific product ID to fetch movements for
+     * @param pageLimit Number of movements to fetch per page
+     * @param startAfterNum Pagination cursor
+     * @param forPendingOrders If true, fetch all movements related to pending orders
+     * @returns Promise that resolves with success status
      */
-    async fetchStockMovements(productId = null, pageLimit = 100, startAfterNum = null, forPendingOrders = false) {
+    async fetchStockMovements(
+      productId: string | null = null,
+      pageLimit: number = 100,
+      startAfterNum: any = null,
+      forPendingOrders: boolean = false
+    ): Promise<boolean> {
       const db = useFirestore();
       const businessId = useLocalStorage("cBId", null);
 
@@ -534,7 +645,7 @@ export const useProductsStore = defineStore("products", {
           this.$state.lastVisibleStockMovement = lastVisible;
         }
 
-        const movements = querySnapshot.docs.map((doc) => {
+        const movements: StockMovement[] = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             ...data,
@@ -542,7 +653,7 @@ export const useProductsStore = defineStore("products", {
             // Format dates for display
             date: data.date ? $dayjs(data.date.toDate()).format("YYYY-MM-DD HH:mm") : null,
             createdAt: data.createdAt ? $dayjs(data.createdAt.toDate()).format("YYYY-MM-DD HH:mm") : null
-          };
+          } as StockMovement;
         });
 
         if (forPendingOrders || !startAfterNum) {
@@ -563,8 +674,10 @@ export const useProductsStore = defineStore("products", {
 
     /**
      * Get statistics for recent movements and losses
+     * @param days Number of days to get statistics for
+     * @returns Object with statistics
      */
-    async getStockMovementStats(days = 30) {
+    async getStockMovementStats(days: number = 30): Promise<{ recentMovements: number; recentLosses: number }> {
       const { $dayjs } = useNuxtApp();
       const businessId = useLocalStorage("cBId", null);
 
@@ -598,12 +711,12 @@ export const useProductsStore = defineStore("products", {
         // Calculate total losses
         let totalLosses = 0;
         querySnapshot.forEach((doc) => {
-          const movement = doc.data();
+          const movement = doc.data() as StockMovement;
           if (movement.type === StockMovementType.LOSS) {
-            // Calculate the monetary value of the loss
+            // Calculate the value of the loss based on cost and quantity
             const lossQuantity = Math.abs(movement.quantity);
-            const costPerUnit = movement.previousCost || 0;
-            totalLosses += lossQuantity * costPerUnit;
+            const lossValue = lossQuantity * movement.previousCost;
+            totalLosses += lossValue;
           }
         });
 
@@ -620,12 +733,13 @@ export const useProductsStore = defineStore("products", {
       }
     },
 
-    // ----------- Suppliers Movements
+    // ----------- Suppliers Methods -----------
 
     /**
      * Fetch all suppliers for the current business
+     * @returns Promise that resolves with suppliers array
      */
-    async fetchSuppliers() {
+    async fetchSuppliers(): Promise<SupplierDocument[]> {
       // Skip if already fetched
       if (this.suppliersFetched) {
         return this.suppliers;
@@ -646,10 +760,13 @@ export const useProductsStore = defineStore("products", {
         );
 
         const querySnapshot = await getDocs(q);
-        const suppliers = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const suppliers: SupplierDocument[] = querySnapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data()
+            } as SupplierDocument)
+        );
 
         this.$state.suppliers = suppliers;
         this.$state.suppliersFetched = true;
@@ -663,8 +780,10 @@ export const useProductsStore = defineStore("products", {
 
     /**
      * Add a new supplier or return existing one if it exists with the same name
+     * @param supplierName Name of the supplier
+     * @returns Promise that resolves with the supplier object
      */
-    async addSupplier(supplierName: string) {
+    async addSupplier(supplierName: string): Promise<SupplierDocument | null> {
       if (!supplierName || supplierName.trim() === "") {
         return null;
       }
@@ -679,7 +798,9 @@ export const useProductsStore = defineStore("products", {
 
       // Clean supplier name and check if it already exists (case insensitive)
       const cleanName = supplierName.trim();
-      const existingSupplier = this.suppliers.find((s: any) => s.name.toLowerCase() === cleanName.toLowerCase());
+      const existingSupplier = this.suppliers.find(
+        (s: SupplierDocument) => s.name.toLowerCase() === cleanName.toLowerCase()
+      );
 
       // Return existing supplier if found
       if (existingSupplier) {
@@ -698,16 +819,16 @@ export const useProductsStore = defineStore("products", {
         const docRef = await addDoc(collection(db, "suppliers"), newSupplierData);
 
         // Add to local state with ID
-        const newSupplier = {
+        const newSupplier: SupplierDocument = {
           id: docRef.id,
           ...newSupplierData,
-          createdAt: new Date() // For local display
+          createdAt: new Date()
         };
 
         this.$state.suppliers.push(newSupplier);
 
         // Sort suppliers by name
-        this.$state.suppliers.sort((a: any, b: any) => a.name.localeCompare(b.name));
+        this.$state.suppliers.sort((a: SupplierDocument, b: SupplierDocument) => a.name.localeCompare(b.name));
 
         return newSupplier;
       } catch (error) {
@@ -718,12 +839,14 @@ export const useProductsStore = defineStore("products", {
 
     /**
      * Find a supplier by name (case insensitive)
+     * @param name Name of the supplier to find
+     * @returns Supplier object if found, null otherwise
      */
-    findSupplierByName(name: string) {
+    findSupplierByName(name: string): SupplierDocument | null {
       if (!name) return null;
 
       const cleanName = name.trim().toLowerCase();
-      return this.suppliers.find((s: any) => s.name.toLowerCase() === cleanName);
+      return this.suppliers.find((s: SupplierDocument) => s.name.toLowerCase() === cleanName) || null;
     }
   }
 });

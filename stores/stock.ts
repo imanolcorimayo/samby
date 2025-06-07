@@ -1,10 +1,71 @@
 import { defineStore } from "pinia";
-import { collection, query, where, getDocs, Timestamp, limit, orderBy } from "firebase/firestore";
+import { collection, query, where, getDocs, Timestamp, orderBy } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 
-// Helper function to validate prerequisites
-function validatePrerequisites() {
+// Type definitions
+type StockStatus = "ok" | "warning" | "critical";
+
+// Interface for prerequisite validation result
+interface PrerequisiteResult {
+  valid: boolean;
+  reason?: string;
+  user?: any;
+  businessId?: any;
+}
+
+// Interface for product usage statistics
+interface ProductUsage {
+  id: string;
+  productName: string;
+  usageByWeek: Record<string, number>;
+  totalUsage: number;
+  avgWeeklyUsage: number;
+  totalRevenue: number;
+  totalProfit: number;
+}
+
+// Interface for stock item
+interface StockItem {
+  id: string;
+  productName: string;
+  currentStock: number;
+  stockLevel: number;
+  avgWeeklyUsage: number;
+  stockCoverageWeeks: number;
+  reorderLevel: number;
+  status: StockStatus;
+  price: number;
+  cost: number;
+  unit: string;
+  profitContribution: number;
+  projectedStockouts: string | null;
+}
+
+// Interface for stock forecast with additional metrics
+interface StockForecast extends StockItem {
+  totalRevenue: number;
+  totalProfit: number;
+  reorderCost: number;
+  cumulativeProfit?: number;
+}
+
+// Interface for state
+interface StockState {
+  stockItems: StockItem[];
+  stockForecasts: StockForecast[];
+  topProducts: StockForecast[];
+  aiRecommendations: string | null;
+  isLoading: boolean;
+  dataFetched: boolean;
+  lastFetchDate: Date | null;
+}
+
+/**
+ * Helper function to validate prerequisites
+ * @returns The validation result with user and businessId if valid
+ */
+function validatePrerequisites(): PrerequisiteResult {
   const user = useCurrentUser();
   const businessId = useLocalStorage("cBId", null);
 
@@ -19,40 +80,6 @@ function validatePrerequisites() {
   return { valid: true, user, businessId };
 }
 
-// Interface for state
-interface StockState {
-  stockItems: StockItem[];
-  stockForecasts: StockForecast[];
-  topProducts: StockForecast[];
-  aiRecommendations: string | null;
-  isLoading: boolean;
-  dataFetched: boolean;
-  lastFetchDate: Date | null;
-}
-
-// Interface for stock item
-interface StockItem {
-  id: string;
-  productName: string;
-  currentStock: number;
-  stockLevel: number;
-  avgWeeklyUsage: number;
-  stockCoverageWeeks: number;
-  reorderLevel: number;
-  status: "ok" | "warning" | "critical";
-  price: number;
-  cost: number;
-  unit: string;
-  profitContribution: number;
-  projectedStockouts: string | null;
-}
-
-// Interface for stock forecast
-interface StockForecast extends StockItem {
-  totalRevenue: number;
-  totalProfit: number;
-}
-
 export const useStockStore = defineStore("stock", {
   state: (): StockState => ({
     stockItems: [],
@@ -65,14 +92,18 @@ export const useStockStore = defineStore("stock", {
   }),
 
   getters: {
-    getStockItems: (state) => state.stockItems,
-    getTopProducts: (state) => state.topProducts,
-    getAiRecommendations: (state) => state.aiRecommendations,
-    isDataFetched: (state) => state.dataFetched
+    getStockItems: (state): StockItem[] => state.stockItems,
+    getTopProducts: (state): StockForecast[] => state.topProducts,
+    getAiRecommendations: (state): string | null => state.aiRecommendations,
+    isDataFetched: (state): boolean => state.dataFetched
   },
 
   actions: {
-    async fetchStockData() {
+    /**
+     * Fetches stock data by analyzing orders and products
+     * @returns Array of stock items or empty array if failed
+     */
+    async fetchStockData(): Promise<StockItem[]> {
       const { $dayjs } = useNuxtApp();
       $dayjs.extend(weekOfYear);
 
@@ -167,9 +198,15 @@ export const useStockStore = defineStore("stock", {
       }
     },
 
-    calculateProductUsage(orders: any, products: any) {
+    /**
+     * Calculates product usage statistics from orders data
+     * @param orders Array of order documents
+     * @param products Array of product documents
+     * @returns Record of product usage statistics
+     */
+    calculateProductUsage(orders: any[], products: any[]): Record<string, ProductUsage> {
       const { $dayjs } = useNuxtApp();
-      const productUsage: any = {};
+      const productUsage: Record<string, ProductUsage> = {};
 
       // Initialize product usage data
       products.forEach((product: any) => {
@@ -217,7 +254,7 @@ export const useStockStore = defineStore("stock", {
       });
 
       // Calculate average weekly usage
-      Object.values(productUsage).forEach((product: any) => {
+      Object.values(productUsage).forEach((product) => {
         const weeksCount = Object.keys(product.usageByWeek).length || 1;
         product.avgWeeklyUsage = product.totalUsage / weeksCount;
       });
@@ -225,9 +262,15 @@ export const useStockStore = defineStore("stock", {
       return productUsage;
     },
 
-    calculateStockForecasts(productUsage: any, products: any) {
-      const stockForecasts: Array<any> = [];
-      const totalProfit: any = Object.values(productUsage).reduce((sum, product: any) => sum + product.totalProfit, 0);
+    /**
+     * Calculates stock forecasts based on product usage and current inventory
+     * @param productUsage Record of product usage statistics
+     * @param products Array of product documents
+     * @returns Array of stock forecasts
+     */
+    calculateStockForecasts(productUsage: Record<string, ProductUsage>, products: any[]): StockForecast[] {
+      const stockForecasts: StockForecast[] = [];
+      const totalProfit: number = Object.values(productUsage).reduce((sum, product) => sum + product.totalProfit, 0);
 
       products.forEach((product: any) => {
         if (!product.isAvailable) return;
@@ -247,7 +290,7 @@ export const useStockStore = defineStore("stock", {
         const reorderLevel = Math.ceil(avgWeeklyUsage * 1);
 
         // Determine stock status
-        let status = "ok";
+        let status: StockStatus = "ok";
         if (stockCoverageWeeks < 1) {
           status = "critical";
         } else if (stockCoverageWeeks < 2) {
@@ -268,14 +311,21 @@ export const useStockStore = defineStore("stock", {
           reorderCost: parseFloat(product.cost) * reorderLevel,
           unit: product.unit || "unidad",
           profitContribution: Math.round(profitContribution * 10) / 10, // Round to 1 decimal
-          projectedStockouts: currentStock < avgWeeklyUsage ? "Esta semana" : null
+          projectedStockouts: currentStock < avgWeeklyUsage ? "Esta semana" : null,
+          totalRevenue: usage.totalRevenue,
+          totalProfit: usage.totalProfit
         });
       });
 
       return stockForecasts;
     },
 
-    calculateTopProducts(stockForecasts: any) {
+    /**
+     * Calculates top products by profit contribution
+     * @param stockForecasts Array of stock forecasts
+     * @returns Array of top products
+     */
+    calculateTopProducts(stockForecasts: StockForecast[]): StockForecast[] {
       // Sort products by profit contribution (highest first)
       const sortedProducts = [...stockForecasts].sort((a, b) => b.profitContribution - a.profitContribution);
 
@@ -291,7 +341,7 @@ export const useStockStore = defineStore("stock", {
 
       // Get top products that contribute to 80% of profit
       return productsWithCumulative
-        .filter((product) => product.cumulativeProfit <= 80)
+        .filter((product) => product.cumulativeProfit! <= 80)
         .sort((a, b) => {
           // First by status
           if (a.status !== b.status) {
@@ -305,13 +355,18 @@ export const useStockStore = defineStore("stock", {
         });
     },
 
-    async generateAiRecommendations(stockForecasts: any, products: any) {
+    /**
+     * Generates AI recommendations based on stock data
+     * @param stockForecasts Array of stock forecasts
+     * @param products Array of product documents
+     */
+    async generateAiRecommendations(stockForecasts: StockForecast[], products: any[]): Promise<void> {
       // In a real implementation, you might call an AI service or use a more sophisticated algorithm
       // For now, we'll generate simple recommendations based on stock levels
 
       try {
-        const criticalItems = stockForecasts.filter((item: any) => item.status === "critical");
-        const warningItems = stockForecasts.filter((item: any) => item.status === "warning");
+        const criticalItems = stockForecasts.filter((item) => item.status === "critical");
+        const warningItems = stockForecasts.filter((item) => item.status === "warning");
         const topItems = this.calculateTopProducts(stockForecasts);
 
         let recommendationsText = "";
@@ -319,7 +374,7 @@ export const useStockStore = defineStore("stock", {
         // Critical items recommendations
         if (criticalItems.length > 0) {
           recommendationsText += "### Productos críticos que necesitan reabastecimiento:\n\n";
-          criticalItems.forEach((item: any) => {
+          criticalItems.forEach((item) => {
             recommendationsText += `- **${item.productName}**: Quedan ${item.stockLevel} ${item.unit}. Comprar al menos ${item.reorderLevel} ${item.unit}.\n`;
           });
           recommendationsText += "\n";
@@ -328,7 +383,7 @@ export const useStockStore = defineStore("stock", {
         // Warning items recommendations
         if (warningItems.length > 0) {
           recommendationsText += "### Productos con stock bajo para las próximas 2 semanas:\n\n";
-          warningItems.forEach((item: any) => {
+          warningItems.forEach((item) => {
             recommendationsText += `- **${item.productName}**: Quedan ${item.stockLevel} ${item.unit}, recomendamos comprar ${item.reorderLevel} ${item.unit} más.\n`;
           });
           recommendationsText += "\n";
@@ -337,7 +392,7 @@ export const useStockStore = defineStore("stock", {
         // Top products recommendations
         if (topItems.length > 0) {
           recommendationsText += "### Productos top que generan el 80% de las ganancias:\n\n";
-          topItems.slice(0, 5).forEach((item: any) => {
+          topItems.slice(0, 5).forEach((item) => {
             const profitMessage = `Contribuye al ${item.profitContribution}% de las ganancias.`;
             recommendationsText += `- **${item.productName}**: ${profitMessage} Mantén siempre stock de este producto.\n`;
           });
@@ -357,7 +412,12 @@ export const useStockStore = defineStore("stock", {
       }
     },
 
-    async reorderStock(productId: any) {
+    /**
+     * Handles reordering stock for a product
+     * @param productId ID of the product to reorder
+     * @returns Success status of the operation
+     */
+    async reorderStock(productId: string): Promise<boolean> {
       try {
         const product = this.stockItems.find((item) => item.id === productId);
         if (!product) {

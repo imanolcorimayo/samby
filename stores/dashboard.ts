@@ -2,19 +2,124 @@ import { defineStore } from "pinia";
 import { serverTimestamp, collection, query, where, getDocs, Timestamp } from "firebase/firestore";
 import { StockMovementType, ToastEvents, type StockMovement } from "~/interfaces";
 
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore"; // ES 2015
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // ES 2015
-import Stock from "~/pages/resumen/stock.vue";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
+// Interface for daily statistics
+interface DailyStats {
+  date: string;
+  dayName: string;
+  totalIncome: number;
+  totalEarnings: number;
+  earningsPercentage: number;
+  totalClients: number;
+  totalNewClients: number;
+  totalOrders: number;
+  productCosts: number;
+  costCeroExists: boolean;
+  totalCosts?: number; // Used internally during processing
+}
+
+// Interface for cost history entry
+interface CostHistoryEntry {
+  date: string;
+  cost: number;
+}
+
+// Interface for product cost variation
+interface ProductCostVariation {
+  productId: string;
+  productName: string;
+  firstCost: number;
+  lastCost: number;
+  absoluteChange: number;
+  percentageChange: number;
+  history: CostHistoryEntry[];
+}
+
+// Interface for individual product statistics
+interface ProductStats {
+  productId: string;
+  productName: string;
+  totalSold: number;
+  revenue: number;
+  cost: number;
+  profit: number;
+  orderCount: number;
+  orderFrequency: number | string; // Can be stored as string with percentage
+  stockOutsCount: number;
+  stockOutsFrequency: number | string; // Can be stored as string with percentage
+  currentStock: number;
+}
+
+// Interface for outstanding client data
+interface OutstandingClient {
+  clientId: string;
+  clientName: string;
+  orderCount: number;
+  totalSpent: number;
+  totalProducts: number;
+  averageOrderValue: number;
+  firstOrderDate: string | null;
+  orders: Array<any>; // Order details
+  isNew: boolean;
+}
+
+// Interface for client statistics
+interface ClientStats {
+  newClients: number;
+  repeatClients: number;
+  newClientPercentage: number;
+  repeatClientPercentage: number;
+  averageOrderValueAll: number;
+  averageOrderValueNew: number;
+  averageOrderValueRepeat: number;
+  averageProductsPerOrder: number;
+  outstandingClients: OutstandingClient[];
+}
+
+// Interface for weekly data summary
+interface WeeklyData {
+  totalIncome: number;
+  totalEarnings: number;
+  totalProductCosts: number;
+  totalNewClients: number;
+  averageOrderValue: number;
+  totalOrders: number;
+  dailyStats: DailyStats[];
+  productCostVariation: ProductCostVariation[];
+  startDate: string;
+  endDate: string;
+  productStats: ProductStats[];
+  clientStats: ClientStats;
+}
+
+// Interface for client cache entry
+interface ClientCacheEntry {
+  id: string;
+  createdAt?: Timestamp;
+  clientName?: string;
+  [key: string]: any; // Other client properties
+}
+
+// Interface for the store state
+interface DashboardState {
+  weeklyData: WeeklyData;
+  isLoading: boolean;
+  weeklyDataFetched: boolean;
+  clientsCache: Map<string, ClientCacheEntry>;
+}
+
+// Interface for prerequisites validation result
 interface Prerequisites {
   valid: boolean;
-  reason: any;
+  reason: string | null;
   user: any;
   businessId: any;
 }
 
 // Helper function to validate prerequisites
-function validatePrerequisites() {
+function validatePrerequisites(): Prerequisites {
   const user = useCurrentUser();
   const businessId = useLocalStorage("cBId", null);
 
@@ -29,45 +134,48 @@ function validatePrerequisites() {
   return { valid: true, user, businessId, reason: null };
 }
 
+// Create the default weekly data structure
+const defaultWeeklyData: WeeklyData = {
+  totalIncome: 0,
+  totalEarnings: 0,
+  totalProductCosts: 0,
+  totalNewClients: 0,
+  averageOrderValue: 0,
+  totalOrders: 0,
+  dailyStats: [],
+  productCostVariation: [],
+  startDate: "",
+  endDate: "",
+  productStats: [],
+  clientStats: {
+    newClients: 0,
+    repeatClients: 0,
+    newClientPercentage: 0,
+    repeatClientPercentage: 0,
+    averageOrderValueAll: 0,
+    averageOrderValueNew: 0,
+    averageOrderValueRepeat: 0,
+    averageProductsPerOrder: 0,
+    outstandingClients: []
+  }
+};
+
 export const useDashboardStore = defineStore("dashboard", {
-  state: () => ({
-    weeklyData: {
-      totalIncome: 0,
-      totalEarnings: 0,
-      totalProductCosts: 0,
-      totalNewClients: 0,
-      averageOrderValue: 0,
-      totalOrders: 0,
-      dailyStats: [],
-      productCostVariation: [],
-      startDate: "",
-      endDate: "",
-      productStats: [],
-      clientStats: {
-        newClients: 0,
-        repeatClients: 0,
-        newClientPercentage: 0,
-        repeatClientPercentage: 0,
-        averageOrderValueAll: 0,
-        averageOrderValueNew: 0,
-        averageOrderValueRepeat: 0,
-        averageProductsPerOrder: 0,
-        outstandingClients: []
-      }
-    },
+  state: (): DashboardState => ({
+    weeklyData: { ...defaultWeeklyData },
     isLoading: false,
     weeklyDataFetched: false,
-    clientsCache: new Map() // Used to track all clients for detecting new ones
+    clientsCache: new Map<string, ClientCacheEntry>()
   }),
 
   getters: {
-    getWeeklyData: (state) => state.weeklyData,
-    isWeeklyDataFetched: (state) => state.weeklyDataFetched,
-    getLoadingState: (state) => state.isLoading
+    getWeeklyData: (state): WeeklyData => state.weeklyData,
+    isWeeklyDataFetched: (state): boolean => state.weeklyDataFetched,
+    getLoadingState: (state): boolean => state.isLoading
   },
 
   actions: {
-    async fetchWeeklyRecap(startDate: any, endDate: any) {
+    async fetchWeeklyRecap(startDate: string, endDate: string): Promise<WeeklyData | null> {
       const { $dayjs } = useNuxtApp();
       const productsStore = useProductsStore();
       await productsStore.fetchData();
@@ -91,7 +199,7 @@ export const useDashboardStore = defineStore("dashboard", {
       // Validate prerequisites
       const prereq: Prerequisites = validatePrerequisites();
       if (!prereq.valid) {
-        useToast(ToastEvents.error, prereq.reason);
+        useToast(ToastEvents.error, prereq.reason as string);
         return null;
       }
 
@@ -105,8 +213,8 @@ export const useDashboardStore = defineStore("dashboard", {
         const startDateTime = $dayjs(formattedStartDate).startOf("day").toDate();
         const endDateTime = $dayjs(formattedEndDate).endOf("day").toDate();
 
-        // Initialize weekly data structure
-        const weeklyDataInit: any = {
+        // Initialize weekly data structure with proper typing
+        const weeklyDataInit: WeeklyData = {
           totalIncome: 0,
           totalEarnings: 0,
           totalProductCosts: 0,
@@ -117,7 +225,7 @@ export const useDashboardStore = defineStore("dashboard", {
           productCostVariation: [],
           startDate: formattedStartDate,
           endDate: formattedEndDate,
-          productsStats: [],
+          productStats: [],
           clientStats: {
             newClients: 0,
             repeatClients: 0,
@@ -132,10 +240,10 @@ export const useDashboardStore = defineStore("dashboard", {
         };
 
         // Structure to track daily data
-        const dailyData: any = {};
+        const dailyData: Record<string, DailyStats> = {};
 
         // Create a day-by-day list of dates in the range
-        const days = [];
+        const days: string[] = [];
         let currentDay = $dayjs(formattedStartDate);
         const lastDay = $dayjs(formattedEndDate);
 
@@ -154,7 +262,8 @@ export const useDashboardStore = defineStore("dashboard", {
             totalNewClients: 0,
             totalOrders: 0,
             productCosts: 0,
-            costCeroExists: false
+            costCeroExists: false,
+            totalCosts: 0
           };
 
           currentDay = currentDay.add(1, "day");
@@ -170,7 +279,7 @@ export const useDashboardStore = defineStore("dashboard", {
         );
 
         const ordersSnapshot = await getDocs(ordersQuery);
-        const orders: any = ordersSnapshot.docs.map((doc) => {
+        const orders: any[] = ordersSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             ...data,
@@ -180,14 +289,14 @@ export const useDashboardStore = defineStore("dashboard", {
         });
 
         // Order ids
-        const orderIds = orders.map((el: any) => el.id);
+        const orderIds: string[] = orders.map((el: any) => el.id);
 
         // Client tracking sets
-        const allClientsInPeriod = new Set();
+        const allClientsInPeriod = new Set<string>();
 
         // Fetch appropriate cost data based on mode
-        let productCosts: any = [];
-        let stockMovements: any = [];
+        let productCosts: any[] = [];
+        let stockMovements: any[] = [];
 
         if (useLegacyLogic) {
           // 3. Fetch product costs for the date range using legacy method
@@ -210,7 +319,7 @@ export const useDashboardStore = defineStore("dashboard", {
         } else {
           // Split the orderIds array into chunks of maximum 30 items
           const chunkSize = 30;
-          const orderIdChunks = [];
+          const orderIdChunks: string[][] = [];
           for (let i = 0; i < orderIds.length; i += chunkSize) {
             orderIdChunks.push(orderIds.slice(i, i + chunkSize));
           }
@@ -326,7 +435,7 @@ export const useDashboardStore = defineStore("dashboard", {
         }
 
         // Process cost data differently based on approach
-        const productCostHistory: any = {};
+        const productCostHistory: Record<string, CostHistoryEntry[]> = {};
 
         if (useLegacyLogic) {
           // Group product costs by day and product - legacy approach
@@ -401,7 +510,7 @@ export const useDashboardStore = defineStore("dashboard", {
         // 5. Calculate earnings based on income and costs
         days.forEach((day) => {
           const dayStats = dailyData[day];
-          const dayCosts = dayStats.totalCosts; // costsByDay[day] || 0;
+          const dayCosts = dayStats.totalCosts || 0;
 
           dayStats.productCosts = dayCosts;
           dayStats.totalEarnings = dayStats.totalIncome - dayCosts;
@@ -413,7 +522,7 @@ export const useDashboardStore = defineStore("dashboard", {
 
           // Add to weekly totals
           weeklyDataInit.totalIncome += dayStats.totalIncome;
-          weeklyDataInit.totalProductCosts += parseFloat(dayCosts || 0);
+          weeklyDataInit.totalProductCosts += parseFloat(dayCosts.toString() || "0");
         });
 
         // Calculate overall earnings
@@ -426,12 +535,12 @@ export const useDashboardStore = defineStore("dashboard", {
         }
 
         // 6. Analyze product cost variations
-        const productVariations: Array<any> = [];
+        const productVariations: ProductCostVariation[] = [];
 
-        Object.entries(productCostHistory).forEach(([productId, history]: any) => {
+        Object.entries(productCostHistory).forEach(([productId, history]: [string, CostHistoryEntry[]]) => {
           if (history.length >= 2) {
             // Sort by date
-            history.sort((a: any, b: any) => $dayjs(a.date).diff($dayjs(b.date)));
+            history.sort((a, b) => $dayjs(a.date).diff($dayjs(b.date)));
 
             const firstCost = history[0].cost;
             const lastCost = history[history.length - 1].cost;
@@ -474,7 +583,7 @@ export const useDashboardStore = defineStore("dashboard", {
         productVariations.sort((a, b) => Math.abs(b.percentageChange) - Math.abs(a.percentageChange));
 
         // 7. Track Product Data Individually
-        const productData = new Map();
+        const productData = new Map<string, ProductStats>();
 
         // Process orders to extract product information
         for (const order of orders) {
@@ -498,7 +607,7 @@ export const useDashboardStore = defineStore("dashboard", {
                 });
               }
 
-              const productStats = productData.get(productId);
+              const productStats = productData.get(productId)!;
               productStats.totalSold += product.quantity || 0;
               productStats.revenue += (product.price || 0) * (product.quantity || 0);
 
@@ -508,7 +617,6 @@ export const useDashboardStore = defineStore("dashboard", {
                 productStats.cost += (product.currentCost || 0) * (product.quantity || 0);
               } else {
                 // New approach - use actual cost from stock movements
-                // When calculating product costs from movements
                 const productMovements = stockMovements.filter(
                   (m: any) =>
                     m.productId === productId &&
@@ -578,14 +686,12 @@ export const useDashboardStore = defineStore("dashboard", {
         weeklyDataInit.productStats = Array.from(productData.values()).sort((a, b) => b.profit - a.profit);
 
         // Convert daily data to array and sort by date
-        weeklyDataInit.dailyStats = Object.values(dailyData).sort((a: any, b: any) =>
-          $dayjs(a.date).diff($dayjs(b.date))
-        );
+        weeklyDataInit.dailyStats = Object.values(dailyData).sort((a, b) => $dayjs(a.date).diff($dayjs(b.date)));
 
         weeklyDataInit.productCostVariation = productVariations.slice(0, 10); // Top 10 variations
 
         // Track client activity in the period
-        const clientActivity = new Map();
+        const clientActivity = new Map<string, OutstandingClient>();
 
         // Process orders to extract client information
         for (const order of orders) {
@@ -600,11 +706,12 @@ export const useDashboardStore = defineStore("dashboard", {
                 totalProducts: 0,
                 averageOrderValue: 0,
                 firstOrderDate: null,
-                orders: []
+                orders: [],
+                isNew: false
               });
             }
 
-            const client = clientActivity.get(order.clientId);
+            const client = clientActivity.get(order.clientId)!;
             client.orderCount++;
             client.totalSpent += order.totalAmount || 0;
 
@@ -624,12 +731,12 @@ export const useDashboardStore = defineStore("dashboard", {
         }
 
         // Identify new vs. repeat clients
-        const newClientsInPeriod = [];
-        const repeatClientsInPeriod = [];
+        const newClientsInPeriod: OutstandingClient[] = [];
+        const repeatClientsInPeriod: OutstandingClient[] = [];
 
         // Check if clients had orders before this period
         for (const [clientId, clientData] of clientActivity) {
-          // Use your cached client data to determine if this client is new
+          // Use cached client data to determine if this client is new
           const client = this.clientsCache.get(clientId);
           const creationDate = client?.createdAt ? $dayjs(client.createdAt.toDate()).format("YYYY-MM-DD") : null;
 
@@ -639,9 +746,11 @@ export const useDashboardStore = defineStore("dashboard", {
             $dayjs(creationDate).isSameOrBefore(formattedEndDate);
 
           if (isNew) {
-            newClientsInPeriod.push({ ...clientData, isNew: true });
+            clientData.isNew = true;
+            newClientsInPeriod.push(clientData);
           } else {
-            repeatClientsInPeriod.push({ ...clientData, isNew: false });
+            clientData.isNew = false;
+            repeatClientsInPeriod.push(clientData);
           }
         }
 
@@ -664,7 +773,7 @@ export const useDashboardStore = defineStore("dashboard", {
         const avgOrderValueRepeat = repeatClientOrders > 0 ? repeatClientSpend / repeatClientOrders : 0;
 
         // Calculate average products per order
-        const totalProductCount = orders.reduce((sum: any, order: any) => sum + (order.products?.length || 0), 0);
+        const totalProductCount = orders.reduce((sum: number, order: any) => sum + (order.products?.length || 0), 0);
         const avgProductsPerOrder = orders.length > 0 ? totalProductCount / orders.length : 0;
 
         // Find outstanding clients (sort by total spent)
@@ -701,30 +810,7 @@ export const useDashboardStore = defineStore("dashboard", {
 
     resetWeeklyData() {
       this.weeklyDataFetched = false;
-      this.weeklyData = {
-        totalIncome: 0,
-        totalEarnings: 0,
-        totalProductCosts: 0,
-        totalNewClients: 0,
-        averageOrderValue: 0,
-        totalOrders: 0,
-        dailyStats: [],
-        productCostVariation: [],
-        startDate: "",
-        endDate: "",
-        productStats: [],
-        clientStats: {
-          newClients: 0,
-          repeatClients: 0,
-          newClientPercentage: 0,
-          repeatClientPercentage: 0,
-          averageOrderValueAll: 0,
-          averageOrderValueNew: 0,
-          averageOrderValueRepeat: 0,
-          averageProductsPerOrder: 0,
-          outstandingClients: []
-        }
-      };
+      this.weeklyData = { ...defaultWeeklyData };
     }
   }
 });
