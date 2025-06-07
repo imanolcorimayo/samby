@@ -334,4 +334,212 @@ roles/{document-id}/
 - Point-in-time recovery capabilities
 - Data export functionality
 
+## Project Structure & Page Architecture
+
+### Frontend Architecture
+
+The application follows a structured Nuxt 3 architecture with clear separation of concerns:
+
+```
+├── pages/                   # Route-based page components
+├── components/              # Reusable UI components
+├── stores/                  # Pinia state management
+├── composables/             # Reusable composition functions
+├── middleware/              # Route middleware (authentication)
+├── layouts/                 # Page layout templates
+├── plugins/                 # Third-party integrations
+├── utils/                   # Utility functions
+└── interfaces/              # TypeScript type definitions
+```
+
+### Page Structure & Navigation Flow
+
+#### Authentication Flow
+
+- **`pages/welcome.vue`** - Landing/login page for user authentication
+- **`pages/negocios/index.vue`** - Business selection for multi-business users
+- **`pages/empleados.vue`** - Employee access management and invitation system
+- **`pages/blocked.vue`** - Access restriction page for unauthorized users
+
+#### Dashboard & Overview
+
+- **`pages/resumen/dashboard.vue`** - Main business dashboard
+  - Key performance metrics display
+  - Recent orders summary
+  - Low stock alerts
+  - Daily sales overview
+  - Quick action buttons
+
+#### Inventory Management
+
+- **`pages/inventario/index.vue`** - Product catalog and inventory overview
+
+  - Product list with search and filtering
+  - Stock level indicators
+  - Category-based organization
+  - Bulk actions for products
+
+- **`pages/inventario/nuevo.vue`** - Product creation and editing
+
+  - Product information forms
+  - Image upload functionality
+  - Pricing and cost configuration
+  - Category assignment
+
+- **`pages/resumen/stock.vue`** - Stock analysis and forecasting
+
+  - Stock level analytics
+  - Usage pattern analysis
+  - Reorder recommendations
+  - Historical stock data
+
+- **`pages/resumen/movimientos-stock.vue`** - Stock movement tracking
+  - Movement history log
+  - Stock adjustment forms
+  - Supplier-based filtering
+  - Cost impact analysis
+
+#### Order Management System
+
+- **`pages/pedidos/index.vue`** - Order list and management hub
+
+  - Active and historical orders
+  - Status-based filtering
+  - Search functionality
+  - Bulk order operations
+
+- **`pages/pedidos/nuevo.vue`** - Order creation interface
+
+  - Product selection with stock validation
+  - Client assignment and management
+  - Shipping option configuration
+  - Real-time total calculation
+
+- **`pages/pedidos/carrito.vue`** - Shopping cart functionality
+
+  - Order item management
+  - Quantity adjustments
+  - Shipping calculations
+  - Order review before confirmation
+
+- **`pages/pedidos/confirmado.vue`** - Order confirmation page
+
+  - Order summary display
+  - Payment confirmation
+  - Delivery scheduling
+  - Order tracking information
+
+- **`pages/pedidos/[orderId].vue`** - Detailed order view
+  - Complete order information
+  - Status tracking timeline
+  - Delivery management
+  - Order modification capabilities
+
+#### Client Relationship Management
+
+- **`pages/clientes/index.vue`** - Client database and list view
+
+  - Client search and filtering
+  - Geographic grouping options
+  - Contact management
+  - Client performance metrics
+
+- **`pages/clientes/nuevo.vue`** - New client registration
+
+  - Contact information forms
+  - Address and location mapping
+  - EmprendeVerde integration
+  - Client categorization
+
+- **`pages/clientes/[clientId].vue`** - Individual client profile
+
+  - Complete client information
+  - Order history analysis
+  - Geographic location details
+  - Personalized recommendations
+
+- **`pages/resumen/map.vue`** - Geographic client distribution
+  - Interactive map visualization
+  - Client location clustering
+  - Delivery route optimization
+  - Zone-based analytics
+
+### Component Architecture
+
+#### Specialized Components
+
+- **`components/business/BusinessNewAndUpdate.vue`** - Business profile management
+- **`components/clients/ClientsDetails.vue`** - Client information display
+- **`components/employee/EmployeeNewAndUpdate.vue`** - Employee management forms
+- **`components/orders/OrdersDetails.vue`** - Order information display
+- **`components/orders/OrdersStockDetails.vue`** - Stock impact analysis for orders
+- **`components/products/ProductsDetails.vue`** - Product information display
+- **`components/products/ProductsEditStock.vue`** - Stock editing interface
+
+#### Utility Components
+
+- **`components/Autocomplete.vue`** - Search and selection functionality
+- **`components/ConfirmDialogue.vue`** - Action confirmation dialogs
+- **`components/ModalStructure.vue`** - Reusable modal framework
+- **`components/Loader.vue`** - Loading state indicators
+- **`components/Tooltip.vue`** - Contextual help tooltips
+
+### State Management (Pinia Stores)
+
+The application uses Pinia for centralized state management with domain-specific stores:
+
+- **`stores/products.ts`** - Product catalog and inventory state
+- **`stores/clients.ts`** - Client database and relationship management
+- **`stores/orders.ts`** - Order processing and status management
+- **`stores/dashboard.ts`** - Dashboard metrics and analytics
+- **`stores/stock.ts`** - Stock movement and level tracking
+- **`stores/zones.ts`** - Geographic zone and delivery management
+
+### Data Processing & Analytics
+
+#### Scripts & Utilities
+
+The `/scripts` directory contains specialized data processing tools:
+
+- **Geographic Processing**: Client location analysis and zone mapping
+- **Cost Analysis**: Daily product cost tracking and profit calculations
+- **Migration Tools**: Database schema updates and data transformations
+- **Report Generation**: Analytics and business intelligence reports
+- **AI Integration**: Gemini AI for recommendations and insights
+
+#### Key Processing Scripts
+
+- `create-daily-product-ranking.js` - Product performance analytics
+- `neighborhood-and-clients.js` - Geographic client distribution analysis
+- `manage-cordoba-coordinates.js` - Location-based client mapping
+- `reports/details-per-zone.js` - Zone-based performance reporting
+
+### Integration & Plugins
+
+#### Third-Party Integrations
+
+- **`plugins/leafletMap.client.js`** - Interactive mapping functionality
+- **`plugins/turf.client.js`** - Geospatial analysis capabilities
+- **Firebase Integration** - Authentication, database, and storage
+- **FormKit** - Advanced form handling and validation
+
+#### Geographic Data
+
+- **`public/barrios.json`** - Neighborhood boundary definitions
+- **Zone Mapping** - Client-to-neighborhood assignment system
+- **Delivery Optimization** - Route planning and geographic analytics
+
+### User Experience Flow
+
+1. **Authentication** → Business Selection → Role Assignment
+2. **Dashboard** → Overview → Quick Actions → Detailed Views
+3. **Order Processing** → Product Selection → Client Assignment → Confirmation
+4. **Inventory Management** → Stock Monitoring → Reorder Alerts → Supplier Management
+5. **Client Management** → Geographic Analysis → Targeted Marketing → Relationship Building
+6. **Analytics** → Performance Metrics → Business Intelligence → Strategic Planning
+
+This comprehensive architecture supports scalable business operations while maintaining clear separation between different functional areas, enabling efficient development and maintenance of the platform.
+
+## Conclusion
+
 This system provides a robust foundation for small business operations, combining modern web technologies with comprehensive business management features to support growth and operational efficiency.
