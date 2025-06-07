@@ -1,29 +1,39 @@
-import { getIdTokenResult } from "firebase/auth";
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, orderBy } from "firebase/firestore";
 import { ToastEvents } from "~/interfaces";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  // If going to /welcome or blocked just continue
-  // process.server should never be activated since ssr was set to false
-  if (to.path.includes("/welcome") || to.path.includes("/blocked") || process.server) return;
+  // Define public routes that don't require authentication
+  const publicRoutes = [
+    "/", // Landing page
+    "/features", // Feature pages
+    "/precios", // Subscription plans
+    "/nosotros", // Company information
+    "/contact", // Contact forms
+    "/blog", // Blog/resources
+    "/welcome", // Login page (to be renamed to /login eventually)
+    "/blocked" // Access restriction page
+  ];
 
-  // If going to the home page, always redirect to /pedidos
-  if (to.path === "/") return navigateTo("/pedidos");
+  // Check if the current route is a public route
+  // Also check for nested routes like /features/inventory
+  const isPublicRoute = publicRoutes.some((route) => to.path === route || to.path.startsWith(`${route}/`));
+
+  // Allow access to public routes without authentication
+  if (isPublicRoute || import.meta.server) return;
 
   const user = await getCurrentUser();
   const indexStore = useIndexStore();
 
-  // Redirect to sign-in
+  // Redirect to sign-in for private routes without authentication
   if (!user) {
     return navigateTo({
-      path: "/welcome",
+      path: "/welcome", // Will become /login in the future
       query: {
         redirect: to.fullPath
       }
     });
   }
 
-  // Business id, if not found redirect to /negocios
+  // Only enforce business selection for non-public pages
   const businessId = useLocalStorage("cBId", null);
   if (to.path !== "/negocios" && !businessId.value) {
     return navigateTo("/negocios");
@@ -41,8 +51,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       return navigateTo("/negocios");
     }
 
-    // Allowed routed to navigate for non admin users
-    const allowedRoutes = ["/pedidos", "/blocked", "/404", "/negocios", "/"];
+    // Routes accessible to both owners and employees
+    const allowedRoutes = ["/pedidos", "/blocked", "/404", "/negocios"];
 
     if (userRole === "propietario" || allowedRoutes.includes(to.path)) {
       return;
