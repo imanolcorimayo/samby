@@ -7,9 +7,9 @@
             <span class="font-bold text-xl">Detalles del pedido</span>
           </div>
           <div class="flex flex-col cursor-pointer w-full">
-            <NuxtLink :to="`/pedidos/${currentOrder.id}`">
-              <span class="text-xs text-gray-500">Pedido id: {{ currentOrder.id }}</span>
-            </NuxtLink>
+            <!-- <NuxtLink :to="`/pedidos/${currentOrder.id}`"> -->
+            <span class="text-xs text-gray-500">Pedido id: {{ currentOrder.id }}</span>
+            <!-- </NuxtLink> -->
           </div>
         </div>
         <span

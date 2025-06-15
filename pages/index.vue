@@ -11,8 +11,8 @@
                 Control total de tu <span class="text-primary">inventario</span> y ventas
               </h1>
               <p class="text-xl text-gray-700 mb-8">
-                Administrá tu negocio con la plataforma más completa de Argentina. Seguimiento de stock en tiempo real,
-                análisis de costos y optimización de ganancias.
+                Administrá tu negocio con una plataforma mas moderna y fácil de usar. Seguimiento de stock en tiempo
+                real, análisis de costos y optimización de ganancias.
               </p>
               <div class="flex flex-col sm:flex-row gap-4">
                 <button @click="startFreeTrial" class="btn bg-primary text-white font-semibold px-6 py-3 rounded-lg">

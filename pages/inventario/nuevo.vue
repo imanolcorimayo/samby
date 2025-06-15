@@ -20,7 +20,7 @@
       />
       <img class="w-[20rem] h-[20rem] rounded-lg" v-else :src="imageUrl" alt="Pre-visualización de la imagen" />
       <button @click="openProductUploadWidget" type="button" class="flex gap-1 btn bg-secondary h-fit items-center">
-        Elejir imagen
+        Elegir imagen
         <span class="text-sm font-medium">(Opcional)</span>
       </button>
     </div>

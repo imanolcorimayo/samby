@@ -277,12 +277,8 @@
         </div>
 
         <div v-else class="flex flex-col gap-3">
-          <div
-            v-for="order in filteredOrders"
-            :key="order.id"
-            class="border rounded-md p-3 hover:bg-gray-50"
-            @click="navigateToOrder(order.id)"
-          >
+          <div v-for="order in filteredOrders" :key="order.id" class="border rounded-md p-3 hover:bg-gray-50">
+            <!-- @click="navigateToOrder(order.id)" -->
             <div class="flex justify-between items-start">
               <div class="flex flex-col">
                 <span class="font-medium">Pedido #{{ order.id.substring(0, 6) }}...</span>
