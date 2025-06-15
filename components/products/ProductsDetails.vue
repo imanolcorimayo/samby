@@ -3,22 +3,28 @@
     <template #header>
       <div class="flex flex-col gap-2 w-full">
         <div class="flex flex-col cursor-pointer w-full">
-          <span class="font-semibold text-xl">{{ currentProduct.productName }}</span>
-          <span class="text-gray-500" v-if="currentProduct.description">{{ currentProduct.description }}</span>
-          <span class="text-gray-500">Unidad: {{ currentProduct.unit }}</span>
+          <span class="font-semibold text-xl" v-if="isNewProduct">Nuevo producto</span>
+          <span class="font-semibold text-xl" v-else>{{ currentProduct.productName }}</span>
+          <span class="text-gray-500" v-if="!isNewProduct && currentProduct.description">{{
+            currentProduct.description
+          }}</span>
+          <span class="text-gray-500" v-if="!isNewProduct">Unidad: {{ currentProduct.unit }}</span>
         </div>
-        <div class="flex flex-col cursor-pointer w-full">
+        <div class="flex flex-col cursor-pointer w-full" v-if="!isNewProduct">
           <span class="text-xs text-gray-500">Producto id: {{ currentProduct.id }}</span>
         </div>
+        <p class="text-gray-600" v-if="isNewProduct">
+          Los productos cargados van a listarse para ser usados a la hora de cargar ventas
+        </p>
       </div>
     </template>
     <template #default>
       <FormKit
         type="form"
-        id="product-modify"
+        id="product-form"
         :form-class="`flex flex-col gap-4 w-full ${submitted ? 'hidden' : ''}`"
-        submit-label="Nuevo Producto"
-        @submit="updateProduct"
+        :submit-label="isNewProduct ? 'Agregar' : 'Modificar'"
+        @submit="handleSubmit"
         :actions="false"
       >
         <div class="flex flex-col items-start sm:flex-row sm:items-end gap-4">
@@ -84,13 +90,39 @@
             v-model="form.step"
           />
         </div>
+        <div class="flex items-start justify-start gap-4" v-if="isNewProduct">
+          <FormKit
+            type="number"
+            name="finalProductStock"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            input-class="w-full"
+            outer-class="w-full flex-1"
+            label="Cantidad de stock (opcional)"
+            placeholder="Ej: 7500"
+            validation="numeric"
+            v-model="form.productStock"
+          />
+          <FormKit
+            type="number"
+            name="finalCost"
+            label-class="font-medium"
+            messages-class="text-red-500 text-[0.75rem]"
+            input-class="w-full"
+            outer-class="w-full flex-1"
+            label="Costo por unidad (opcional)"
+            placeholder="Costo al que compraste el producto por unidad"
+            validation="numeric"
+            v-model="form.cost"
+          />
+        </div>
         <FormKit
           type="number"
           name="price"
           label-class="font-medium"
           messages-class="text-red-500 text-[0.75rem]"
           input-class="w-full"
-          outer-class="w-full flex-1"
+          :outer-class="isNewProduct ? 'w-full' : 'w-full flex-1'"
           label="Precio de venta por unidad"
           placeholder="Ej: 7500"
           validation="required|numeric|min:1"
@@ -154,20 +186,49 @@
           </div>
         </div>
       </FormKit>
+
+      <!-- Success message when a new product is created -->
+      <div v-if="submitted && isNewProduct" class="w-full flex flex-col gap-[2rem] flex-1 min-h-full justify-center">
+        <div class="flex flex-col items-center gap-[1rem]">
+          <IconParkOutlineCheckOne class="text-[3rem] text-success" />
+          <span class="text-[2rem] font-semibold">¡Nuevo Producto Cargado!</span>
+        </div>
+        <div class="flex flex-col gap-4">
+          <span class="text-[1.143rem] text-gray-600 text-center">
+            Ahora este producto va a ser listado a la hora de cargar una venta
+          </span>
+          <div class="flex flex-col gap-3">
+            <button @click="resetForm" class="btn bg-primary text-white">Agregar Otro Producto</button>
+            <button @click="closeModalAndGoTo('/')" class="btn bg-secondary w-full text-center ring-1 ring-gray-300">
+              Menu
+            </button>
+            <button
+              @click="closeModalAndGoTo('/inventario')"
+              class="btn bg-secondary w-full text-center ring-1 ring-gray-300"
+            >
+              Ver productos
+            </button>
+          </div>
+        </div>
+      </div>
     </template>
     <template #footer>
       <div v-if="submitting" class="btn bg-secondary border text-center">loading...</div>
       <FormKit
-        v-else
+        v-else-if="!submitted"
         type="submit"
-        form="product-modify"
-        label="Modificar"
-        input-class="btn bg-secondary border text-center hover:bg-gray-200 hover:ring-2 hover:ring-gray-500 w-full"
+        form="product-form"
+        :label="isNewProduct ? 'Agregar' : 'Modificar'"
+        :input-class="
+          isNewProduct
+            ? 'btn bg-primary text-white text-center w-full'
+            : 'btn bg-secondary border text-center hover:bg-gray-200 hover:ring-2 hover:ring-gray-500 w-full'
+        "
       />
 
       <div v-if="submitting" class="btn bg-danger text-white text-nowrap">loading...</div>
       <button
-        v-else
+        v-if="!isNewProduct && !submitted"
         @click="deleteProduct()"
         class="flex items-center justify-center gap-2 btn bg-danger text-white text-nowrap hover:ring-2 hover:ring-red-500"
       >
@@ -182,6 +243,10 @@
 <script setup>
 import { ToastEvents } from "~/interfaces";
 import TablerTrash from "~icons/tabler/trash";
+import IconParkOutlineCheckOne from "~icons/icon-park-outline/check-one";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 // ----- Define Pinia Vars -----
 const productsStore = useProductsStore();
@@ -189,7 +254,9 @@ const { getProducts: products, areProductsFetched, getCurrentProductImage } = st
 
 // ----- Define Vars -----
 const submitting = ref(false);
-const currentProduct = ref(null);
+const submitted = ref(false);
+const isNewProduct = ref(false);
+const currentProduct = ref({});
 const form = ref({
   productName: "",
   description: "",
@@ -199,8 +266,10 @@ const form = ref({
   step: 0.5,
   price: 0,
   category: "otro",
-  isAvailable: false,
-  highlightProduct: false
+  isAvailable: true,
+  highlightProduct: false,
+  productStock: 0,
+  cost: 0
 });
 const imageUrl = ref("");
 
@@ -209,13 +278,62 @@ const mainModal = ref(null);
 const confirmDialogue = ref(null);
 
 // ----- Define Methods -----
-async function updateProduct() {
-  // Prevent multiple submits
-  if (submitting.value) {
-    return;
-  }
+function resetForm() {
+  submitted.value = false;
+  form.value = {
+    productName: "",
+    description: "",
+    imageUrl: null,
+    productImageId: null,
+    unit: "Kg",
+    step: 0.5,
+    price: 0,
+    category: "otro",
+    isAvailable: true,
+    highlightProduct: false,
+    productStock: 0,
+    cost: 0
+  };
+  imageUrl.value = "";
+}
+
+function closeModalAndGoTo(path) {
+  // Close modal
+  mainModal.value.closeModal();
+
+  // Navigate to path
+  router.push(path);
+}
+
+async function handleSubmit() {
+  // If submitting, return
+  if (submitting.value) return;
+
+  // Set submitting to avoid having multiple requests
   submitting.value = true;
 
+  if (isNewProduct.value) {
+    await createProduct();
+  } else {
+    await updateProduct();
+  }
+
+  submitting.value = false;
+}
+
+async function createProduct() {
+  // Add the product to the store
+  await productsStore.addProduct({
+    ...form.value,
+    imageUrl: imageUrl.value || null,
+    productImageId: productsStore.currentProductImage?.id || null
+  });
+
+  // Set submitted state
+  submitted.value = true;
+}
+
+async function updateProduct() {
   // Confirm dialogue
   const confirmed = await confirmDialogue.value.openDialog({ edit: true });
 
@@ -271,9 +389,8 @@ async function updateProduct() {
     return;
   }
 
-  // Clean currentProduct and submitting object
-  currentProduct.value = null;
-  submitting.value = false;
+  // Clean currentProduct
+  currentProduct.value = {};
 
   // Close modal
   mainModal.value.closeModal();
@@ -312,7 +429,7 @@ async function deleteProduct() {
   }
 
   // Clean currentProduct and submitting
-  currentProduct.value = null;
+  currentProduct.value = {};
   submitting.value = false;
 
   // Close modal
@@ -337,17 +454,19 @@ function openProductUploadWidget() {
         uploadPreset: "product_pic",
         sources: ["local", "camera"],
         cropping: true, // Optional: Enable cropping
-        croppingCoordinatesMode: "custom",
-        showSkipCropButton: false, // Makes cropping mandatory
         multiple: false, // Allow single upload only
         croppingAspectRatio: 1, // Forces a 1:1 aspect ratio for square crop
-        croppingDefaultSelection: "500x500", // Default crop size for selection
+        croppingDefaultSelection: isNewProduct.value ? "300x300" : "500x500", // Default crop size for selection
 
         clientAllowedFormats: ["png", "webp", "jpeg"], //restrict uploading to image files only
         maxImageFileSize: 1000000, //restrict file size to less than 1MB
-        maxImageWidth: 500, //Scales the image down to a width of 500 pixels before uploading
+        maxImageWidth: isNewProduct.value ? 300 : 500, //Scales the image down
         transformation: [
-          { width: 500, height: 500, crop: "fill" } // Ensures the image is 500x500
+          {
+            width: isNewProduct.value ? 300 : 500,
+            height: isNewProduct.value ? 300 : 500,
+            crop: "fill"
+          }
         ],
         return_delete_token: true
       },
@@ -380,7 +499,23 @@ function openProductUploadWidget() {
   }
 }
 
-const showModal = (productId) => {
+const showModal = (productId = null) => {
+  // Reset form and submitted state
+  resetForm();
+  submitted.value = false;
+
+  // Set the mode based on whether productId is provided
+  isNewProduct.value = productId === null;
+
+  if (isNewProduct.value) {
+    // If it's a new product, just show the modal with empty form
+    currentProduct.value = {};
+    mainModal.value.showModal();
+    return;
+  }
+
+  // Otherwise, load existing product
+
   // Check products are fetched
   if (!areProductsFetched.value) {
     useToast("error", "Parece que los productos no han sido cargados aún, por favor intenta nuevamente.");
@@ -424,13 +559,11 @@ const showModal = (productId) => {
   mainModal.value.showModal();
 };
 
-// ----- Define Hooks -----
-
 // ----- Define Expose -----
 defineExpose({ showModal });
 
+// Add the Cloudinary script
 useHead({
-  // Add the Cloudinary script
   script: [
     {
       src: "https://upload-widget.cloudinary.com/latest/global/all.js",

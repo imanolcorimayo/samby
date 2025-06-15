@@ -8,9 +8,9 @@
           <h1 class="text-start font-semibold">Inventario</h1>
           <span class="text-gray-600 text-sm">Agrega los productos con su cantidad y costo</span>
         </div>
-        <NuxtLink to="/inventario/nuevo" class="btn bg-primary text-white flex items-center"
-          ><IcRoundPlus class="text-[1.143rem]" /> Nuevo Producto
-        </NuxtLink>
+        <button @click="showNewProductModal" class="btn bg-primary text-white flex items-center">
+          <IcRoundPlus class="text-[1.143rem]" /> Nuevo Producto
+        </button>
       </div>
 
       <!-- KPI Cards -->
@@ -264,6 +264,13 @@ function showProductsDetails(id) {
   if (!productsDetails.value) return;
 
   productsDetails.value.showModal(id);
+}
+
+function showNewProductModal() {
+  // Check productsDetails is defined
+  if (!productsDetails.value) return;
+
+  productsDetails.value.showModal(); // Call without ID to indicate new product creation
 }
 
 function showEditStock(id) {
