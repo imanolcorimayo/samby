@@ -20,10 +20,10 @@
               to="/"
               class="flex-1 shrink-0 flex items-center space-x-3 rtl:space-x-reverse hover:bg-transparent no-hover"
             >
-              <img src="/img/logo-admin2.webp" class="w-16 rounded-lg" alt="Emprende Verde Admin Logo" />
+              <img src="/img/logo-admin2.webp" class="w-16 rounded-lg" alt="Samby Admin Logo" />
             </NuxtLink>
             <div class="flex flex-col justify-center gap-1">
-              <span class="text-lg text-nowrap font-medium text-gray-600">Emprende Verde</span>
+              <span class="text-lg text-nowrap font-medium text-gray-600">Samby</span>
               <span class="text-xs font-semibold text-gray-600">Administradores</span>
             </div>
           </div>

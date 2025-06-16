@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { collection, addDoc, query, where, getDocs, serverTimestamp, limit } from "firebase/firestore";
 import { watch } from "vue";
 
-type TestingGroup = "A" | "B" | "C";
+type TestingGroup = "A" | "B";
 
 interface ABTestingState {
   testingGroup: TestingGroup | null;
@@ -18,7 +18,7 @@ export const useABTestingStore = defineStore("abTesting", {
   actions: {
     // Assigns a random testing group
     assignRandomGroup(): TestingGroup {
-      const groups: TestingGroup[] = ["A", "B", "C"];
+      const groups: TestingGroup[] = ["A", "B"];
       return groups[Math.floor(Math.random() * groups.length)];
     },
 

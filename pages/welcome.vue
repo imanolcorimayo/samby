@@ -4,12 +4,16 @@
       class="container flex flex-col justify-center align-center gap-[2.857rem] h-[90vh] max-w-[80rem] px-[1.429rem] m-auto"
     >
       <div class="w-full flex justify-center align-center">
-        <PhXLogoDuotone class="w-[100px] h-auto" />
-        <!-- <img class="no-flex" src="/img/new-logo.png" alt="Logo Created With my.logomakr.com" width="200"> -->
+        <img
+          class="no-flex rounded-lg"
+          src="/img/logo-admin2.webp"
+          alt="Logo Created With my.logomakr.com"
+          width="200"
+        />
       </div>
       <div class="flex flex-col justify-center gap-[0.571rem] text-center">
         <h1>Bienvenido a Samby! 😎</h1>
-        <span class="text-gray-600 text-[1.143rem]">Inicia sesion para ver detalles de tu negocio</span>
+        <span class="text-gray-600 text-[1.143rem]">Inicia sesion para ver detalles o dar de alta tu negocio</span>
       </div>
       <div class="flex flex-col items-center">
         <button class="w-full max-w-80 btn bg-primary text-white" @click="googleSignIn">

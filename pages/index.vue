@@ -7,7 +7,7 @@
         <div class="container mx-auto px-4">
           <div class="flex flex-col lg:flex-row items-center gap-12 w-full">
             <div class="lg:w-1/2">
-              <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+              <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 text-start">
                 Control total de tu <span class="text-primary">inventario</span> y ventas
               </h1>
               <p class="text-xl text-gray-700 mb-8">
@@ -24,7 +24,7 @@
               </div>
             </div>
             <div class="lg:w-1/2">
-              <!-- <img src="/img/inventory-dashboard.webp" alt="Dashboard de inventario" class="rounded-lg shadow-xl" /> -->
+              <img src="/img/home-service.png" alt="Dashboard de inventario" class="rounded-lg shadow-xl" />
             </div>
           </div>
         </div>
@@ -116,8 +116,7 @@
         <div class="container mx-auto px-4 text-center">
           <h2 class="text-3xl font-bold mb-6">¿Listo para transformar tu negocio?</h2>
           <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-            Únete a cientos de negocios en Argentina que ya optimizaron su gestión de inventario y aumentaron sus
-            ganancias.
+            Únete a negocios en Argentina que ya optimizaron su gestión de inventario y finanzas.
           </p>
           <button @click="startFreeTrial" class="btn bg-primary text-white font-semibold py-3 px-8 rounded-lg">
             Comenzar ahora
@@ -133,7 +132,7 @@
         <div class="container mx-auto px-4">
           <div class="flex flex-col lg:flex-row-reverse items-center gap-12">
             <div class="lg:w-1/2">
-              <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+              <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 text-start">
                 Potencia la relación con tus <span class="text-primary">clientes</span>
               </h1>
               <p class="text-xl text-gray-700 mb-8">
@@ -150,7 +149,7 @@
               </div>
             </div>
             <div class="lg:w-1/2">
-              <!-- <img src="/img/client-map.webp" alt="Mapa de clientes" class="rounded-lg shadow-xl" /> -->
+              <img src="/img/home-clients.png" alt="Mapa de clientes" class="rounded-lg shadow-xl" />
             </div>
           </div>
         </div>
@@ -168,7 +167,7 @@
               </div>
               <h3 class="text-xl font-semibold mb-2">Mapeo geográfico</h3>
               <p class="text-gray-600">
-                Optimizá rutas de entrega y analizá la distribución geográfica de tus clientes.
+                Visualizá las posiciones de entrega y analizá la distribución geográfica de tus clientes.
               </p>
             </div>
 
@@ -252,134 +251,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Landing page variant C: Analytics & Financial focus -->
-    <div v-if="testingGroup === 'C'" class="min-h-screen">
-      <!-- Hero Section -->
-      <div class="bg-gradient-to-b from-primary/10 to-white pt-16 pb-24">
-        <div class="container mx-auto px-4">
-          <div class="flex flex-col lg:flex-row items-center gap-12 w-full">
-            <div class="lg:w-1/2">
-              <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-                Decisiones basadas en <span class="text-primary">datos reales</span>
-              </h1>
-              <p class="text-xl text-gray-700 mb-8">
-                Potenciá tu negocio con análisis avanzados. Monitoreá ventas, costos y ganancias con paneles intuitivos
-                y reportes detallados en tiempo real.
-              </p>
-              <div class="flex flex-col sm:flex-row gap-4">
-                <button @click="startFreeTrial" class="btn bg-primary text-white font-semibold px-6 py-3 rounded-lg">
-                  Comenzar prueba gratuita
-                </button>
-                <button @click="scrollToFeatures" class="btn bg-white border-2 border-gray-300 px-6 py-3 rounded-lg">
-                  Conocer más
-                </button>
-              </div>
-            </div>
-            <div class="lg:w-1/2">
-              <!-- <img src="/img/analytics-dashboard.webp" alt="Dashboard de analíticas" class="rounded-lg shadow-xl" /> -->
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Features -->
-      <div id="features" class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-12">Análisis de negocio inteligente</h2>
-
-          <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
-              <div class="text-primary text-4xl mb-4">
-                <HeroiconsPresentationChartBar class="w-12 h-12" />
-              </div>
-              <h3 class="text-xl font-semibold mb-2">Métricas de rendimiento</h3>
-              <p class="text-gray-600">
-                Indicadores clave de desempeño para tomar decisiones informadas en cada área de tu negocio.
-              </p>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
-              <div class="text-primary text-4xl mb-4">
-                <HeroiconsChartPie class="w-12 h-12" />
-              </div>
-              <h3 class="text-xl font-semibold mb-2">Análisis de rentabilidad</h3>
-              <p class="text-gray-600">
-                Seguimiento detallado de costos y márgenes de ganancia por producto, cliente y período.
-              </p>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
-              <div class="text-primary text-4xl mb-4">
-                <HeroiconsDocumentChartBar class="w-12 h-12" />
-              </div>
-              <h3 class="text-xl font-semibold mb-2">Reportes personalizados</h3>
-              <p class="text-gray-600">
-                Generación de reportes detallados para cada área de tu negocio con exportación en múltiples formatos.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pricing preview -->
-      <div class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4 text-center">
-          <h2 class="text-3xl font-bold mb-4">Planes adaptados a tu negocio</h2>
-          <p class="text-xl text-gray-600 mb-8">Desde emprendedores hasta empresas establecidas</p>
-
-          <div class="max-w-md mx-auto">
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary">
-              <div class="p-6">
-                <h3 class="text-2xl font-bold mb-2">Plan Enterprise</h3>
-                <div class="text-4xl font-bold mb-4">
-                  Personalizado <span class="text-sm text-gray-600 font-normal">para tu empresa</span>
-                </div>
-                <ul class="mb-6 text-left">
-                  <li class="flex items-center mb-2">
-                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
-                    Integraciones personalizadas
-                  </li>
-                  <li class="flex items-center mb-2">
-                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
-                    Soporte prioritario
-                  </li>
-                  <li class="flex items-center">
-                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
-                    Empleados ilimitados
-                  </li>
-                </ul>
-                <button
-                  @click="startFreeTrial"
-                  class="w-full btn bg-primary text-white font-semibold py-3 px-6 rounded-lg"
-                >
-                  Contactar ventas
-                </button>
-              </div>
-            </div>
-            <div class="mt-6">
-              <NuxtLink to="/precios" class="text-primary font-semibold hover:underline"
-                >Ver todos los planes →</NuxtLink
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA Section -->
-      <div class="py-16 bg-primary/10">
-        <div class="container mx-auto px-4 text-center">
-          <h2 class="text-3xl font-bold mb-6">Toma mejores decisiones comerciales</h2>
-          <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-            Descubrí insights valiosos sobre tu negocio y optimizá cada aspecto de tu operación con nuestros análisis
-            avanzados.
-          </p>
-          <button @click="startFreeTrial" class="btn bg-primary text-white font-semibold py-3 px-8 rounded-lg">
-            Comenzar ahora
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -390,9 +261,6 @@ import HeroiconsChartBar from "~icons/heroicons/chart-bar";
 import HeroiconsMapPin from "~icons/heroicons/map-pin";
 import HeroiconsCreditCard from "~icons/heroicons/credit-card";
 import HeroiconsUserGroup from "~icons/heroicons/user-group";
-import HeroiconsPresentationChartBar from "~icons/heroicons/presentation-chart-bar";
-import HeroiconsChartPie from "~icons/heroicons/chart-pie";
-import HeroiconsDocumentChartBar from "~icons/heroicons/document-chart-bar";
 import HeroiconsCheckCircle from "~icons/heroicons/check-circle";
 
 import { useABTestingStore } from "~/stores/abTesting";
