@@ -545,7 +545,7 @@ function confirmProductSelection() {
     }
   });
 
-  showProductSelector = false;
+  showProductSelector.value = false;
 }
 
 function calculateProductTotal(product) {
