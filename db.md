@@ -111,7 +111,7 @@ dailyProductCost/
 
 ### stockMovements
 
-Tracks stock movements for products.
+Comprehensive inventory movement tracking system for perishable goods.
 
 ```
 stockMovements/

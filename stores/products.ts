@@ -64,7 +64,7 @@ export interface ProductImageDocument {
 }
 
 // --- Supplier Document Interface ---
-export interface SupplierDocument {
+interface SupplierDocument {
   id?: string;
   name: string;
   businessId: string;

@@ -184,6 +184,15 @@
           <li>
             <NuxtLink
               v-if="indexStore?.isOwner"
+              to="/proveedores"
+              class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
+            >
+              <IcBaselineWarehouse class="text-gray-500" /> Proveedores
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink
+              v-if="indexStore?.isOwner"
               to="/empleados"
               class="flex items-center gap-2 text-gray-700 px-1 py-2 hover:bg-primary/40 rounded hover:font-bold"
             >
@@ -252,6 +261,7 @@ import SiSignOutFill from "~icons/si/sign-out-fill";
 import MaterialSymbolsKeyboardArrowDown from "~icons/material-symbols/keyboard-arrow-down";
 import MaterialSymbolsDashboard from "~icons/material-symbols/dashboard";
 import MaterialSymbolsMap from "~icons/material-symbols/map";
+import IcBaselineWarehouse from "~icons/ic/baseline-warehouse";
 
 // ------ Define Useful Properties --------
 const route = useRoute();

@@ -2,15 +2,21 @@
   <div class="flex flex-col gap-[2rem] w-full mb-8">
     <ProductsDetails ref="productsDetails" />
     <ProductsEditStock ref="editStock" />
+    <ProductsLoadRemito ref="loadRemito" />
     <div class="flex flex-col gap-[1rem]">
       <div class="flex justify-between items-center">
         <div class="flex flex-col">
           <h1 class="text-start font-semibold">Inventario</h1>
           <span class="text-gray-600 text-sm">Agrega los productos con su cantidad y costo</span>
         </div>
-        <button @click="showNewProductModal" class="btn bg-primary text-white flex items-center">
-          <IcRoundPlus class="text-[1.143rem]" /> Nuevo Producto
-        </button>
+        <div class="flex gap-2">
+          <button @click="showLoadRemitoModal" class="btn bg-secondary text-dark flex items-center">
+            <LucideFileText class="text-[1.143rem] mr-1" /> Cargar Remito
+          </button>
+          <button @click="showNewProductModal" class="btn bg-primary text-white flex items-center">
+            <IcRoundPlus class="text-[1.143rem]" /> Nuevo Producto
+          </button>
+        </div>
       </div>
 
       <!-- KPI Cards -->
@@ -175,6 +181,7 @@ import LucideEdit from "~icons/lucide/edit";
 import LucidePackage2 from "~icons/lucide/package-2";
 import LucideHistory from "~icons/lucide/history";
 import FlowbiteDollarOutline from "~icons/flowbite/dollar-outline";
+import ProductsLoadRemito from "~/components/products/ProductsLoadRemito.vue";
 
 // ----- Define Pinia Vars --------
 const productsStore = useProductsStore();
@@ -185,6 +192,7 @@ const search = ref("");
 // Refs
 const productsDetails = ref(null);
 const editStock = ref(null);
+const loadRemito = ref(null);
 const stockStats = ref({
   recentMovements: 0,
   recentLosses: 0
@@ -203,7 +211,7 @@ const productsCleaned = computed(() => {
       const nameIncludes = product.productName.toLowerCase().includes(search.value.toLowerCase());
 
       // Check if description includes search
-      const descriptionIncludes = product.description.toLowerCase().includes(search.value.toLowerCase());
+      const descriptionIncludes = product.description?.toLowerCase().includes(search.value.toLowerCase()) || false;
 
       // Check if category includes search
       const category = product.category ?? "otro";
@@ -278,6 +286,13 @@ function showEditStock(id) {
   if (!editStock.value) return;
 
   editStock.value.showModal(id);
+}
+
+function showLoadRemitoModal() {
+  // Check loadRemito is defined
+  if (!loadRemito.value) return;
+
+  loadRemito.value.showModal();
 }
 
 // Function will manage if the data is already fetched
