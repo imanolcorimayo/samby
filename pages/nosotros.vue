@@ -237,6 +237,11 @@ useHead({
       name: "description",
       content:
         "Conoce al equipo detrás de Samby, expertos en soluciones tecnológicas para fruterías y verdulerías en Argentina. Nuestra misión es optimizar la gestión de productos frescos y reducir el desperdicio."
+    },
+    {
+      name: "keywords",
+      content:
+        "equipo samby, nosotros, fruterías, verdulerías, productos frescos, misión, Santiago Contreras, Imanol Corimayo, gestión inventario"
     }
   ]
 });

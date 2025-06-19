@@ -186,6 +186,17 @@ function openMap(client) {
 clientsStore.fetchData();
 
 useHead({
-  title: "Lista de clientes"
+  title: "Lista de clientes",
+  meta: [
+    {
+      name: "description",
+      content: "Explora y gestiona tu lista de clientes en Samby, la solución integral para fruterías y verdulerías."
+    },
+    {
+      name: "keywords",
+      content:
+        "samby, gestión inventario, fruterías, verdulerías, control stock, gestión pedidos, análisis negocio, Argentina, pymes"
+    }
+  ]
 });
 </script>

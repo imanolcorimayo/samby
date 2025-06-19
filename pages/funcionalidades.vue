@@ -294,6 +294,11 @@ useHead({
       name: "description",
       content:
         "Descubre las funcionalidades de Samby diseñadas específicamente para fruterías y verdulerías: control de inventario perecedero, gestión de pedidos, mapeo de clientes y análisis de rentabilidad."
+    },
+    {
+      name: "keywords",
+      content:
+        "funcionalidades samby, control inventario, gestión pedidos, gestión clientes, análisis reportes, fruterías, verdulerías, productos frescos, perecederos"
     }
   ]
 });

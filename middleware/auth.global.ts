@@ -8,7 +8,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     "/precios", // Subscription plans
     "/nosotros", // Company information
     "/contacto", // Contact forms
-    "/blog", // Blog/resources
     "/welcome", // Login page (to be renamed to /login eventually)
     "/blocked" // Access restriction page
   ];

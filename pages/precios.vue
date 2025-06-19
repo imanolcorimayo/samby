@@ -294,6 +294,11 @@ useHead({
       name: "description",
       content:
         "Conoce nuestros planes adaptados específicamente para fruterías y verdulerías en Argentina. Plan gratuito y plan profesional para gestionar inventario perecedero, optimizar entregas y aumentar tus ventas."
+    },
+    {
+      name: "keywords",
+      content:
+        "precios samby, plan gratuito, plan profesional, tarifas, fruterías, verdulerías, comparativa planes, gestión productos frescos"
     }
   ]
 });

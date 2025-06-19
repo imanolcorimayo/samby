@@ -1,2 +1,28 @@
+# Allow all bots
 User-agent: *
+
+# Allow public static pages
+Allow: /$
+Allow: /funcionalidades$
+Allow: /precios$
+Allow: /nosotros$
+Allow: /contacto$
+Allow: /terminos-y-condiciones$
+Allow: /politicas-de-privacidad$
+
+# Disallow authentication and private pages
+Disallow: /welcome
+Disallow: /blocked
+Disallow: /negocios
+Disallow: /pedidos
+Disallow: /productos
+Disallow: /clientes
+Disallow: /proveedores
+Disallow: /reportes
+Disallow: /configuracion
+Disallow: /empleados
+
+# Disallow all other routes by default
 Disallow: /
+
+Sitemap: https://samby.wiseutils.com/sitemap.xml
