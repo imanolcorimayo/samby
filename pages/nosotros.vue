@@ -27,18 +27,25 @@
           <div class="md:w-1/2">
             <h2 class="text-3xl font-bold mb-6">Nuestra historia</h2>
             <p class="text-gray-700 mb-4">
-              Samby nació de la necesidad real que vimos en los mercados de frutas y verduras de Argentina. Notamos que
-              muchos negocios enfrentaban desafíos únicos: gestionar productos perecederos, controlar el desperdicio,
-              optimizar rutas de entrega y adaptarse a las fluctuaciones estacionales.
+              Mi nombre es Santiago Nicolás Contreras, tengo 27 años y hace tres años decidí empezar en el rubro de
+              frutas y verduras. Aunque tenía muchas dudas, tenía algo claro: quería salir adelante con mi familia y
+              construir una mejor vida.
             </p>
             <p class="text-gray-700 mb-4">
-              Fundada en 2020 por un equipo de expertos en tecnología y con experiencia en el sector de alimentos
-              frescos, nuestra misión es proporcionar herramientas tecnológicas accesibles que resuelvan los problemas
-              específicos de fruterías y verdulerías.
+              Comenzamos con una pequeña verdulería que sostuvimos con mucho esfuerzo durante un año. Luego, pudimos
+              comprar nuestro primer vehículo y dar el paso al reparto mayorista. Fue en esa etapa donde empezamos a
+              notar varios problemas de administración y organización.
+            </p>
+            <p class="text-gray-700 mb-4">
+              Ahí surgió la idea de crear una herramienta propia. Junto a Imanol, mi amigo y socio, empezamos a
+              desarrollar una aplicación pensada específicamente para el trabajo mayorista en frutas y verduras. La idea
+              fue siempre clara: que nos ayudara a gestionar mejor los pedidos, la administración y el día a día del
+              negocio.
             </p>
             <p class="text-gray-700">
-              Hoy, cientos de negocios en toda Argentina utilizan nuestra plataforma para reducir desperdicios, aumentar
-              eficiencia y mejorar la satisfacción de sus clientes.
+              Hoy, después de mucho trabajo, logramos crear una app funcional que usamos todos los días y que realmente
+              nos simplifica el trabajo. Esta herramienta nació desde la necesidad real y la experiencia, y hoy queremos
+              compartirla con otros que estén en el mismo camino.
             </p>
           </div>
         </div>
@@ -57,8 +64,8 @@
             </div>
             <h3 class="text-xl font-semibold mb-2">Reducir el desperdicio</h3>
             <p class="text-gray-600">
-              Ayudamos a minimizar la pérdida de productos frescos mediante tecnología de seguimiento de vencimientos y
-              optimización de inventario.
+              Optimizamos la gestión de inventario y pedidos para minimizar la pérdida de productos frescos, mejorando
+              la rotación y control de stock en negocios minoristas.
             </p>
           </div>
 
@@ -68,19 +75,19 @@
             </div>
             <h3 class="text-xl font-semibold mb-2">Potenciar negocios locales</h3>
             <p class="text-gray-600">
-              Queremos que las fruterías y verdulerías argentinas crezcan y prosperen con herramientas tecnológicas
-              accesibles y efectivas.
+              Proporcionamos a las fruterías y verdulerías argentinas las herramientas tecnológicas que necesitan para
+              competir y crecer en un mercado cada vez más exigente.
             </p>
           </div>
 
           <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
             <div class="text-primary text-4xl mb-4">
-              <HeroiconsGlobeAmericas class="w-12 h-12" />
+              <HeroiconsArrowsRightLeft class="w-12 h-12" />
             </div>
-            <h3 class="text-xl font-semibold mb-2">Promover la sostenibilidad</h3>
+            <h3 class="text-xl font-semibold mb-2">Mejorar la cadena de suministro</h3>
             <p class="text-gray-600">
-              Contribuimos a un sistema alimentario más sostenible optimizando cada aspecto de la cadena de suministro
-              de productos frescos.
+              Facilitamos la comunicación entre mayoristas y minoristas, optimizando rutas de entrega y tiempos de
+              respuesta para ofrecer productos más frescos al consumidor final.
             </p>
           </div>
         </div>
@@ -92,37 +99,30 @@
       <div class="container mx-auto px-4 max-w-5xl">
         <h2 class="text-3xl font-bold text-center mb-12">Nuestro equipo</h2>
 
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-2 gap-8">
           <div class="text-center">
             <div class="w-32 h-32 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
-              <img src="/img/default-product.webp" alt="Team Member" class="w-full h-full object-cover" />
+              <img src="/img/samby-profile.png" alt="Team Member" class="w-full h-full object-cover" />
             </div>
             <h3 class="text-xl font-semibold mb-1">Santiago Contreras</h3>
             <p class="text-primary font-medium mb-2">Fundador & CEO</p>
             <p class="text-gray-600">
-              Más de 10 años de experiencia en desarrollo de software y gestión de productos alimenticios.
+              Fundador y propietario de negocio mayorista de frutas y verduras con más de 10 años de experiencia en el
+              sector. Conoce de primera mano los desafíos diarios del rubro y lidera la visión de Samby para transformar
+              la gestión de negocios frescos.
             </p>
           </div>
 
           <div class="text-center">
             <div class="w-32 h-32 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
-              <img src="/img/default-product.webp" alt="Team Member" class="w-full h-full object-cover" />
+              <img src="/img/imanol-profile.png" alt="Team Member" class="w-full h-full object-cover" />
             </div>
-            <h3 class="text-xl font-semibold mb-1">Laura Méndez</h3>
-            <p class="text-primary font-medium mb-2">Directora de Operaciones</p>
+            <h3 class="text-xl font-semibold mb-1">Imanol Corimayo</h3>
+            <p class="text-primary font-medium mb-2">CTO</p>
             <p class="text-gray-600">
-              Especialista en logística y cadenas de suministro para productos perecederos en mercados locales.
-            </p>
-          </div>
-
-          <div class="text-center">
-            <div class="w-32 h-32 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
-              <img src="/img/default-product.webp" alt="Team Member" class="w-full h-full object-cover" />
-            </div>
-            <h3 class="text-xl font-semibold mb-1">Martín Rodríguez</h3>
-            <p class="text-primary font-medium mb-2">Jefe de Tecnología</p>
-            <p class="text-gray-600">
-              Ingeniero de software especializado en sistemas de inventario y análisis de datos en tiempo real.
+              Desarrollador full-stack con amplia experiencia en la creación de soluciones tecnológicas. Combina su
+              conocimiento técnico con un profundo entendimiento del sector de frutas y verduras para diseñar
+              herramientas aplicables a problemas reales.
             </p>
           </div>
         </div>
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Partnership Section -->
-    <div class="py-16 bg-gray-50">
+    <div class="py-16 bg-gray-50 hidden">
       <div class="container mx-auto px-4 max-w-5xl">
         <h2 class="text-3xl font-bold text-center mb-12">Alianzas estratégicas</h2>
 
@@ -160,7 +160,7 @@
     </div>
 
     <!-- Testimonials Section -->
-    <div class="py-16 bg-white">
+    <div class="py-16 bg-white hidden">
       <div class="container mx-auto px-4 max-w-5xl">
         <h2 class="text-3xl font-bold text-center mb-12">Lo que dicen nuestros clientes</h2>
 
@@ -210,7 +210,7 @@
           <button @click="startFreeTrial()" class="btn bg-primary text-white font-semibold py-3 px-8 rounded-lg">
             Comenzar prueba gratuita
           </button>
-          <NuxtLink to="/contact" class="btn bg-white border-2 border-gray-300 font-semibold py-3 px-8 rounded-lg">
+          <NuxtLink to="/contacto" class="btn bg-white border-2 border-gray-300 font-semibold py-3 px-8 rounded-lg">
             Contactar al equipo
           </NuxtLink>
         </div>
@@ -222,7 +222,7 @@
 <script setup>
 import HeroiconsCubeTransparent from "~icons/heroicons/cube-transparent";
 import HeroiconsRocketLaunch from "~icons/heroicons/rocket-launch";
-import HeroiconsGlobeAmericas from "~icons/heroicons/globe-americas";
+import HeroiconsArrowsRightLeft from "~icons/heroicons/arrows-right-left";
 
 // Methods
 const startFreeTrial = () => {

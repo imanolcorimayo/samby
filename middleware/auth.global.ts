@@ -4,17 +4,17 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   // Define public routes that don't require authentication
   const publicRoutes = [
     "/", // Landing page
-    "/features", // Feature pages
+    "/funcionalidades", // Feature pages
     "/precios", // Subscription plans
     "/nosotros", // Company information
-    "/contact", // Contact forms
+    "/contacto", // Contact forms
     "/blog", // Blog/resources
     "/welcome", // Login page (to be renamed to /login eventually)
     "/blocked" // Access restriction page
   ];
 
   // Check if the current route is a public route
-  // Also check for nested routes like /features/inventory
+  // Also check for nested routes like /funcionalidades/inventory
   const isPublicRoute = publicRoutes.some((route) => to.path === route || to.path.startsWith(`${route}/`));
 
   // Allow access to public routes without authentication

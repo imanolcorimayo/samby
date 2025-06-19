@@ -717,20 +717,32 @@ clientRecommendations/
 
 ```javascript
 subscriptionPlans: {
-  fruteria_starter: {
-    name: "Frutería Starter",
-    price: 12999, // ARS per month
-    features: ["Inventory básico", "Hasta 50 productos", "2 empleados", "Alertas de vencimiento"]
+  plan_gratuito: {
+    name: "Plan Gratuito",
+    price: 0, // Free
+    features: [
+      "Gestión básica de inventario y productos",
+      "Hasta 20 productos con control de stock",
+      "Sin acceso para empleados",
+      "Gestión de pedidos (máx. 30/día)",
+      "Gestión de clientes (máx. 20)",
+      "Un solo negocio por cuenta",
+      "Solo estadísticas básicas en dashboard",
+      "Gestión de proveedores"
+    ]
   },
-  verduleria_pro: {
-    name: "Verdulería Professional",
+  plan_profesional: {
+    name: "Plan Profesional",
     price: 24999, // ARS per month
-    features: ["Gestión avanzada", "Productos ilimitados", "8 empleados", "Análisis estacional"]
-  },
-  negocio_mixto: {
-    name: "Negocio Mixto Enterprise",
-    price: 49999, // ARS per month
-    features: ["Frutas y verduras", "Múltiples sucursales", "Empleados ilimitados", "Integración proveedores"]
+    features: [
+      "Productos ilimitados",
+      "Gestión de empleados con permisos",
+      "Pedidos y clientes ilimitados",
+      "Múltiples negocios en una cuenta",
+      "Estadísticas de clientes con mapa geográfico",
+      "Estadísticas avanzadas de movimientos de inventario",
+      "Previsión de stock y análisis de rentabilidad"
+    ]
   }
 }
 ```
