@@ -22,28 +22,25 @@ This system provides a complete solution for fruits and vegetables providers to 
 This project follows a set of core architectural principles to ensure consistency, maintainability, and performance. All new development should adhere to these axioms:
 
 1.  **State Management & Caching Principle:**
-
-    - **Axiom:** Data fetched from Firestore is always cached in its corresponding Pinia store.
-    - **Why it's valuable:** This is the application's primary performance strategy. It prevents redundant reads from Firebase by treating the Pinia store as a temporary, client-side cache. Any developer adding a new feature must adhere to this pattern: check the store for data before making an API call. This is tracked via state flags like `areClientsFetched`.
+    *   **Axiom:** Data fetched from Firestore is always cached in its corresponding Pinia store.
+    *   **Why it's valuable:** This is the application's primary performance strategy. It prevents redundant reads from Firebase by treating the Pinia store as a temporary, client-side cache. Any developer adding a new feature must adhere to this pattern: check the store for data before making an API call. This is tracked via state flags like `areClientsFetched`.
 
 2.  **Modal-Driven Interface for CRUD:**
-
-    - **Axiom:** All "Create," "Update," and "View Details" actions are handled via modals, not separate pages.
-    - **Why it's valuable:** This establishes a fundamental UI/UX pattern. It ensures a consistent user experience across different modules and simplifies the application's routing. Developers should not create new pages for these actions but instead build or reuse modal components.
+    *   **Axiom:** All "Create," "Update," and "View Details" actions are handled via modals, not separate pages.
+    *   **Why it's valuable:** This establishes a fundamental UI/UX pattern. It ensures a consistent user experience across different modules and simplifies the application's routing. Developers should not create new pages for these actions but instead build or reuse modal components.
 
 3.  **Standardized Form Implementation:**
-
-    - **Axiom:** All forms are built using the `FormKit` library.
-    - **Why it's valuable:** This ensures all forms throughout the application have a consistent look, feel, and validation behavior. It saves development time and enforces a unified design language.
+    *   **Axiom:** All forms are built using the `FormKit` library.
+    *   **Why it's valuable:** This ensures all forms throughout the application have a consistent look, feel, and validation behavior. It saves development time and enforces a unified design language.
 
 4.  **Separation of Concerns for Scripts:**
-
-    - **Axiom:** The `/scripts` directory is the designated location for all data maintenance, migration, and one-off administrative tasks.
-    - **Why it's valuable:** This keeps the core application codebase clean and focused on user-facing features. It makes it clear where to find and create tools for managing the application's data behind the scenes.
+    *   **Axiom:** The `/scripts` directory is the designated location for all data maintenance, migration, and one-off administrative tasks.
+    *   **Why it's valuable:** This keeps the core application codebase clean and focused on user-facing features. It makes it clear where to find and create tools for managing the application's data behind the scenes.
 
 5.  **Universal Authentication & Business Context:**
-    - **Axiom:** Every authenticated API request and data operation is tied to a specific `businessId`.
-    - **Why it's valuable:** This is the cornerstone of the multi-tenant architecture. The `auth.global.ts` middleware enforces that a user is logged in and has selected a business. This principle must be respected in every Pinia store and component to ensure data isolation and security.
+    *   **Axiom:** Every authenticated API request and data operation is tied to a specific `businessId`.
+    *   **Why it's valuable:** This is the cornerstone of the multi-tenant architecture. The `auth.global.ts` middleware enforces that a user is logged in and has selected a business. This principle must be respected in every Pinia store and component to ensure data isolation and security.
+
 
 #### Package JSON scripts and dependencies
 
@@ -426,12 +423,12 @@ Following the architecture pattern of using modals for details and edits rather 
 ### 5. Proveedores (Suppliers)
 
 - `/proveedores.vue` - Supplier directory with produce specialties and modals for:
-  - `suppliers/SupplierDetails.vue` - View supplier details with tabs for:
-    - Supplier information and produce specialties
-    - Purchase history with quality tracking
-    - Seasonal relationship management
-  - `suppliers/SupplierForm.vue` - Add/edit supplier information with specialty tracking
-  - `suppliers/QualityTracking.vue` - Quality ratings and performance metrics
+    - `suppliers/SupplierDetails.vue` - View supplier details with tabs for:
+      - Supplier information and produce specialties
+      - Purchase history with quality tracking
+      - Seasonal relationship management
+    - `suppliers/SupplierForm.vue` - Add/edit supplier information with specialty tracking
+    - `suppliers/QualityTracking.vue` - Quality ratings and performance metrics
 
 ### 6. Resumen (Reports)
 
