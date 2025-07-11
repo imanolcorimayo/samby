@@ -40,32 +40,46 @@ export default defineNuxtConfig({
   pwa: {
     registerType: "autoUpdate",
     workbox: {
-      // globPatterns: ["**/*.{js,css,html,png,svg,ico,webp,jpg,jpeg}"],
-      // navigateFallback: "/spa-loading-template.html"
-      // runtimeCaching: [
-      //   {
-      //     urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*$/,
-      //     handler: "NetworkFirst",
-      //     options: {
-      //       cacheName: "firestore-cache",
-      //       expiration: {
-      //         maxEntries: 10,
-      //         maxAgeSeconds: 300 // 5 minutes
-      //       }
-      //     }
-      //   },
-      //   {
-      //     urlPattern: /^https:\/\/.*\.firebaseapp\.com\/.*$/,
-      //     handler: "NetworkFirst",
-      //     options: {
-      //       cacheName: "firebase-cache",
-      //       expiration: {
-      //         maxEntries: 10,
-      //         maxAgeSeconds: 300
-      //       }
-      //     }
-      //   }
-      // ]
+      navigateFallback: "/",
+      globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
+      runtimeCaching: [
+        {
+          urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+          handler: "CacheFirst",
+          options: {
+            cacheName: "google-fonts-cache",
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+            },
+            cacheableResponse: {
+              statuses: [0, 200]
+            }
+          }
+        },
+        {
+          urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+          handler: "CacheFirst",
+          options: {
+            cacheName: "gstatic-fonts-cache",
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+            },
+            cacheableResponse: {
+              statuses: [0, 200]
+            }
+          }
+        }
+      ]
+    },
+    client: {
+      installPrompt: true,
+      periodicSyncForUpdates: 20 // check for updates every 20 minutes
+    },
+    devOptions: {
+      enabled: true,
+      type: "module"
     },
     manifest: {
       name: "Samby - Gestión para fruterías y verdulerías",
@@ -97,12 +111,6 @@ export default defineNuxtConfig({
           purpose: "any maskable"
         }
       ]
-    },
-    devOptions: {
-      enabled: false,
-      suppressWarnings: true,
-      navigateFallbackAllowlist: [/^\/$/, /^\/funcionalidades$/, /^\/precios$/, /^\/contacto$/],
-      type: "module"
     }
   },
 

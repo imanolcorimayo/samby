@@ -16,7 +16,9 @@
     <!-- Core Features Section -->
     <section class="py-16 bg-white" aria-labelledby="core-features-heading">
       <div class="container mx-auto px-4">
-        <h2 id="core-features-heading" class="text-3xl font-bold text-center mb-12">Soluciones completas para tu negocio</h2>
+        <h2 id="core-features-heading" class="text-3xl font-bold text-center mb-12">
+          Soluciones completas para tu negocio
+        </h2>
 
         <div class="grid md:grid-cols-2 gap-8">
           <!-- Inventory Management -->
@@ -145,7 +147,9 @@
     <!-- Additional Features -->
     <section class="py-16 bg-gray-50" aria-labelledby="additional-features-heading">
       <div class="container mx-auto px-4">
-        <h2 id="additional-features-heading" class="text-3xl font-bold text-center mb-12">Características adicionales</h2>
+        <h2 id="additional-features-heading" class="text-3xl font-bold text-center mb-12">
+          Características adicionales
+        </h2>
 
         <div class="grid md:grid-cols-3 gap-8">
           <!-- Suppliers Management -->
@@ -311,7 +315,7 @@ useHead({
     },
     {
       property: "og:image",
-      content: "/img/home-service.png"
+      content: "/img/home-service.webp"
     },
     {
       property: "og:type",
@@ -336,7 +340,7 @@ useHead({
     },
     {
       name: "twitter:image",
-      content: "/img/home-service.png"
+      content: "/img/home-service.webp"
     },
     {
       name: "robots",

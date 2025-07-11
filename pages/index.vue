@@ -25,7 +25,7 @@
             </div>
             <div class="lg:w-1/2">
               <img
-                src="/img/home-service.png"
+                src="/img/home-service.webp"
                 alt="Dashboard de inventario para fruterías y verdulerías - Sistema Samby"
                 class="rounded-lg shadow-xl"
                 loading="lazy"
@@ -157,7 +157,7 @@
             </div>
             <div class="lg:w-1/2">
               <img
-                src="/img/home-clients.png"
+                src="/img/home-clients.webp"
                 alt="Mapa de clientes para optimización de entregas - Sistema Samby"
                 class="rounded-lg shadow-xl"
                 loading="lazy"
@@ -319,7 +319,7 @@ useHead({
     },
     {
       property: "og:image",
-      content: "/img/home-service.png"
+      content: "/img/home-service.webp"
     },
     {
       property: "og:type",
@@ -344,7 +344,7 @@ useHead({
     },
     {
       name: "twitter:image",
-      content: "/img/home-service.png"
+      content: "/img/home-service.webp"
     },
     {
       name: "robots",
@@ -395,7 +395,7 @@ useHead({
           ratingValue: "4.8",
           reviewCount: "127"
         },
-        screenshot: "/img/home-service.png",
+        screenshot: "/img/home-service.webp",
         softwareVersion: "1.0",
         releaseNotes: "Sistema completo de gestión para fruterías y verdulerías",
         featureList: [
