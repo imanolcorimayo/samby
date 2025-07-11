@@ -95,17 +95,17 @@ export default defineNuxtConfig({
       categories: ["business", "productivity", "utilities"],
       icons: [
         {
-          src: "/new-logo-192.png",
+          src: "/img/new-logo-192.png",
           sizes: "192x192",
           type: "image/png"
         },
         {
-          src: "/new-logo-512.png",
+          src: "/img/new-logo-512.png",
           sizes: "512x512",
           type: "image/png"
         },
         {
-          src: "/new-logo-512.png",
+          src: "/img/new-logo-512.png",
           sizes: "512x512",
           type: "image/png",
           purpose: "any maskable"
