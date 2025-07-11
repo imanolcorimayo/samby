@@ -75,30 +75,64 @@
       </section>
 
       <!-- Pricing preview -->
-      <div class="py-16 bg-gray-50">
+      <section class="py-16 bg-gray-50" aria-labelledby="pricing-heading">
         <div class="container mx-auto px-4 text-center">
-          <h2 class="text-3xl font-bold mb-4">Planes adaptados a tu negocio</h2>
+          <h2 id="pricing-heading" class="text-3xl font-bold mb-4">Planes adaptados a tu negocio</h2>
           <p class="text-xl text-gray-600 mb-8">Desde emprendedores hasta empresas establecidas</p>
 
-          <div class="max-w-md mx-auto">
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary">
+          <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <!-- Plan Gratuito -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-gray-200">
               <div class="p-6">
-                <h3 class="text-2xl font-bold mb-2">Plan Inicial</h3>
+                <h3 class="text-2xl font-bold mb-2">Plan Gratuito</h3>
                 <div class="text-4xl font-bold mb-4">
-                  $14,999 <span class="text-sm text-gray-600 font-normal">/mes</span>
+                  $0 <span class="text-sm text-gray-600 font-normal">/mes</span>
                 </div>
-                <ul class="mb-6 text-left">
-                  <li class="flex items-center mb-2">
+                <ul class="mb-6 text-left space-y-2">
+                  <li class="flex items-center">
                     <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
-                    Control de inventario básico
-                  </li>
-                  <li class="flex items-center mb-2">
-                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
-                    Hasta 100 productos
+                    Hasta 20 productos
                   </li>
                   <li class="flex items-center">
                     <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
-                    5 empleados
+                    Máx. 30 pedidos/día
+                  </li>
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Hasta 20 clientes
+                  </li>
+                </ul>
+                <button
+                  @click="startFreeTrial"
+                  class="w-full btn bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg"
+                >
+                  Comenzar gratis
+                </button>
+              </div>
+            </div>
+            
+            <!-- Plan Profesional -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary">
+              <div class="p-6 bg-primary/10">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-2xl font-bold">Plan Profesional</h3>
+                  <span class="bg-primary text-white text-xs font-bold py-1 px-2 rounded">RECOMENDADO</span>
+                </div>
+                <div class="text-4xl font-bold mb-4">
+                  $24,999 <span class="text-sm text-gray-600 font-normal">/mes</span>
+                </div>
+                <ul class="mb-6 text-left space-y-2">
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Productos ilimitados
+                  </li>
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Gestión de empleados
+                  </li>
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Análisis avanzados
                   </li>
                 </ul>
                 <button
@@ -109,19 +143,20 @@
                 </button>
               </div>
             </div>
-            <div class="mt-6">
-              <NuxtLink to="/precios" class="text-primary font-semibold hover:underline"
-                >Ver todos los planes →</NuxtLink
-              >
-            </div>
+          </div>
+          
+          <div class="mt-8">
+            <NuxtLink to="/precios" class="text-primary font-semibold hover:underline"
+              >Ver todos los planes →</NuxtLink
+            >
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- CTA Section -->
-      <div class="py-16 bg-primary/10">
+      <section class="py-16 bg-primary/10" aria-labelledby="cta-heading">
         <div class="container mx-auto px-4 text-center">
-          <h2 class="text-3xl font-bold mb-6">¿Listo para transformar tu negocio?</h2>
+          <h2 id="cta-heading" class="text-3xl font-bold mb-6">¿Listo para transformar tu negocio?</h2>
           <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
             Únete a negocios en Argentina que ya optimizaron su gestión de inventario y finanzas.
           </p>
@@ -129,7 +164,7 @@
             Comenzar ahora
           </button>
         </div>
-      </div>
+      </section>
     </div>
 
     <!-- Landing page variant B: Order & Client Management focus -->
@@ -170,9 +205,9 @@
       </div>
 
       <!-- Features -->
-      <div id="features" class="py-16 bg-white">
+      <section id="features" class="py-16 bg-white" aria-labelledby="features-heading">
         <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-12">Gestión de pedidos y clientes</h2>
+          <h2 id="features-heading" class="text-3xl font-bold text-center mb-12">Gestión de pedidos y clientes</h2>
 
           <div class="grid md:grid-cols-3 gap-8">
             <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
@@ -206,33 +241,67 @@
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Pricing preview -->
-      <div class="py-16 bg-gray-50">
+      <section class="py-16 bg-gray-50" aria-labelledby="pricing-heading">
         <div class="container mx-auto px-4 text-center">
-          <h2 class="text-3xl font-bold mb-4">Planes adaptados a tu negocio</h2>
+          <h2 id="pricing-heading" class="text-3xl font-bold mb-4">Planes adaptados a tu negocio</h2>
           <p class="text-xl text-gray-600 mb-8">Desde emprendedores hasta empresas establecidas</p>
 
-          <div class="max-w-md mx-auto">
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary">
+          <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <!-- Plan Gratuito -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-gray-200">
               <div class="p-6">
-                <h3 class="text-2xl font-bold mb-2">Plan Profesional</h3>
+                <h3 class="text-2xl font-bold mb-2">Plan Gratuito</h3>
                 <div class="text-4xl font-bold mb-4">
-                  $49,000 <span class="text-sm text-gray-600 font-normal">/mes</span>
+                  $0 <span class="text-sm text-gray-600 font-normal">/mes</span>
                 </div>
-                <ul class="mb-6 text-left">
-                  <li class="flex items-center mb-2">
+                <ul class="mb-6 text-left space-y-2">
+                  <li class="flex items-center">
                     <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
-                    Análisis avanzados
+                    Hasta 20 productos
                   </li>
-                  <li class="flex items-center mb-2">
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Máx. 30 pedidos/día
+                  </li>
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Hasta 20 clientes
+                  </li>
+                </ul>
+                <button
+                  @click="startFreeTrial"
+                  class="w-full btn bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg"
+                >
+                  Comenzar gratis
+                </button>
+              </div>
+            </div>
+            
+            <!-- Plan Profesional -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary">
+              <div class="p-6 bg-primary/10">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-2xl font-bold">Plan Profesional</h3>
+                  <span class="bg-primary text-white text-xs font-bold py-1 px-2 rounded">RECOMENDADO</span>
+                </div>
+                <div class="text-4xl font-bold mb-4">
+                  $24,999 <span class="text-sm text-gray-600 font-normal">/mes</span>
+                </div>
+                <ul class="mb-6 text-left space-y-2">
+                  <li class="flex items-center">
                     <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
                     Productos ilimitados
                   </li>
                   <li class="flex items-center">
                     <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
-                    15 empleados
+                    Gestión de empleados
+                  </li>
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Análisis avanzados
                   </li>
                 </ul>
                 <button
@@ -243,19 +312,20 @@
                 </button>
               </div>
             </div>
-            <div class="mt-6">
-              <NuxtLink to="/precios" class="text-primary font-semibold hover:underline"
-                >Ver todos los planes →</NuxtLink
-              >
-            </div>
+          </div>
+          
+          <div class="mt-8">
+            <NuxtLink to="/precios" class="text-primary font-semibold hover:underline"
+              >Ver todos los planes →</NuxtLink
+            >
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- CTA Section -->
-      <div class="py-16 bg-primary/10">
+      <section class="py-16 bg-primary/10" aria-labelledby="cta-heading">
         <div class="container mx-auto px-4 text-center">
-          <h2 class="text-3xl font-bold mb-6">Optimizá la relación con tus clientes</h2>
+          <h2 id="cta-heading" class="text-3xl font-bold mb-6">Optimizá la relación con tus clientes</h2>
           <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
             Conocé mejor a tus clientes, mejorá las entregas y aumentá la satisfacción con nuestra plataforma integral.
           </p>
@@ -263,7 +333,7 @@
             Comenzar ahora
           </button>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
@@ -384,11 +454,28 @@ useHead({
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         offers: {
-          "@type": "Offer",
-          price: "14999",
+          "@type": "AggregateOffer",
+          lowPrice: "0",
+          highPrice: "24999",
           priceCurrency: "ARS",
           priceValidUntil: "2025-12-31",
-          availability: "https://schema.org/InStock"
+          availability: "https://schema.org/InStock",
+          offers: [
+            {
+              "@type": "Offer",
+              name: "Plan Gratuito",
+              price: "0",
+              priceCurrency: "ARS",
+              availability: "https://schema.org/InStock"
+            },
+            {
+              "@type": "Offer",
+              name: "Plan Profesional",
+              price: "24999",
+              priceCurrency: "ARS",
+              availability: "https://schema.org/InStock"
+            }
+          ]
         },
         aggregateRating: {
           "@type": "AggregateRating",
