@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cargando - Samby</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: linear-gradient(to bottom, rgba(34, 197, 94, 0.1), white);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .loader-container {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: #22c55e;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .loader-text {
+      font-size: 1.25rem;
+      color: #374151;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    
+    .loader-subtext {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 2rem;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #22c55e;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .feature-hints {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .feature-hint {
+      background: white;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.75rem;
+      color: #6b7280;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    @media (max-width: 640px) {
+      .loader-container {
+        padding: 1rem;
+      }
+      
+      .logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+      
+      .loader-text {
+        font-size: 1.125rem;
+      }
+      
+      .feature-hints {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .feature-hint {
+        width: 100%;
+        max-width: 200px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-container">
+    <div class="logo">S</div>
+    <div class="loader-text">Cargando Samby</div>
+    <div class="loader-subtext">Preparando tu plataforma de gestión</div>
+    <div class="spinner"></div>
+    <div class="feature-hints">
+      <div class="feature-hint">📦 Control de inventario</div>
+      <div class="feature-hint">🛒 Gestión de pedidos</div>
+      <div class="feature-hint">👥 Seguimiento de clientes</div>
+      <div class="feature-hint">📊 Análisis de negocio</div>
+    </div>
+  </div>
+</body>
+</html>

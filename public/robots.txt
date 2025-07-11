@@ -1,2 +1,13 @@
+Sitemap: https://samby.wiseutils.com/sitemap.xml
+
+# Allow all bots
 User-agent: *
-Disallow: /
+Disallow: /welcome
+Disallow: /blocked
+Disallow: /negocios
+Disallow: /pedidos
+Disallow: /clientes
+Disallow: /proveedores
+Disallow: /inventario
+Disallow: /resumen
+Disallow: /empleados

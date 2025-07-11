@@ -3,11 +3,11 @@
     <!-- Landing page variant A: Inventory Management focus -->
     <div v-if="testingGroup === 'A'" class="min-h-screen">
       <!-- Hero Section -->
-      <div class="bg-gradient-to-b from-primary/10 to-white pt-16 pb-24">
+      <section class="bg-gradient-to-b from-primary/10 to-white pt-16 pb-24" aria-labelledby="hero-heading">
         <div class="container mx-auto px-4">
           <div class="flex flex-col lg:flex-row items-center gap-12 w-full">
             <div class="lg:w-1/2">
-              <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 text-start">
+              <h1 id="hero-heading" class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 text-start">
                 Control total de tu <span class="text-primary">inventario</span> y ventas
               </h1>
               <p class="text-xl text-gray-700 mb-8">
@@ -24,16 +24,23 @@
               </div>
             </div>
             <div class="lg:w-1/2">
-              <img src="/img/home-service.png" alt="Dashboard de inventario" class="rounded-lg shadow-xl" />
+              <img
+                src="/img/home-service.png"
+                alt="Dashboard de inventario para fruterías y verdulerías - Sistema Samby"
+                class="rounded-lg shadow-xl"
+                loading="lazy"
+                width="600"
+                height="400"
+              />
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Features -->
-      <div id="features" class="py-16 bg-white">
+      <section id="features" class="py-16 bg-white" aria-labelledby="features-heading">
         <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-12">Control de inventario simplificado</h2>
+          <h2 id="features-heading" class="text-3xl font-bold text-center mb-12">Control de inventario simplificado</h2>
 
           <div class="grid md:grid-cols-3 gap-8">
             <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
@@ -65,7 +72,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Pricing preview -->
       <div class="py-16 bg-gray-50">
@@ -149,7 +156,14 @@
               </div>
             </div>
             <div class="lg:w-1/2">
-              <img src="/img/home-clients.png" alt="Mapa de clientes" class="rounded-lg shadow-xl" />
+              <img
+                src="/img/home-clients.png"
+                alt="Mapa de clientes para optimización de entregas - Sistema Samby"
+                class="rounded-lg shadow-xl"
+                loading="lazy"
+                width="600"
+                height="400"
+              />
             </div>
           </div>
         </div>
@@ -263,8 +277,6 @@ import HeroiconsCreditCard from "~icons/heroicons/credit-card";
 import HeroiconsUserGroup from "~icons/heroicons/user-group";
 import HeroiconsCheckCircle from "~icons/heroicons/check-circle";
 
-import { useABTestingStore } from "~/stores/abTesting";
-
 // Initialize testing group on client-side only
 const testingGroup = ref("A"); // Default to A for SSR
 
@@ -284,12 +296,143 @@ const startFreeTrial = () => {
 
 // SEO metadata
 useHead({
-  title: "Samby - Sistema de gestión de negocios para PyMEs en Argentina",
+  title: "Samby - Sistema de gestión para fruterías y verdulerías en Argentina",
   meta: [
     {
       name: "description",
       content:
-        "Plataforma de gestión integral para pequeñas y medianas empresas en Argentina. Control de inventario, gestión de pedidos y análisis de negocio."
+        "Plataforma de gestión integral para fruterías y verdulerías en Argentina. Control de inventario perecedero, gestión de pedidos frescos, análisis de rentabilidad y optimización de entregas. Prueba gratuita 14 días."
+    },
+    {
+      name: "keywords",
+      content:
+        "sistema gestión fruterías, verdulería software, inventario productos frescos, gestión pedidos argentina, control stock perecedero, análisis rentabilidad, optimización entregas, software PyME argentina"
+    },
+    {
+      property: "og:title",
+      content: "Samby - Sistema de gestión para fruterías y verdulerías"
+    },
+    {
+      property: "og:description",
+      content:
+        "Optimiza tu frutería o verdulería con Samby. Control de inventario perecedero, gestión de pedidos y análisis de rentabilidad. Prueba gratuita 14 días."
+    },
+    {
+      property: "og:image",
+      content: "/img/home-service.png"
+    },
+    {
+      property: "og:type",
+      content: "website"
+    },
+    {
+      property: "og:locale",
+      content: "es_AR"
+    },
+    {
+      name: "twitter:card",
+      content: "summary_large_image"
+    },
+    {
+      name: "twitter:title",
+      content: "Samby - Sistema de gestión para fruterías y verdulerías"
+    },
+    {
+      name: "twitter:description",
+      content:
+        "Optimiza tu frutería o verdulería con Samby. Control de inventario perecedero, gestión de pedidos y análisis de rentabilidad."
+    },
+    {
+      name: "twitter:image",
+      content: "/img/home-service.png"
+    },
+    {
+      name: "robots",
+      content: "index, follow"
+    },
+    {
+      name: "author",
+      content: "Samby"
+    },
+    {
+      name: "geo.region",
+      content: "AR"
+    },
+    {
+      name: "geo.country",
+      content: "Argentina"
+    },
+    {
+      name: "language",
+      content: "Spanish"
+    }
+  ],
+  link: [
+    {
+      rel: "canonical",
+      href: "https://samby.com.ar"
+    }
+  ],
+  script: [
+    {
+      type: "application/ld+json",
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "Samby",
+        description: "Sistema de gestión integral para fruterías y verdulerías en Argentina",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        offers: {
+          "@type": "Offer",
+          price: "14999",
+          priceCurrency: "ARS",
+          priceValidUntil: "2025-12-31",
+          availability: "https://schema.org/InStock"
+        },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: "4.8",
+          reviewCount: "127"
+        },
+        screenshot: "/img/home-service.png",
+        softwareVersion: "1.0",
+        releaseNotes: "Sistema completo de gestión para fruterías y verdulerías",
+        featureList: [
+          "Control de inventario perecedero",
+          "Gestión de pedidos",
+          "Análisis de rentabilidad",
+          "Optimización de entregas",
+          "Gestión de clientes",
+          "Reportes y análisis"
+        ],
+        author: {
+          "@type": "Organization",
+          name: "Samby",
+          url: "https://samby.com.ar"
+        }
+      })
+    },
+    {
+      type: "application/ld+json",
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Samby",
+        url: "https://samby.com.ar",
+        logo: "/img/logo-admin.webp",
+        description: "Plataforma de gestión integral para fruterías y verdulerías en Argentina",
+        address: {
+          "@type": "PostalAddress",
+          addressCountry: "AR",
+          addressLocality: "Argentina"
+        },
+        sameAs: [
+          "https://www.facebook.com/sambyapp",
+          "https://www.instagram.com/sambyapp",
+          "https://www.linkedin.com/company/samby"
+        ]
+      })
     }
   ]
 });

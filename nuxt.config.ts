@@ -37,9 +37,73 @@ export default defineNuxtConfig({
     "/blocked": { ssr: false }
   },
 
-  // @ts-ignore
   pwa: {
-    /* your pwa options */
+    registerType: "autoUpdate",
+    workbox: {
+      // globPatterns: ["**/*.{js,css,html,png,svg,ico,webp,jpg,jpeg}"],
+      // navigateFallback: "/spa-loading-template.html"
+      // runtimeCaching: [
+      //   {
+      //     urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*$/,
+      //     handler: "NetworkFirst",
+      //     options: {
+      //       cacheName: "firestore-cache",
+      //       expiration: {
+      //         maxEntries: 10,
+      //         maxAgeSeconds: 300 // 5 minutes
+      //       }
+      //     }
+      //   },
+      //   {
+      //     urlPattern: /^https:\/\/.*\.firebaseapp\.com\/.*$/,
+      //     handler: "NetworkFirst",
+      //     options: {
+      //       cacheName: "firebase-cache",
+      //       expiration: {
+      //         maxEntries: 10,
+      //         maxAgeSeconds: 300
+      //       }
+      //     }
+      //   }
+      // ]
+    },
+    manifest: {
+      name: "Samby - Gestión para fruterías y verdulerías",
+      short_name: "Samby",
+      description: "Sistema de gestión integral para fruterías y verdulerías en Argentina",
+      theme_color: "#22c55e",
+      background_color: "#ffffff",
+      display: "standalone",
+      orientation: "portrait",
+      scope: "/",
+      start_url: "/",
+      lang: "es-AR",
+      categories: ["business", "productivity", "utilities"],
+      icons: [
+        {
+          src: "/new-logo-192.png",
+          sizes: "192x192",
+          type: "image/png"
+        },
+        {
+          src: "/new-logo-512.png",
+          sizes: "512x512",
+          type: "image/png"
+        },
+        {
+          src: "/new-logo-512.png",
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "any maskable"
+        }
+      ]
+    },
+    devOptions: {
+      enabled: false,
+      suppressWarnings: true,
+      navigateFallbackAllowlist: [/^\/$/, /^\/funcionalidades$/, /^\/precios$/, /^\/contacto$/],
+      type: "module"
+    }
   },
 
   modules: [
@@ -48,7 +112,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@nuxtjs/google-fonts",
     "@pinia/nuxt",
-    // "@vite-pwa/nuxt",
+    "@vite-pwa/nuxt",
     "unplugin-icons/nuxt",
     "@formkit/nuxt"
   ],

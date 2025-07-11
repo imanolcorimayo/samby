@@ -1,9 +1,9 @@
 <template>
   <div class="min-h-screen">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-b from-primary/10 to-white pt-16 pb-20">
+    <section class="bg-gradient-to-b from-primary/10 to-white pt-16 pb-20" aria-labelledby="hero-heading">
       <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+        <h1 id="hero-heading" class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
           Funcionalidades diseñadas para <span class="text-primary">fruterías y verdulerías</span>
         </h1>
         <p class="text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
@@ -11,12 +11,12 @@
           negocio de productos frescos.
         </p>
       </div>
-    </div>
+    </section>
 
     <!-- Core Features Section -->
-    <div class="py-16 bg-white">
+    <section class="py-16 bg-white" aria-labelledby="core-features-heading">
       <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">Soluciones completas para tu negocio</h2>
+        <h2 id="core-features-heading" class="text-3xl font-bold text-center mb-12">Soluciones completas para tu negocio</h2>
 
         <div class="grid md:grid-cols-2 gap-8">
           <!-- Inventory Management -->
@@ -140,12 +140,12 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Additional Features -->
-    <div class="py-16 bg-gray-50">
+    <section class="py-16 bg-gray-50" aria-labelledby="additional-features-heading">
       <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">Características adicionales</h2>
+        <h2 id="additional-features-heading" class="text-3xl font-bold text-center mb-12">Características adicionales</h2>
 
         <div class="grid md:grid-cols-3 gap-8">
           <!-- Suppliers Management -->
@@ -185,12 +185,12 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Platform Benefits -->
-    <div class="py-16 bg-white">
+    <section class="py-16 bg-white" aria-labelledby="benefits-heading">
       <div class="container mx-auto px-4 max-w-5xl">
-        <h2 class="text-3xl font-bold text-center mb-12">¿Por qué elegir Samby?</h2>
+        <h2 id="benefits-heading" class="text-3xl font-bold text-center mb-12">¿Por qué elegir Samby?</h2>
 
         <div class="grid md:grid-cols-2 gap-6 md:gap-12">
           <div class="flex items-start md:mb-8">
@@ -246,12 +246,12 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- CTA Section -->
-    <div class="py-16 bg-primary/10">
+    <section class="py-16 bg-primary/10" aria-labelledby="cta-heading">
       <div class="container mx-auto px-4 text-center">
-        <h2 class="text-3xl font-bold mb-6">¿Listo para transformar tu frutería o verdulería?</h2>
+        <h2 id="cta-heading" class="text-3xl font-bold mb-6">¿Listo para transformar tu frutería o verdulería?</h2>
         <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
           Únete a cientos de negocios de productos frescos en Argentina que ya han mejorado su gestión con Samby.
         </p>
@@ -264,7 +264,7 @@
           </NuxtLink>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
@@ -288,17 +288,127 @@ const startFreeTrial = () => {
 
 // Page metadata
 useHead({
-  title: "Funcionalidades - Samby",
+  title: "Funcionalidades - Sistema de gestión para fruterías y verdulerías | Samby",
   meta: [
     {
       name: "description",
       content:
-        "Descubre las funcionalidades de Samby diseñadas específicamente para fruterías y verdulerías: control de inventario perecedero, gestión de pedidos, mapeo de clientes y análisis de rentabilidad."
+        "Descubre las funcionalidades completas de Samby: control de inventario perecedero, gestión de pedidos frescos, mapeo de clientes, análisis de rentabilidad, optimización de entregas y gestión de empleados para fruterías y verdulerías."
     },
     {
       name: "keywords",
       content:
-        "funcionalidades samby, control inventario, gestión pedidos, gestión clientes, análisis reportes, fruterías, verdulerías, productos frescos, perecederos"
+        "funcionalidades samby, control inventario perecedero, gestión pedidos frescos, mapeo clientes, análisis rentabilidad, optimización entregas, gestión empleados, fruterías, verdulerías, productos frescos, sistema gestión argentina"
+    },
+    {
+      property: "og:title",
+      content: "Funcionalidades completas para fruterías y verdulerías - Samby"
+    },
+    {
+      property: "og:description",
+      content:
+        "Control de inventario perecedero, gestión de pedidos frescos, mapeo de clientes y análisis de rentabilidad. Todas las herramientas que necesitas para optimizar tu frutería o verdulería."
+    },
+    {
+      property: "og:image",
+      content: "/img/home-service.png"
+    },
+    {
+      property: "og:type",
+      content: "website"
+    },
+    {
+      property: "og:locale",
+      content: "es_AR"
+    },
+    {
+      name: "twitter:card",
+      content: "summary_large_image"
+    },
+    {
+      name: "twitter:title",
+      content: "Funcionalidades completas para fruterías y verdulerías - Samby"
+    },
+    {
+      name: "twitter:description",
+      content:
+        "Control de inventario perecedero, gestión de pedidos frescos, mapeo de clientes y análisis de rentabilidad para fruterías y verdulerías."
+    },
+    {
+      name: "twitter:image",
+      content: "/img/home-service.png"
+    },
+    {
+      name: "robots",
+      content: "index, follow"
+    },
+    {
+      name: "author",
+      content: "Samby"
+    },
+    {
+      name: "geo.region",
+      content: "AR"
+    },
+    {
+      name: "geo.country",
+      content: "Argentina"
+    },
+    {
+      name: "language",
+      content: "Spanish"
+    }
+  ],
+  link: [
+    {
+      rel: "canonical",
+      href: "https://samby.com.ar/funcionalidades"
+    }
+  ],
+  script: [
+    {
+      type: "application/ld+json",
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: "Funcionalidades - Samby",
+        description: "Funcionalidades completas del sistema de gestión para fruterías y verdulerías",
+        url: "https://samby.com.ar/funcionalidades",
+        mainEntity: {
+          "@type": "SoftwareApplication",
+          name: "Samby",
+          description: "Sistema de gestión integral para fruterías y verdulerías",
+          featureList: [
+            "Control de inventario perecedero",
+            "Gestión de pedidos frescos",
+            "Mapeo geográfico de clientes",
+            "Análisis de rentabilidad",
+            "Optimización de entregas",
+            "Gestión de empleados",
+            "Gestión de proveedores",
+            "Reportes y análisis avanzados"
+          ],
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web"
+        },
+        breadcrumb: {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Inicio",
+              item: "https://samby.com.ar"
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Funcionalidades",
+              item: "https://samby.com.ar/funcionalidades"
+            }
+          ]
+        }
+      })
     }
   ]
 });
