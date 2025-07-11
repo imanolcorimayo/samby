@@ -285,27 +285,28 @@
 </template>
 
 <script setup>
-const mobileMenuOpen = ref(false);
-const user = ref(null);
+import { onAuthStateChanged } from 'firebase/auth'
 
-// Check if user is logged in
-onMounted(async () => {
-  user.value = await getCurrentUser();
+const mobileMenuOpen = ref(false)
+const user = ref(null)
 
-  console.log("User logged in:", user.value);
-});
+// Check if user is logged in (client-side only)
+onMounted(() => {
+  if (process.client) {
+    const { $firebase } = useNuxtApp()
+    
+    if ($firebase?.auth) {
+      // Listen for auth state changes
+      onAuthStateChanged($firebase.auth, (authUser) => {
+        user.value = authUser
+        console.log("Auth state changed:", authUser?.email || 'No user')
+      })
+    }
+  }
+})
 
 // Computed properties for authentication state
-const isLoggedIn = computed(() => !!user.value);
-const userName = computed(() => user.value?.displayName || user.value?.email?.split("@")[0] || "Usuario");
-const userImage = computed(() => user.value?.photoURL);
-
-// Watch for auth state changes
-watch(
-  async () => await getCurrentUser(),
-  (newUser) => {
-    user.value = newUser;
-  },
-  { immediate: true }
-);
+const isLoggedIn = computed(() => !!user.value)
+const userName = computed(() => user.value?.displayName || user.value?.email?.split("@")[0] || "Usuario")
+const userImage = computed(() => user.value?.photoURL)
 </script>

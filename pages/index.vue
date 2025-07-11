@@ -265,27 +265,22 @@ import HeroiconsCheckCircle from "~icons/heroicons/check-circle";
 
 import { useABTestingStore } from "~/stores/abTesting";
 
-// Initialize the AB testing store
-const abTestingStore = useABTestingStore();
-// Get current testing group
-const testingGroup = computed(() => abTestingStore.testingGroup);
+// Initialize testing group on client-side only
+const testingGroup = ref("A"); // Default to A for SSR
 
 // Scroll to features section
 const scrollToFeatures = () => {
-  document.getElementById("features").scrollIntoView({
-    behavior: "smooth"
-  });
+  if (process.client) {
+    document.getElementById("features").scrollIntoView({
+      behavior: "smooth"
+    });
+  }
 };
 
 // Start free trial
 const startFreeTrial = () => {
   navigateTo("/welcome");
 };
-
-onMounted(async () => {
-  // Initialize testing group from store
-  await abTestingStore.initializeTestingGroup();
-});
 
 // SEO metadata
 useHead({

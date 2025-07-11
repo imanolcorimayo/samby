@@ -37,11 +37,13 @@ export const useABTestingStore = defineStore("abTesting", {
       return cookies.value as TestingGroup | null;
     },
 
-    // Save testing group to Firestore
+    // Save testing group to Firestore (client-side only)
     async saveGroupToFirestore(userId: string, group: TestingGroup) {
-      const db = useFirestore();
-
+      if (!process.client) return false;
+      
       try {
+        const db = useFirestore();
+        
         // Check if user already has a testing group assigned
         const userGroupsRef = collection(db, "userTestingGroups");
         const userGroupQuery = query(userGroupsRef, where("userUid", "==", userId), limit(1));
@@ -87,21 +89,27 @@ export const useABTestingStore = defineStore("abTesting", {
       return group;
     },
 
-    // Set up a watcher to save the testing group when a user logs in
+    // Set up a watcher to save the testing group when a user logs in (client-side only)
     setupUserWatcher() {
-      const user = useCurrentUser();
+      if (!process.client) return;
+      
+      try {
+        const user = useCurrentUser();
 
-      // Watch for changes in user authentication state
-      watch(
-        user,
-        async (newUser) => {
-          if (newUser && this.testingGroup) {
-            // User logged in and we have a testing group, save to Firestore
-            await this.saveGroupToFirestore(newUser.uid, this.testingGroup);
-          }
-        },
-        { immediate: true }
-      );
+        // Watch for changes in user authentication state
+        watch(
+          user,
+          async (newUser) => {
+            if (newUser && this.testingGroup) {
+              // User logged in and we have a testing group, save to Firestore
+              await this.saveGroupToFirestore(newUser.uid, this.testingGroup);
+            }
+          },
+          { immediate: true }
+        );
+      } catch (error) {
+        console.error("Error setting up user watcher:", error);
+      }
     }
   }
 });

@@ -12,7 +12,30 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css", "~/assets/css/style.css", "vue3-toastify/dist/index.css"],
 
-  ssr: false,
+  routeRules: {
+    // Static pages for SEO (prerendered at build time)
+    "/contacto": { prerender: true },
+    "/nosotros": { prerender: true },
+    "/precios": { prerender: true },
+    "/funcionalidades": { prerender: true },
+    "/politicas-de-privacidad": { prerender: true },
+    "/terminos-y-condiciones": { prerender: true },
+
+    "/": { ssr: true },
+
+    // Login page, no need to prerender
+    "/welcome": { ssr: false },
+
+    // App pages as SPA for Firebase compatibility
+    "/resumen/**": { ssr: false },
+    "/pedidos/**": { ssr: false },
+    "/clientes/**": { ssr: false },
+    "/inventario/**": { ssr: false },
+    "/empleados/**": { ssr: false },
+    "/proveedores/**": { ssr: false },
+    "/negocios/**": { ssr: false },
+    "/blocked": { ssr: false }
+  },
 
   // @ts-ignore
   pwa: {
@@ -24,7 +47,6 @@ export default defineNuxtConfig({
     "dayjs-nuxt",
     "@vueuse/nuxt",
     "@nuxtjs/google-fonts",
-    "nuxt-vuefire",
     "@pinia/nuxt",
     // "@vite-pwa/nuxt",
     "unplugin-icons/nuxt",
@@ -45,26 +67,17 @@ export default defineNuxtConfig({
     }
   },
 
-  vuefire: {
-    // ensures the auth module is enabled
-    auth: {
-      enabled: true
-    },
-    config: {
-      apiKey: process.env.FIREBASE_API_KEY,
-      authDomain: `${process.env.FIREBASE_PROJECT_ID}.firebaseapp.com`,
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
-      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.FIREBASE_APP_ID
-    }
-  },
-
   runtimeConfig: {
     public: {
       env: process.env.ENVIRONMENT,
       cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
-      cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET
+      cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
+      firebaseApiKey: process.env.FIREBASE_API_KEY,
+      firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
+      firebaseAuthDomain: `${process.env.FIREBASE_PROJECT_ID}.firebaseapp.com`,
+      firebaseStorageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
+      firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      firebaseAppId: process.env.FIREBASE_APP_ID
     }
   }
 });

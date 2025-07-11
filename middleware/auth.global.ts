@@ -9,7 +9,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     "/nosotros", // Company information
     "/contacto", // Contact forms
     "/welcome", // Login page (to be renamed to /login eventually)
-    "/blocked" // Access restriction page
+    "/blocked", // Access restriction page
+    "/politicas-de-privacidad", // Privacy policy
+    "/terminos-y-condiciones" // Terms and conditions
   ];
 
   // Check if the current route is a public route
@@ -17,52 +19,57 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const isPublicRoute = publicRoutes.some((route) => to.path === route || to.path.startsWith(`${route}/`));
 
   // Allow access to public routes without authentication
-  if (isPublicRoute || import.meta.server) return;
-
-  const user = await getCurrentUser();
-  const indexStore = useIndexStore();
-
-  // Redirect to sign-in for private routes without authentication
-  if (!user) {
-    return navigateTo({
-      path: "/welcome", // Will become /login in the future
-      query: {
-        redirect: to.fullPath
-      }
-    });
+  if (isPublicRoute) {
+    return;
   }
 
-  // Only enforce business selection for non-public pages
-  const businessId = useLocalStorage("cBId", null);
-  if (to.path !== "/negocios" && !businessId.value) {
-    return navigateTo("/negocios");
-  }
+  // Only check auth on client side
+  if (import.meta.client) {
+    const user = await getCurrentUser();
+    const indexStore = useIndexStore();
 
-  try {
-    // Update in store to manage roles globally
-    const userRole = await indexStore.updateUserRole();
+    // Redirect to sign-in for private routes without authentication
+    if (!user) {
+      return navigateTo({
+        path: "/welcome",
+        query: {
+          redirect: to.fullPath
+        }
+      });
+    }
 
-    if (!userRole && to.path !== "/negocios") {
-      useToast(
-        ToastEvents.error,
-        "No tienes permisos para acceder a esta sección. Elegí un negocio para continuar. Contactate con soporte si tenés problemas."
-      );
+    // Only enforce business selection for non-public pages
+    const businessId = useLocalStorage("cBId", null);
+    if (to.path !== "/negocios" && !businessId.value) {
       return navigateTo("/negocios");
     }
 
-    // Routes accessible to both owners and employees
-    const allowedRoutes = ["/pedidos", "/blocked", "/404", "/negocios"];
+    try {
+      // Update in store to manage roles globally
+      const userRole = await indexStore.updateUserRole();
 
-    if (userRole === "propietario" || allowedRoutes.includes(to.path)) {
-      return;
+      if (!userRole && to.path !== "/negocios") {
+        useToast(
+          ToastEvents.error,
+          "No tienes permisos para acceder a esta sección. Elegí un negocio para continuar. Contactate con soporte si tenés problemas."
+        );
+        return navigateTo("/negocios");
+      }
+
+      // Routes accessible to both owners and employees
+      const allowedRoutes = ["/pedidos", "/blocked", "/404", "/negocios"];
+
+      if (userRole === "propietario" || allowedRoutes.includes(to.path)) {
+        return;
+      }
+
+      useToast(
+        ToastEvents.error,
+        "No tienes permisos para acceder a esta sección. Contactate con soporte si tenés problemas."
+      );
+      return navigateTo("/pedidos");
+    } catch (error) {
+      console.error("ERROR ", error);
     }
-
-    useToast(
-      ToastEvents.error,
-      "No tienes permisos para acceder a esta sección. Contactate con soporte si tenés problemas."
-    );
-    return navigateTo("/pedidos");
-  } catch (error) {
-    console.error("ERROR ", error);
   }
 });

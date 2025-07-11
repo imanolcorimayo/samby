@@ -37,3 +37,4 @@ yarn.lock
 /scripts/export-prod-to-develop.js
 
 /scripts/tests/*
+service-account.json
