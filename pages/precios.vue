@@ -49,7 +49,7 @@
                 </li>
                 <li class="flex items-start">
                   <HeroiconsCheckCircle class="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" />
-                  <span>Gestión de proveedores</span>
+                  <span>Gestión de proveedores (máx. 10 proveedores)</span>
                 </li>
                 <li class="flex items-start">
                   <HeroiconsCheckCircle class="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" />
@@ -164,6 +164,11 @@
               <tr class="hover:bg-gray-50">
                 <td class="p-4 border-b border-gray-200 font-medium">Gestión de clientes</td>
                 <td class="p-4 border-b border-gray-200 text-center">Máx. 20</td>
+                <td class="p-4 border-b border-primary/30 text-center bg-primary/5">Ilimitados</td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="p-4 border-b border-gray-200 font-medium">Gestión de proveedores</td>
+                <td class="p-4 border-b border-gray-200 text-center">Máx. 10</td>
                 <td class="p-4 border-b border-primary/30 text-center bg-primary/5">Ilimitados</td>
               </tr>
               <tr class="hover:bg-gray-50">

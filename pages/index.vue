@@ -101,6 +101,10 @@
                     <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
                     Hasta 20 clientes
                   </li>
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Hasta 10 proveedores
+                  </li>
                 </ul>
                 <button
                   @click="startFreeTrial"
@@ -110,10 +114,10 @@
                 </button>
               </div>
             </div>
-            
+
             <!-- Plan Profesional -->
             <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary">
-              <div class="p-6 bg-primary/10">
+              <div class="p-6 bg-primary/10 h-full">
                 <div class="flex justify-between items-start mb-2">
                   <h3 class="text-2xl font-bold">Plan Profesional</h3>
                   <span class="bg-primary text-white text-xs font-bold py-1 px-2 rounded">RECOMENDADO</span>
@@ -134,6 +138,10 @@
                     <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
                     Análisis avanzados
                   </li>
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Multiples negocios
+                  </li>
                 </ul>
                 <button
                   @click="startFreeTrial"
@@ -144,11 +152,9 @@
               </div>
             </div>
           </div>
-          
+
           <div class="mt-8">
-            <NuxtLink to="/precios" class="text-primary font-semibold hover:underline"
-              >Ver todos los planes →</NuxtLink
-            >
+            <NuxtLink to="/precios" class="text-primary font-semibold hover:underline">Ver todos los planes →</NuxtLink>
           </div>
         </div>
       </section>
@@ -270,6 +276,10 @@
                     <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
                     Hasta 20 clientes
                   </li>
+                  <li class="flex items-center">
+                    <HeroiconsCheckCircle class="h-5 w-5 text-primary mr-2" />
+                    Hasta 10 proveedores
+                  </li>
                 </ul>
                 <button
                   @click="startFreeTrial"
@@ -279,7 +289,7 @@
                 </button>
               </div>
             </div>
-            
+
             <!-- Plan Profesional -->
             <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary">
               <div class="p-6 bg-primary/10">
@@ -313,11 +323,9 @@
               </div>
             </div>
           </div>
-          
+
           <div class="mt-8">
-            <NuxtLink to="/precios" class="text-primary font-semibold hover:underline"
-              >Ver todos los planes →</NuxtLink
-            >
+            <NuxtLink to="/precios" class="text-primary font-semibold hover:underline">Ver todos los planes →</NuxtLink>
           </div>
         </div>
       </section>
