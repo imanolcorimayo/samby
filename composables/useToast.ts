@@ -2,7 +2,6 @@ import { toast } from "vue3-toastify";
 import type { ToastEvents } from "~/interfaces";
 
 enum Methods {
-  "sendMail",
   "goSignUp",
   "goHome"
 }
@@ -52,10 +51,6 @@ export const useToast = async (type: ToastEvents, message: string, method: Metho
 };
 
 const methods = {
-  sendMail: () => {
-    //@ts-ignore
-    window.open("mailto:imanolcorimayotest@gmail.com", "_blank").focus();
-  },
   goSignUp: async () => {
     return await navigateTo("/sign-up");
   },

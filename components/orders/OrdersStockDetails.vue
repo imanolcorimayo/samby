@@ -91,8 +91,7 @@ const finalList = computed(() => {
 // ----- Define Methods -----
 function sendListMessage() {
   // Clean the client's phone number to contain only numbers
-  // const phone = 3513545369; // Meli's number
-  const phone = indexStore.currentBusiness.phone; // Meli's number
+  const phone = indexStore.currentBusiness.phone;
 
   if (!phone) {
     useToast(
