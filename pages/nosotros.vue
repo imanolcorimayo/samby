@@ -226,7 +226,7 @@ import HeroiconsArrowsRightLeft from "~icons/heroicons/arrows-right-left";
 
 // Methods
 const startFreeTrial = () => {
-  navigateTo("/welcome");
+  navigateTo("/welcome?redirect=/negocios");
 };
 
 // Page metadata

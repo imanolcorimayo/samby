@@ -287,8 +287,8 @@ import HeroiconsXCircle from "~icons/heroicons/x-circle";
 const startFreeTrial = (plan) => {
   // TODO: Future analytics tracking for plan selection
 
-  // Navigate to welcome/signup page
-  navigateTo("/welcome?plan=" + (plan || "gratuito"));
+  // Navigate to welcome page, then redirect to negocios after login
+  navigateTo("/welcome?redirect=/negocios&plan=" + (plan || "gratuito"));
 };
 
 // Page metadata

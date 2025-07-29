@@ -4,28 +4,99 @@
     <ModalStructure ref="mainModal">
       <template #header>
         <div class="flex flex-col gap-2 w-full">
-          <span class="font-semibold text-xl">Ingresar a un negocio</span>
-          <span class="text-gray-500">Ingresa a un negocio usando el codigo que te provea el propietario</span>
+          <span class="font-semibold text-xl">Unirte a un negocio</span>
+          <span class="text-gray-500"
+            >Ingresa el código de invitación que te proporcionó el propietario del negocio</span
+          >
         </div>
       </template>
       <template #default>
-        <input v-model="joinBusinessCode" type="text" placeholder="Agrega el codigo y apreta continuar" />
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Código de invitación</label>
+            <input
+              v-model="joinBusinessCode"
+              type="text"
+              placeholder="Ejemplo: BUSINESS-1234"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          </div>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              <div class="text-sm text-blue-700">
+                <p class="font-medium mb-1">¿No tienes un código?</p>
+                <p>
+                  Solicita al propietario del negocio que te envíe el código de invitación desde la sección de
+                  empleados.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </template>
       <template #footer>
-        <button
-          @click="joinBusiness"
-          class="btn bg-secondary text-nowrap ring-1 ring-primary hover:bg-primary hover:text-white"
-        >
-          Continuar
-        </button>
+        <div class="flex gap-2 justify-end">
+          <button @click="mainModal.closeModal()" class="btn bg-gray-100 text-gray-700 hover:bg-gray-200">
+            Cancelar
+          </button>
+          <button
+            @click="joinBusiness"
+            :disabled="!joinBusinessCode?.trim()"
+            class="btn bg-primary text-white hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Unirme al negocio
+          </button>
+        </div>
       </template>
     </ModalStructure>
+    <!-- Welcome Banner for New Users -->
+    <div
+      v-if="!indexStore.businesses.length"
+      class="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg p-6 mb-6"
+    >
+      <div class="flex items-start gap-4">
+        <div class="bg-primary/20 rounded-full p-3">
+          <MageShopFill class="text-primary text-2xl" />
+        </div>
+        <div class="flex-1">
+          <h2 class="text-xl font-semibold text-gray-900 mb-2">¡Bienvenido a Samby!</h2>
+          <p class="text-gray-700 mb-4">
+            Para comenzar a usar Samby, necesitas crear tu primer negocio o unirte a uno existente.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button
+              @click="newOrUpdateBusiness.showModal()"
+              class="btn bg-primary text-white flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium"
+            >
+              <IcRoundPlus class="text-lg" />
+              Crear mi primer negocio
+            </button>
+            <button
+              @click="mainModal.showModal()"
+              class="btn bg-white border border-gray-300 text-gray-700 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium hover:bg-gray-50"
+            >
+              <IcRoundPlus class="text-lg" />
+              Unirme con código
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="flex justify-between items-center">
       <div class="flex flex-col items-start">
-        <h1 class="text-start font-semibold">Negocios</h1>
-        <span class="text-gray-500">Administra tus negocios y/o empleos</span>
+        <h1 class="text-start font-semibold">Mis Negocios</h1>
+        <span class="text-gray-500" v-if="indexStore.businesses.length">Administra tus negocios y empleos</span>
+        <span class="text-gray-500" v-else>Aún no tienes negocios registrados</span>
       </div>
-      <div class="flex gap-2">
+      <div class="flex gap-2" v-if="indexStore.businesses.length">
         <button
           @click="newOrUpdateBusiness.showModal()"
           class="btn bg-primary text-white flex items-center text-nowrap h-fit"
@@ -83,8 +154,34 @@
         </div>
       </div>
     </div>
-    <div class="flex justify-center align-center" v-else>
-      <span class="font-semibold">No tenes ningun negocio todavía. Creá o unite a un negocio existente</span>
+    <!-- Instructions for New Users -->
+    <div class="text-center py-12" v-else>
+      <div class="bg-white rounded-lg border border-gray-200 p-8 max-w-md mx-auto">
+        <div class="mb-6">
+          <div class="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <MageShopFill class="text-gray-400 text-2xl" />
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">¿Qué quieres hacer?</h3>
+          <p class="text-gray-600 text-sm">Elige una opción para comenzar a usar Samby</p>
+        </div>
+
+        <div class="space-y-3">
+          <button
+            @click="newOrUpdateBusiness.showModal()"
+            class="w-full btn bg-primary text-white flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium"
+          >
+            <IcRoundPlus class="text-lg" />
+            Crear nuevo negocio
+          </button>
+          <button
+            @click="mainModal.showModal()"
+            class="w-full btn bg-white border border-gray-300 text-gray-700 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium hover:bg-gray-50"
+          >
+            <IcRoundPlus class="text-lg" />
+            Unirme a negocio existente
+          </button>
+        </div>
+      </div>
     </div>
 
     <ConfirmDialogue ref="confirmDialogue" />
@@ -145,6 +242,6 @@ async function leaveBusiness(businessId) {
 }
 
 useHead({
-  title: "Lista de pedidos"
+  title: "Mis Negocios - Samby"
 });
 </script>

@@ -25,10 +25,10 @@
           <div class="flex items-center gap-4">
             <!-- Show when not logged in -->
             <template v-if="!isLoggedIn">
-              <NuxtLink to="/welcome" class="hidden lg:inline-block text-gray-600 hover:text-primary"
+              <NuxtLink to="/welcome?redirect=/negocios" class="hidden lg:inline-block text-gray-600 hover:text-primary"
                 >Iniciar sesión</NuxtLink
               >
-              <NuxtLink to="/welcome" class="btn bg-primary text-white px-4 py-2 rounded-lg">Prueba gratis</NuxtLink>
+              <NuxtLink to="/welcome?redirect=/negocios" class="btn bg-primary text-white px-4 py-2 rounded-lg">Prueba gratis</NuxtLink>
             </template>
 
             <!-- Show when logged in -->
@@ -130,7 +130,7 @@
             </div>
           </template>
           <template v-else>
-            <NuxtLink to="/welcome" class="block py-2 text-gray-600 hover:text-primary">Iniciar sesión</NuxtLink>
+            <NuxtLink to="/welcome?redirect=/negocios" class="block py-2 text-gray-600 hover:text-primary">Iniciar sesión</NuxtLink>
           </template>
         </div>
       </div>

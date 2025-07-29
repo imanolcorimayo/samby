@@ -369,7 +369,7 @@ const scrollToFeatures = () => {
 
 // Start free trial
 const startFreeTrial = () => {
-  navigateTo("/welcome");
+  navigateTo("/welcome?redirect=/negocios");
 };
 
 // SEO metadata

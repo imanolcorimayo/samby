@@ -287,7 +287,7 @@ import HeroiconsHeart from "~icons/heroicons/heart";
 
 // Methods
 const startFreeTrial = () => {
-  navigateTo("/welcome");
+  navigateTo("/welcome?redirect=/negocios");
 };
 
 // Page metadata

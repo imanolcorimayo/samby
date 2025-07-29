@@ -40,7 +40,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     // Only enforce business selection for non-public pages
     const businessId = useLocalStorage("cBId", null);
-    if (to.path !== "/negocios" && !businessId.value) {
+    if (!to.path.startsWith("/negocios") && !businessId.value) {
       return navigateTo("/negocios");
     }
 
